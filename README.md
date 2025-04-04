@@ -4,6 +4,7 @@
 </div>
 
 
+
 ## 🛠 Technologies
 <p align="center">
 	<img src="https://img.shields.io/badge/TypeScript-3178C6.svg?style=flat&logo=TypeScript&logoColor=white" alt="TypeScript">
@@ -24,6 +25,38 @@
 Calendula is a calendar project inspired by Google Calendar. It is built using React and Tailwind and features a highly responsive and intuitive interface.
 
 The Calendula project is designed for convenient task and event planning. It combines a minimalist design with robust functionality, allowing users to easily manage their time while also supporting customizable color themes.
+
+
+
+## 🧑‍💻 Team
+<div>
+    <ul>
+        <li>
+            <p>🧑🏼‍💻 <a href="https://github.com/laskevych">Andrew Laskevych</a></p>
+        </li>
+        <li>
+            <p>👩🏼‍💻 <a href="https://github.com/InessaRepeshko">Inessa Repeshko</a></p>
+        </li>
+        <li>
+            <p>🧑🏻‍💻 <a href="https://github.com/vzharyi">Vadym Zharyi</a></p>
+        </li>
+    </ul>
+</div>
+
+![CleanShot 2025-04-04 at 22 09 53@2x](https://github.com/user-attachments/assets/164d1a54-6b51-4dac-a764-08872aef4e72)
+
+
+# 🌼 About "Calendula" calendar app
+Calendula is an enterprise platform that transforms time management with flexible calendars, interactive events, and team sync.
+
+Organise your day, share ideas, and streamline your workflow with easy search, notifications, and a personalised design.
+
+Here is a [link](https://docs.google.com/presentation/d/1UFsV7MbyVHJA5UCWVKEkgtV1f3Buq-kT/edit?usp=sharing) to the presentation file.</p>
+
+![CleanShot 2025-04-04 at 22 08 48@2x](https://github.com/user-attachments/assets/d7ba631f-5a18-435d-aab4-922ec6139a56)
+![CleanShot 2025-04-04 at 22 24 50@2x](https://github.com/user-attachments/assets/af5899fb-ac8d-4152-ad79-d6b3a58a2fbd)
+![CleanShot 2025-04-04 at 22 22 42@2x](https://github.com/user-attachments/assets/f8c37dbe-48a0-4d73-ba2e-b2ca3f85d47c)
+
 
 
 ## 🎯 Basic features
@@ -86,6 +119,17 @@ The Calendula project is designed for convenient task and event planning. It com
 	* Monthly calendar in the sidebar
 	* Synchronise between the monthly calendar in the sidebar and main event view
 	* Show the current day and time on the calendar
+
+
+
+## 👤 Use case diagram
+ ![Use_Case_Diagram](https://github.com/user-attachments/assets/f3d36261-01ff-45aa-b711-fc5385f250f8)
+
+
+
+## 🚚 Deployment Diagram
+![Deployment_Diagram](https://github.com/user-attachments/assets/60806da5-3964-435e-bfe4-9499c8ed97f4)
+
 
 
 ## 🚀 Get started
