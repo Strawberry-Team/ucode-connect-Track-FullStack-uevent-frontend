@@ -14,6 +14,7 @@ export default function App() {
         <Router>
             <Toaster/>
             <AuthGuard>
+
                 <Routes>
                     <Route path="/" element={<Navigate to="/calendar" replace />} />
                     <Route path="/login" element={<LoginPage/>}/>
