@@ -4,12 +4,12 @@
 @plugin "tailwindcss-animate";
 
 body {
-  overscroll-behavior: none;
+  overflow: auto;
 }
 
 
 :root {
-  --background: oklch(1 0 0);
+  --background: oklch(0.98 0.007 277.165);
   --foreground: oklch(0.145 0 0);
   --card: oklch(1 0 0);
   --card-foreground: oklch(0.145 0 0);
@@ -127,22 +127,11 @@ body {
   }
 }
 
-.custom-scroll::-webkit-scrollbar {
-  width: 6px;
+.px-custom {
+  padding-left: clamp(1rem, calc(1rem + 0.23 * (100vw - 950px)), 25rem);
+  padding-right: clamp(1rem, calc(1rem + 0.23 * (100vw - 950px)), 25rem);
 }
 
-.custom-scroll::-webkit-scrollbar-thumb {
-  background-color: #aaabb3;
-  border-radius: 9999px;
-}
-
-.custom-scroll::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-.custom-scroll::-webkit-scrollbar-button {
-  display: none;
-}
 
 @layer base {
   [data-radix-tooltip-content]::before,
