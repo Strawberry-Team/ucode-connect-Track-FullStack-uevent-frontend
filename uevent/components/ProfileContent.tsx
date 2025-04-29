@@ -327,8 +327,8 @@ const handleChangePassword = async () => {
   return (
     <>
       <Head>
-        <title>Your Profile | UEvent</title>
-        <meta name="description" content="Manage your UEvent profile" />
+        <title>Your Profile | TripUp</title>
+        <meta name="description" content="Manage your TripUp profile" />
       </Head>
 
       <ToastContainer position="bottom-right" autoClose={3000} />
@@ -344,7 +344,7 @@ const handleChangePassword = async () => {
                   <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 6v.75m0 3v.75m0 3v.75m0 3V18m-9-5.25h5.25M7.5 15h3M3.375 5.25c-.621 0-1.125.504-1.125 1.125v3.026a2.999 2.999 0 0 1 0 5.198v3.026c0 .621.504 1.125 1.125 1.125h17.25c.621 0 1.125-.504 1.125-1.125v-3.026a2.999 2.999 0 0 1 0-5.198V6.375c0-.621-.504-1.125-1.125-1.125H3.375Z" />
                 </svg>
               </div>
-              <span className="text-xl font-semibold text-white">UEvent</span>
+              <span className="text-xl font-semibold text-white">TripUp</span>
             </Link>
           </div>
           
@@ -487,7 +487,7 @@ const handleChangePassword = async () => {
                   <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 6v.75m0 3v.75m0 3v.75m0 3V18m-9-5.25h5.25M7.5 15h3M3.375 5.25c-.621 0-1.125.504-1.125 1.125v3.026a2.999 2.999 0 0 1 0 5.198v3.026c0 .621.504 1.125 1.125 1.125h17.25c.621 0 1.125-.504 1.125-1.125v-3.026a2.999 2.999 0 0 1 0-5.198V6.375c0-.621-.504-1.125-1.125-1.125H3.375Z" />
                 </svg>
               </div>
-              <span className="text-lg font-semibold text-gray-800 dark:text-white">UEvent</span>
+              <span className="text-lg font-semibold text-gray-800 dark:text-white">TripUp</span>
             </Link>
             
             <div className="flex items-center">

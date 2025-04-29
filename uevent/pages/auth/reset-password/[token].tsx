@@ -59,8 +59,8 @@ export default function ResetPassword() {
   return (
     <>
       <Head>
-        <title>Reset Password | UEvent</title>
-        <meta name="description" content="Reset your UEvent account password" />
+        <title>Reset Password | TripUp</title>
+        <meta name="description" content="Reset your TripUp account password" />
       </Head>
 
       <div className="min-h-screen flex items-center justify-center bg-neutral-50">
@@ -72,7 +72,7 @@ export default function ResetPassword() {
                   <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 6v.75m0 3v.75m0 3v.75m0 3V18m-9-5.25h5.25M7.5 15h3M3.375 5.25c-.621 0-1.125.504-1.125 1.125v3.026a2.999 2.999 0 0 1 0 5.198v3.026c0 .621.504 1.125 1.125 1.125h17.25c.621 0 1.125-.504 1.125-1.125v-3.026a2.999 2.999 0 0 1 0-5.198V6.375c0-.621-.504-1.125-1.125-1.125H3.375Z" />
                 </svg>
               </div>
-              <span className="text-xl font-semibold text-gray-800 dark:text-white">UEvent</span>
+              <span className="text-xl font-semibold text-gray-800 dark:text-white">TripUp</span>
             </Link>
           </div>
 

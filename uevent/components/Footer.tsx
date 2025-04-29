@@ -6,7 +6,7 @@ export default function Footer() {
       <div className="mx-auto max-w-7xl px-4">
         <div className="grid grid-cols-1 gap-8 md:grid-cols-4">
           <div>
-            <h3 className="text-lg font-medium text-gray-900 dark:text-white">uevent</h3>
+            <h3 className="text-lg font-medium text-gray-900 dark:text-white">TripUp</h3>
             <p className="mt-2 text-sm text-gray-600 dark:text-gray-200">
               Connect with like-minded people through events that matter to you.
             </p>
@@ -63,7 +63,7 @@ export default function Footer() {
         
         <div className="mt-8 border-t border-gray-200 dark:border-gray-800 pt-8">
           <p className="text-center text-sm text-gray-600 dark:text-gray-200">
-            &copy; {new Date().getFullYear()} uevent. All rights reserved.
+            &copy; {new Date().getFullYear()} TripUp. All rights reserved.
           </p>
         </div>
       </div>

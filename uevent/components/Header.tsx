@@ -252,7 +252,7 @@ export default function Header() {
           {/* Logo и бренд */}
           <div className="pl-4 md:pl-6">
             <Link href="/" className="text-xl font-bold text-emerald-600 hover:text-emerald-700 transition-colors">
-              uevent
+            TripUp
             </Link>
           </div>
 
@@ -536,7 +536,7 @@ export default function Header() {
           <div className="fixed inset-0 bg-black bg-opacity-50" onClick={() => setIsMobileMenuOpen(false)}></div>
           <div className="fixed right-0 top-0 h-full w-[300px] bg-white dark:bg-black shadow-lg dark:shadow-none p-5 overflow-y-auto transition transform">
             <div className="flex justify-between items-center mb-5">
-              <div className="text-xl font-bold text-emerald-600">uevent</div>
+              <div className="text-xl font-bold text-emerald-600">TripUp</div>
               <button 
                 onClick={() => setIsMobileMenuOpen(false)} 
                 className="p-2 rounded-md text-gray-600 dark:text-gray-200 hover:text-emerald-600 hover:bg-gray-100 dark:hover:bg-gray-900 focus:outline-none"

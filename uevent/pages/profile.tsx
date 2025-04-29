@@ -47,7 +47,7 @@ export default function Profile() {
     return (
       <>
         <Head>
-          <title>Loading Profile | UEvent</title>
+          <title>Loading Profile | TripUp</title>
         </Head>
         <LoadingProfile />
       </>
@@ -59,7 +59,7 @@ export default function Profile() {
     return (
       <>
         <Head>
-          <title>Loading Profile | UEvent</title>
+          <title>Loading Profile | TripUp</title>
         </Head>
         <LoadingProfile />
       </>
@@ -69,8 +69,8 @@ export default function Profile() {
   return (
     <>
       <Head>
-        <title>Your Profile | UEvent</title>
-        <meta name="description" content="Manage your UEvent profile" />
+        <title>Your Profile | TripUp</title>
+        <meta name="description" content="Manage your TripUp profile" />
       </Head>
 
       <ToastContainer position="bottom-right" autoClose={3000} />

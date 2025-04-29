@@ -155,8 +155,8 @@ const handleSubmit = async (e: React.FormEvent) => {
   return (
     <>
       <Head>
-        <title>Sign Up | UEvent</title>
-        <meta name="description" content="Create your UEvent account and start connecting with events and people" />
+        <title>Sign Up | TripUp</title>
+        <meta name="description" content="Create your TripUp account and start connecting with events and people" />
       </Head>
 
       <div className="min-h-screen flex items-center justify-center dark:bg-dark-bg">
@@ -195,7 +195,7 @@ const handleSubmit = async (e: React.FormEvent) => {
             </div>
             
             <div className="absolute bottom-4 left-4 right-4 text-center text-emerald-200 text-sm">
-              <p>&copy; {new Date().getFullYear()} UEvent. All rights reserved.</p>
+              <p>&copy; {new Date().getFullYear()} TripUp. All rights reserved.</p>
             </div>
           </div>
 
@@ -208,13 +208,13 @@ const handleSubmit = async (e: React.FormEvent) => {
     <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 6v.75m0 3v.75m0 3v.75m0 3V18m-9-5.25h5.25M7.5 15h3M3.375 5.25c-.621 0-1.125.504-1.125 1.125v3.026a2.999 2.999 0 0 1 0 5.198v3.026c0 .621.504 1.125 1.125 1.125h17.25c.621 0 1.125-.504 1.125-1.125v-3.026a2.999 2.999 0 0 1 0-5.198V6.375c0-.621-.504-1.125-1.125-1.125H3.375Z" />
   </svg>
 </div>
-                <span className="text-xl font-semibold text-gray-800 dark:text-white">UEvent</span>
+                <span className="text-xl font-semibold text-gray-800 dark:text-white">TripUp</span>
               </Link>
             </div>
 
             <div className="mb-8">
               <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">Create your account</h1>
-              <p className="text-gray-600 dark:text-gray-200">Join UEvent to discover events and meet new people</p>
+              <p className="text-gray-600 dark:text-gray-200">Join TripUp to discover events and meet new people</p>
             </div>
 
             {registrationSuccess ? (

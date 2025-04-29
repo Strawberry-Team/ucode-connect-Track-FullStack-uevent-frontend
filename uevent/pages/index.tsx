@@ -677,7 +677,7 @@ const handleFormatChange = (formatId: string) => {
   return (
     <div className="min-h-screen bg-white dark:bg-black text-gray-900 dark:text-white">
       <Head>
-        <title>uevent - Discover Events & Connect</title>
+        <title>TripUp - Discover Events & Connect</title>
         <meta name="description" content="Find exciting events, connect with like-minded people, and make the most of your time" />
         <link rel="icon" href="/favicon.ico" />
       </Head>

@@ -86,7 +86,7 @@ const groupNotificationsByDate = () => {
   return (
     <>
       <Head>
-        <title>Notifications | uevent</title>
+        <title>Notifications | TripUp</title>
       </Head>
       
       <div className="bg-gray-50 dark:bg-gray-900 min-h-screen">
