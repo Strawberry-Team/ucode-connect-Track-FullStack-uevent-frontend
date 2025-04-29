@@ -25,8 +25,8 @@ const PaymentPage: React.FC = () => {
       if (!id || typeof id !== 'string') {
         // Можно подождать или показать ошибку, если ID не пришел
         if (router.isReady) { // Ждем пока router будет готов
-             setError('Order ID is missing or invalid.');
-             setLoading(false);
+          setError('Order ID is missing or invalid.');
+          setLoading(false);
         }
         return;
       }
@@ -36,22 +36,12 @@ const PaymentPage: React.FC = () => {
       setClientSecret(null); // Сбрасываем перед новым запросом
 
       try {
-        const apiUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
         console.log(`Requesting payment init data for order ${id}`);
         // Шаг 5: Запрос на инициализацию платежа
-        
+
         const response = await paymentService.createPaymentIntent(id);
 
-        const { clientSecret: cs, publishableKey: pk, orderStatus: status } = response.data;
-        console.log(`Received payment init data: Status - ${status}`);
-        setOrderStatus(status);
-
-        // Проверяем статус заказа ПЕРЕД настройкой формы
-        if (status !== 'PENDING') {
-          setError(`This order cannot be paid. Current status: ${status}. Please create a new order.`);
-          setLoading(false);
-          return; // Не продолжаем инициализацию
-        }
+        const { clientSecret: cs, publishableKey: pk } = response;
 
         // Инициализируем Stripe Promise только один раз с полученным ключом
         if (!stripePromise && pk) {
@@ -60,7 +50,7 @@ const PaymentPage: React.FC = () => {
         }
 
         if (!cs) {
-             throw new Error('Client Secret not received from backend.');
+          throw new Error('Client Secret not received from backend.');
         }
 
         setClientSecret(cs); // Сохраняем clientSecret для Elements
@@ -75,7 +65,7 @@ const PaymentPage: React.FC = () => {
 
     // Вызываем инициализацию только когда router готов и orderId доступен
     if (router.isReady) {
-        initializePayment();
+      initializePayment();
     }
 
   }, [id, router.isReady]); // Зависим от orderId и готовности роутера
@@ -97,9 +87,9 @@ const PaymentPage: React.FC = () => {
   if (error) {
     return (
         <div>
-            <h1>Payment Error</h1>
-            <p style={{ color: 'red' }}>{error}</p>
-            {/* <Link href="/checkout">Return to Checkout</Link> Или на другую страницу */}
+          <h1>Payment Error</h1>
+          <p style={{ color: 'red' }}>{error}</p>
+          {/* <Link href="/checkout">Return to Checkout</Link> Или на другую страницу */}
         </div>
     );
   }
@@ -111,13 +101,13 @@ const PaymentPage: React.FC = () => {
 
 
   return (
-    <div>
-      <h1>Complete Payment for Order #{id}</h1>
-      <p>Order Status: {orderStatus}</p> {/* Показываем статус */}
-      <Elements options={options} stripe={stripePromise}>
-        <PaymentForm orderId={Number(id)} clientSecret={clientSecret} />
-      </Elements>
-    </div>
+      <div>
+        <h1>Complete Payment for Order #{id}</h1>
+        <p>Order Status: {orderStatus}</p> {/* Показываем статус */}
+        <Elements options={options} stripe={stripePromise}>
+          <PaymentForm orderId={Number(id)} clientSecret={clientSecret} />
+        </Elements>
+      </div>
   );
 };
 

@@ -18,9 +18,9 @@ const getAuthHeaders = () => {
 
 export const paymentService = {
 // Update an existing promo code
-async createPaymentIntent(orderId: number) {
+  async createPaymentIntent(orderId: number) {
     try {
-      const response = await axios.post(`${API_URL}/payments/stripe/payment-intents`, orderId, getAuthHeaders());
+      const response = await axios.post(`${API_URL}/payments/stripe/payment-intents`, {orderId}, getAuthHeaders());
       return response.data;
     } catch (error) {
       console.error('Error updating promo code:', error);
