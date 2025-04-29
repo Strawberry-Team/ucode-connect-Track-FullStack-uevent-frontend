@@ -409,12 +409,14 @@ export default function Header() {
                     </Link>
                     <NotificationDropdown />
                     
-                    {/* <Link href="/events/create" className="px-4 py-2 text-sm font-medium text-emerald-600 bg-white dark:bg-black border border-emerald-600 rounded-md hover:bg-emerald-50 dark:hover:bg-emerald-800/30 flex items-center gap-2">
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-                      </svg>
-                      <span>Create Event</span>
-                    </Link> */}
+                    {user && user.role === 'ADMIN' && (
+            <Link href="http://localhost:3001/admin/login" className="px-4 py-2 text-sm font-medium text-emerald-600 bg-white dark:bg-black border border-emerald-600 rounded-md hover:bg-emerald-50 dark:hover:bg-emerald-800/30 flex items-center gap-2">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+              </svg>
+              <span>Admin Panel</span>
+            </Link>
+          )} 
                   </>
                 )}
               </>
@@ -442,6 +444,7 @@ export default function Header() {
                     ) : (
                       <span className="text-lg font-medium">{getInitials(user.firstName, user.lastName)}</span>
                     )}
+                    
                   </div>
                 </button>
                 
@@ -449,6 +452,7 @@ export default function Header() {
                   <div className="absolute right-0 mt-2 w-56 bg-white dark:bg-black rounded-md shadow-lg dark:shadow-none border border-gray-200 dark:border-gray-800 z-50">
                     <div className="px-4 py-3 border-b border-gray-200 dark:border-gray-800">
                       <p className="text-sm font-medium text-gray-900 dark:text-white">{user.firstName} {user.lastName}</p>
+                      
                       <p className="text-xs text-gray-500 dark:text-gray-400 truncate">{user.email}</p>
                     </div>
                     <div className="py-1">

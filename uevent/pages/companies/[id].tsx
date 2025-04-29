@@ -267,7 +267,7 @@ const CompanyPage: React.FC = () => {
             >
               Events
             </button>
-            <button
+            {/* <button
               onClick={() => setActiveTab('testimonials')}
               className={`py-4 px-6 font-medium text-sm border-b-2 whitespace-nowrap ${
                 activeTab === 'testimonials'
@@ -276,7 +276,7 @@ const CompanyPage: React.FC = () => {
               }`}
             >
               Testimonials
-            </button>
+            </button> */}
           </div>
         </div>
       </div>

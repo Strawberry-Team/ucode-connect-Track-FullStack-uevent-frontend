@@ -3,7 +3,18 @@ import { useOrders } from '../contexts/OrderContext';
 import { useAuth } from '../contexts/AuthContext';
 import Link from 'next/link';
 import { toast } from 'react-toastify';
-
+import {
+  CheckCircle,
+  Clock,
+  XCircle,
+  CalendarDays,
+  MapPin,
+  CreditCard,
+  Ticket,
+  ChevronDown,
+  Eye,
+  AlertCircle
+} from 'lucide-react';
 // Define types based on the actual API response structure
 interface Ticket {
   id: number;
@@ -73,24 +84,28 @@ const formatTime = (dateString: string | undefined): string => {
 // Status color mapping
 const statusColors = {
   PENDING: {
-    bg: 'bg-yellow-100 dark:bg-yellow-900/30',
-    text: 'text-yellow-800 dark:text-yellow-300',
-    border: 'border-yellow-200 dark:border-yellow-800'
+    bg: 'bg-amber-100 dark:bg-amber-900/30',
+    text: 'text-amber-800 dark:text-amber-300',
+    border: 'border-amber-200 dark:border-amber-800',
+    icon: <Clock className="h-4 w-4" />
   },
-  COMPLETED: {
-    bg: 'bg-green-100 dark:bg-green-900/30',
-    text: 'text-green-800 dark:text-green-300',
-    border: 'border-green-200 dark:border-green-800'
+  PAID: {
+    bg: 'bg-emerald-100 dark:bg-emerald-900/30',
+    text: 'text-emerald-800 dark:text-emerald-300',
+    border: 'border-emerald-200 dark:border-emerald-800',
+    icon: <CheckCircle className="h-4 w-4" />
   },
   FAILED: {
     bg: 'bg-red-100 dark:bg-red-900/30',
     text: 'text-red-800 dark:text-red-300',
-    border: 'border-red-200 dark:border-red-800'
+    border: 'border-red-200 dark:border-red-800',
+    icon: <XCircle className="h-4 w-4" />
   },
-  CANCELED: {
+  CANCELLED: {
     bg: 'bg-gray-100 dark:bg-gray-800',
     text: 'text-gray-800 dark:text-gray-300',
-    border: 'border-gray-200 dark:border-gray-700'
+    border: 'border-gray-200 dark:border-gray-700',
+    icon: <XCircle className="h-4 w-4" />
   }
 };
 
@@ -374,8 +389,38 @@ const MyTicketsSection: React.FC<MyTicketsSectionProps> = ({ user }) => {
                           <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
                         </svg>
                       </div>
-                      
-                      {order.paymentStatus === 'PENDING' && (
+{(order.paymentStatus === 'PENDING' || order.paymentStatus === 'FAILED') && (
+  <div className="flex flex-col md:flex-row gap-2">
+    {/* {order.paymentStatus === 'PENDING' && (
+      <button
+        onClick={() => handleCancelOrder(order.id as number)}
+        disabled={cancelingOrderId === order.id}
+        className="mt-3 md:mt-0 inline-flex items-center justify-center px-4 py-2 border border-red-300 dark:border-red-700 text-red-700 dark:text-red-400 bg-white dark:bg-black hover:bg-red-50 dark:hover:bg-red-900/20 font-medium rounded-lg transition-colors shadow-sm dark:shadow-none"
+      >
+        {cancelingOrderId === order.id ? (
+          <>
+            <div className="animate-spin h-4 w-4 mr-2 border-2 border-red-500 rounded-full border-t-transparent"></div>
+            <span>Cancelling...</span>
+          </>
+        ) : (
+          <>
+            <XCircle className="h-4 w-4 mr-1.5" />
+            <span>Cancel Order</span>
+          </>
+        )}
+      </button>
+    )} */}
+    
+    <Link 
+      href={`/stripe/payment/${order.id}`}
+      className="mt-3 md:mt-0 inline-flex items-center justify-center px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-medium rounded-lg transition-colors shadow-sm"
+    >
+      <CreditCard className="h-4 w-4 mr-1.5" />
+      {order.paymentStatus === 'FAILED' ? 'Retry Payment' : 'Complete Payment'}
+    </Link>
+  </div>
+)}
+                      {/* {order.paymentStatus === 'PENDING' && (
                         <button
                           onClick={() => handleCancelOrder(order.id as number)}
                           disabled={cancelingOrderId === order.id}
@@ -398,7 +443,7 @@ const MyTicketsSection: React.FC<MyTicketsSectionProps> = ({ user }) => {
                             </>
                           )}
                         </button>
-                      )}
+                      )} */}
                     </div>
 
                     {/* Expanded Tickets List */}

@@ -1144,7 +1144,7 @@ const renderAttendeesModal = () => {
                   </div>
                   
                   <div className="flex flex-wrap items-center gap-3 mt-4">
-                  {(event.status !== 'CANCELLED' && event.status !== 'FINISHED') &&  (
+                  {(event.status !== 'CANCELLED' && event.status !== 'FINISHED') && user && (
   <button 
     onClick={() => setPurchaseModalOpen(true)} 
     className="px-6 py-3 bg-white text-emerald-700 hover:bg-emerald-50 rounded-lg font-semibold shadow-md flex items-center transition-colors"
@@ -1154,21 +1154,25 @@ const renderAttendeesModal = () => {
   </button>
 )}
                     
-                    <EventSubscribeButton 
-  eventId={event.id.toString()} 
-  className="ml-auto sm:ml-0"
-/>
+                    {user && (
+    <EventSubscribeButton 
+      eventId={event.id.toString()} 
+      className="ml-auto sm:ml-0"
+    />
+  )}
                     
-                    <button className="p-3 rounded-lg border border-white/30 bg-transparent text-white hover:bg-white/10 flex items-center transition-colors">
+                    {/* <button className="p-3 rounded-lg border border-white/30 bg-transparent text-white hover:bg-white/10 flex items-center transition-colors">
                       <Share2 className="w-5 h-5" />
-                    </button>
+                    </button> */}
                     
-                    <Link
-                      href={`/events/${event.id}/edit`}
-                      className="p-3 rounded-lg border border-white/30 bg-transparent text-white hover:bg-white/10 flex items-center transition-colors"
-                    >
-                      <Edit className="w-5 h-5" />
-                    </Link>
+                    {isEventAuthor && (
+    <Link
+      href={`/events/${event.id}/edit`}
+      className="p-3 rounded-lg border border-white/30 bg-transparent text-white hover:bg-white/10 flex items-center transition-colors"
+    >
+      <Edit className="w-5 h-5" />
+    </Link>
+  )}
                   </div>
                 </div>
               </div>
@@ -1418,61 +1422,100 @@ const renderAttendeesModal = () => {
             
             {/* Right Column - Sidebar */}
             <div className="space-y-8">
-              {/* Registration/Ticket Info */}
-              <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm overflow-hidden border border-gray-100 dark:border-gray-700">
-                <div className="px-6 py-5 border-b border-gray-100 dark:border-gray-700">
-                  <h2 className="text-xl font-semibold text-gray-900 dark:text-white">Registration</h2>
-                </div>
-                <div className="p-6">
-                {event.status === 'CANCELLED' || event.status === 'FINISHED' ? (
-  <div className="text-center py-4">
-    <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-red-100 dark:bg-red-900 text-red-600 dark:text-red-300 mb-3">
-      {event.status === 'CANCELLED' ? (
-        <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-        </svg>
+              {/* Registration/Ticket Info - показывается только авторизованным пользователям */}
+{user ? (
+  <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm overflow-hidden border border-gray-100 dark:border-gray-700">
+    <div className="px-6 py-5 border-b border-gray-100 dark:border-gray-700">
+      <h2 className="text-xl font-semibold text-gray-900 dark:text-white">Registration</h2>
+    </div>
+    <div className="p-6">
+      {event.status === 'CANCELLED' || event.status === 'FINISHED' ? (
+        <div className="text-center py-4">
+          <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-red-100 dark:bg-red-900 text-red-600 dark:text-red-300 mb-3">
+            {event.status === 'CANCELLED' ? (
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            ) : (
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            )}
+          </div>
+          <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-1">
+            {event.status === 'CANCELLED' ? 'Event Cancelled' : 'Event Finished'}
+          </h3>
+          <p className="text-gray-600 dark:text-gray-400">
+            {event.status === 'CANCELLED' 
+              ? 'This event has been cancelled.' 
+              : 'This event has already taken place.'}
+          </p>
+        </div>
       ) : (
-        <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-        </svg>
+        <>
+          <div className="mb-6">
+            <div className="flex justify-between items-center mb-2">
+              <span className="text-gray-600 dark:text-gray-400">Tickets Available From</span>
+              <span className="text-gray-900 dark:text-white font-medium">{formatDate(event.ticketsAvailableFrom)}</span>
+            </div>
+            <div className="flex justify-between items-center">
+              <span className="text-gray-600 dark:text-gray-400">Type</span>
+              <span className="text-gray-900 dark:text-white font-medium">Conference Pass</span>
+            </div>
+          </div>
+          
+          <button 
+            onClick={() => setPurchaseModalOpen(true)}
+            className="w-full py-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg font-semibold transition-colors"
+          >
+            Register Now
+          </button>
+          
+          <p className="text-sm text-gray-500 dark:text-gray-400 mt-3">
+            Secure your spot at this event. Limited seats available.
+          </p>
+        </>
       )}
     </div>
-    <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-1">
-      {event.status === 'CANCELLED' ? 'Event Cancelled' : 'Event Finished'}
-    </h3>
-    <p className="text-gray-600 dark:text-gray-400">
-      {event.status === 'CANCELLED' 
-        ? 'This event has been cancelled.' 
-        : 'This event has already taken place.'}
-    </p>
   </div>
-): (
-                    <>
-                      <div className="mb-6">
-                        <div className="flex justify-between items-center mb-2">
-                          <span className="text-gray-600 dark:text-gray-400">Tickets Available From</span>
-                          <span className="text-gray-900 dark:text-white font-medium">{formatDate(event.ticketsAvailableFrom)}</span>
-                        </div>
-                        <div className="flex justify-between items-center">
-                          <span className="text-gray-600 dark:text-gray-400">Type</span>
-                          <span className="text-gray-900 dark:text-white font-medium">Conference Pass</span>
-                        </div>
-                      </div>
-                      
-                      <button 
-  onClick={() => setPurchaseModalOpen(true)}
-  className="w-full py-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg font-semibold transition-colors"
->
-  Register Now
-</button>
-                      
-                      <p className="text-sm text-gray-500 dark:text-gray-400 mt-3">
-                        Secure your spot at this event. Limited seats available.
-                      </p>
-                    </>
-                  )}
-                </div>
-              </div>
+) : (
+  /* Альтернативное сообщение для неавторизованных пользователей */
+  <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm overflow-hidden border border-gray-100 dark:border-gray-700">
+    <div className="px-6 py-5 border-b border-gray-100 dark:border-gray-700">
+      <h2 className="text-xl font-semibold text-gray-900 dark:text-white">Registration</h2>
+    </div>
+    <div className="p-6">
+      <div className="text-center py-4">
+        <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-emerald-100 dark:bg-emerald-900 text-emerald-600 dark:text-blue-300 mb-3">
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+          </svg>
+        </div>
+        <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-1">
+          Sign in to Register
+        </h3>
+        <p className="text-gray-600 dark:text-gray-400 mb-4">
+          Please sign in or create an account to register for this event.
+        </p>
+        <div className="flex justify-center space-x-3">
+          <Link 
+            href="/login" 
+            className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg font-medium transition-colors"
+          >
+            Sign In
+          </Link>
+          {/* <Link 
+            href="/sign-up" 
+            className="px-4 py-2 bg-white border border-gray-300 text-gray-700 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200 rounded-lg font-medium hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors"
+          >
+            Sign Up
+          </Link> */}
+        </div>
+      </div>
+    </div>
+  </div>
+)}
+              
               {/* <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm overflow-hidden border border-gray-100 dark:border-gray-700">
   <div className="px-6 py-5 border-b border-gray-100 dark:border-gray-700">
     <h2 className="text-xl font-semibold text-gray-900 dark:text-white">Stay Updated</h2>

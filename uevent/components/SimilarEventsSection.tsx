@@ -154,12 +154,12 @@ const SimilarEventsSection = ({ event, maxEvents = 3 }) => {
           <span className="w-1 h-6 bg-emerald-500 rounded-full mr-3"></span>
           <h2 className="text-xl font-bold text-gray-900 dark:text-white">Similar Events</h2>
         </div>
-        {similarEvents.length > 0 && (
+        {/* {similarEvents.length > 0 && (
           <Link href="/events" className="text-emerald-600 dark:text-emerald-400 text-sm font-medium hover:text-emerald-700 dark:hover:text-emerald-300 transition-colors flex items-center group">
             View all
             <ArrowRight className="ml-1 w-4 h-4 transform group-hover:translate-x-1 transition-transform" />
           </Link>
-        )}
+        )} */}
       </div>
       
       <div className="p-6">

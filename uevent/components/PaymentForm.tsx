@@ -1,4 +1,3 @@
-// src/components/PaymentForm.tsx
 import React, { useState } from 'react';
 import {
   useStripe,
@@ -7,10 +6,11 @@ import {
 } from '@stripe/react-stripe-js';
 import { StripePaymentElementOptions } from '@stripe/stripe-js';
 import { useRouter } from 'next/router';
+import { Lock, AlertCircle } from 'lucide-react';
 
 interface PaymentFormProps {
   orderId: number;
-  clientSecret: string; // Получаем как prop
+  clientSecret: string;
 }
 
 const PaymentForm: React.FC<PaymentFormProps> = ({ orderId, clientSecret }) => {
@@ -19,14 +19,14 @@ const PaymentForm: React.FC<PaymentFormProps> = ({ orderId, clientSecret }) => {
   const router = useRouter();
 
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
 
     if (!stripe || !elements) {
       console.log('Stripe.js has not loaded yet.');
-      setIsLoading(false); // Останавливаем загрузку, если Stripe не готов
+      setIsLoading(false);
       setErrorMessage("Payment system is not ready. Please wait a moment and try again.");
       return;
     }
@@ -36,35 +36,34 @@ const PaymentForm: React.FC<PaymentFormProps> = ({ orderId, clientSecret }) => {
 
     console.log(`Attempting to confirm payment for order ${orderId}`);
 
-    // Шаг 5 -> 6: Вызов confirmPayment
+    // Step 5 -> 6: Call confirmPayment
     const { error, paymentIntent } = await stripe.confirmPayment({
       elements,
       confirmParams: {
-        // URL, куда Stripe вернет пользователя после 3DS (или других действий)
-        return_url: `http://localhost:5173/orders/confirmation/${orderId}`,
+        // URL where Stripe will return the user after 3DS (or other actions)
+        return_url: `${window.location.origin}/orders/confirmation/${orderId}`,
       },
-      redirect: 'if_required', // Поведение по умолчанию
+      redirect: 'if_required', // Default behavior
     });
 
-    // Этот код выполнится ТОЛЬКО если НЕ было редиректа (ошибка или редкий успех без 3DS)
+    // This code will execute ONLY if there was NO redirect (error or rare success without 3DS)
     if (error) {
-      // Ошибки валидации карты, отклонения банком (без 3DS), проблемы сети и т.д.
+      // Card validation errors, bank rejections (without 3DS), network issues, etc.
       console.error('Stripe confirmPayment error:', error);
       setErrorMessage(error.message || 'An unexpected payment error occurred.');
-      setIsLoading(false); // Позволяем пользователю попробовать снова
+      setIsLoading(false); // Allow user to try again
     } else if (paymentIntent && paymentIntent.status === 'succeeded') {
-      // Очень редкий случай для confirmPayment с redirect: 'if_required',
-      // но если вдруг успех произошел мгновенно без 3DS.
+      // Very rare case for confirmPayment with redirect: 'if_required',
+      // but in case success happens immediately without 3DS.
       console.log('Payment succeeded immediately (no redirect). Redirecting to confirmation...');
-      // Перенаправляем на страницу подтверждения для проверки статуса бэкендом
+      // Redirect to confirmation page for backend status verification
       router.push(`/orders/confirmation/${orderId}?status=processing`);
-      // setIsLoading(false); // Не нужно, идет редирект
     } else {
-      // Если нет ошибки и нет статуса 'succeeded', и не было редиректа -
-      // это странная ситуация. Возможно, стоит показать общее сообщение.
+      // If there's no error and no 'succeeded' status, and no redirect -
+      // this is an unusual situation. Consider showing a general message.
       console.warn('Unexpected state after confirmPayment without redirect:', paymentIntent);
       setErrorMessage('Payment processing started. If you are not redirected, please check your order status.');
-      setIsLoading(false); // Позволяем пользователю видеть сообщение
+      setIsLoading(false); // Allow user to see the message
     }
   };
 
@@ -73,16 +72,56 @@ const PaymentForm: React.FC<PaymentFormProps> = ({ orderId, clientSecret }) => {
   };
 
   return (
-    <form id="payment-form" onSubmit={handleSubmit}>
-      <PaymentElement id="payment-element" options={paymentElementOptions} />
+    <form onSubmit={handleSubmit} className="space-y-4">
+      <div className="space-y-4">
+        <PaymentElement 
+          id="payment-element" 
+          options={paymentElementOptions} 
+        />
+        
+        {errorMessage && (
+          <div className="p-3 bg-red-50 dark:bg-red-900/30 rounded-lg border border-red-100 dark:border-red-800/30 mt-4">
+            <div className="flex items-start">
+              <div className="flex-shrink-0">
+                <AlertCircle className="h-4 w-4 text-red-500 dark:text-red-400" />
+              </div>
+              <div className="ml-2">
+                <div className="text-sm text-red-700 dark:text-red-300">
+                  {errorMessage}
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
 
-      <button disabled={isLoading || !stripe || !elements} id="submit" style={{ marginTop: '20px' }}>
-        <span id="button-text">
-          {isLoading ? 'Processing...' : 'Pay Now'}
-        </span>
+      <button
+        type="submit"
+        disabled={isLoading || !stripe || !elements}
+        className={`
+          relative w-full py-3 px-6 mt-4
+          bg-gradient-to-r from-emerald-600 to-green-600 hover:from-emerald-700 hover:to-green-700
+          text-white font-medium rounded-lg 
+          shadow-md shadow-emerald-500/10
+          transition-all duration-200
+          disabled:opacity-70 disabled:cursor-not-allowed
+          focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2
+        `}
+      >
+        {isLoading ? (
+          <div className="flex items-center justify-center">
+            <div className="mr-2">
+              <div className="h-4 w-4 rounded-full border-2 border-transparent border-t-white animate-spin"></div>
+            </div>
+            <span className="inline-block">Processing...</span>
+          </div>
+        ) : (
+          <div className="flex items-center justify-center">
+            <span className="inline-block mr-2">Pay Now</span>
+            <Lock className="h-4 w-4" />
+          </div>
+        )}
       </button>
-
-      {errorMessage && <div id="payment-message" style={{ color: 'red', marginTop: '10px' }}>{errorMessage}</div>}
     </form>
   );
 };
