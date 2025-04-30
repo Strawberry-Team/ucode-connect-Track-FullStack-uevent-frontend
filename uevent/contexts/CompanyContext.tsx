@@ -102,48 +102,45 @@ export const CompanyProvider: React.FC<{children: ReactNode}> = ({ children }) =
   const [viewingSpecificCompany, setViewingSpecificCompany] = useState<boolean>(false);
   // Fetch all companies owned by the current user
   const getUserCompanies = async () => {
-    if (!user) {
-      setUserCompanies([]);
-      return;
-    }
-
-    try {
-      setIsLoading(true);
-      setError(null);
-      const companies = await companyService.getUserCompanies();
-      setUserCompanies(companies);
-    } catch (error) {
-      console.error('Error fetching user companies:', error);
-      toast.error('Failed to load your companies');
-    } finally {
-      setIsLoading(false);
-    }
+    // Simply call fetchCompany which now handles both states
+    await fetchCompany();
   };
 
   // Fetch company data of the current user's primary company
   const fetchCompany = async () => {
-    resetViewingSpecificCompany();
+    // Only reset if we're actually viewing a specific company,
+    // preventing the infinite loop
+    if (viewingSpecificCompany) {
+      resetViewingSpecificCompany();
+    }
+  
     if (!user) {
       setCompany(null);
+      setUserCompanies([]);
       return;
     }
   
     try {
-      setIsLoading(true);
+      //setIsLoading(true);
       setError(null);
       const companyData = await companyService.getCompany();
-      console.log('Fetched company data:', companyData);
       
-      // Check if the response is an array and extract the first item
+      // Update both states from a single API call
       if (Array.isArray(companyData) && companyData.length > 0) {
         setCompany(companyData[0]);
-      } else {
+        setUserCompanies(companyData); // Set all companies
+      } else if (companyData) {
         setCompany(companyData);
+        setUserCompanies([companyData]); // Wrap in array
+      } else {
+        setCompany(null);
+        setUserCompanies([]);
       }
     } catch (error) {
-      // Error handling remains the same
+      // Error handling
       if (error.response && error.response.status === 404) {
         setCompany(null);
+        setUserCompanies([]);
       } else {
         setError('Failed to fetch company data');
         console.error('Error fetching company:', error);
@@ -451,15 +448,14 @@ export const CompanyProvider: React.FC<{children: ReactNode}> = ({ children }) =
   };
   // Load user data when user changes
   // В существующем useEffect
-useEffect(() => {
-  if (user && !viewingSpecificCompany) { 
-    fetchCompany();
-    getUserCompanies();
-  } else if (!user) {
-    resetCompanyState();
-    setUserCompanies([]);
-  }
-}, [user, viewingSpecificCompany]);
+  useEffect(() => {
+    if (user && !viewingSpecificCompany) { 
+      fetchCompany(); // Just call this single function
+    } else if (!user) {
+      resetCompanyState();
+      setUserCompanies([]);
+    }
+  }, [user, viewingSpecificCompany]);
   // Load company news when company changes
   useEffect(() => {
     if (company?.id) {

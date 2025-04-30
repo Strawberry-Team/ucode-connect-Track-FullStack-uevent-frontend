@@ -17,9 +17,9 @@ export const EventBasicInfoSchema = z.object({
     .min(1, { message: "Venue is required" })
     .max(200, { message: "Venue name is too long (max 200 characters)" }),
   
-  locationCoordinates: z
-    .string()
-    .optional(),
+    locationCoordinates: z.string().regex(/^-?\d+(\.\d+)?,-?\d+(\.\d+)?$/, {
+      message: "Coordinates must be in format 'latitude,longitude'"
+    }),
   
   startedAt: z
     .string()

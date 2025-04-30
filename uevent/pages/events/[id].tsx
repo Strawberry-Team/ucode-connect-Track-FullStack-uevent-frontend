@@ -18,6 +18,7 @@ import CompanyEventsSection from '../../components/CompanyEventsSection';
 import SimilarEventsSection from '../../components/SimilarEventsSection';
 import { usePromoCodes } from '../../contexts/PromoCodeContext';
 import { useOrders } from '../../contexts/OrderContext';
+import EventLocationMap from '../../components/EventLocationMap';
 
 import DisqusComments from "../../components/DisqusComments";
 import { X, Plus, Minus, Check, AlertCircle, CreditCard } from 'lucide-react';
@@ -1223,46 +1224,38 @@ const renderAttendeesModal = () => {
               </div>
               
               {/* Location */}
-              <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm overflow-hidden border border-gray-100 dark:border-gray-700">
-                <div className="px-6 py-5 border-b border-gray-100 dark:border-gray-700">
-                  <h2 className="text-xl font-semibold text-gray-900 dark:text-white">Location</h2>
-                </div>
-                <div className="p-6">
-                  <div className="flex items-start mb-4">
-                    <MapPin className="w-5 h-5 mr-2 text-emerald-500 flex-shrink-0 mt-1" />
-                    <div>
-                      <h3 className="font-medium text-gray-900 dark:text-white">{event.venue}</h3>
-                      <p className="text-gray-600 dark:text-gray-400 text-sm">{event.locationCoordinates}</p>
-                    </div>
-                  </div>
-                  
-                  {/* Map Placeholder */}
-                  <div className="aspect-video bg-gray-100 dark:bg-gray-700 rounded-lg overflow-hidden">
-                    <iframe 
-                      width="100%" 
-                      height="100%" 
-                      frameBorder="0" 
-                      scrolling="no" 
-                      marginHeight="0" 
-                      marginWidth="0" 
-                      src={`https://www.openstreetmap.org/export/embed.html?bbox=${event.locationCoordinates.split(',')[1]},${event.locationCoordinates.split(',')[0]}&layer=mapnik&marker=${event.locationCoordinates.split(',')[0]},${event.locationCoordinates.split(',')[1]}`} 
-                      style={{ border: 0 }}
-                    ></iframe>
-                  </div>
-                  
-                  <div className="mt-4">
-                    <a 
-                      href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(event.locationCoordinates)}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center text-emerald-600 hover:text-emerald-700 dark:text-emerald-400 dark:hover:text-emerald-300"
-                    >
-                      <span>View on Google Maps</span>
-                      <ExternalLink className="w-4 h-4 ml-1" />
-                    </a>
-                  </div>
-                </div>
-              </div>
+<div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm overflow-hidden border border-gray-100 dark:border-gray-700">
+  <div className="px-6 py-5 border-b border-gray-100 dark:border-gray-700">
+    <h2 className="text-xl font-semibold text-gray-900 dark:text-white">Location</h2>
+  </div>
+  <div className="p-6">
+    <div className="flex items-start mb-4">
+      <MapPin className="w-5 h-5 mr-2 text-emerald-500 flex-shrink-0 mt-1" />
+      <div>
+        <h3 className="font-medium text-gray-900 dark:text-white">{event.venue}</h3>
+        <p className="text-gray-600 dark:text-gray-400 text-sm">{event.locationCoordinates}</p>
+      </div>
+    </div>
+    
+    {/* Map Component */}
+    <EventLocationMap 
+      coordinates={event.locationCoordinates} 
+      venueName={event.venue} 
+    />
+    
+    <div className="mt-4">
+      <a 
+        href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(event.locationCoordinates)}`}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="inline-flex items-center text-emerald-600 hover:text-emerald-700 dark:text-emerald-400 dark:hover:text-emerald-300"
+      >
+        <span>View on Google Maps</span>
+        <ExternalLink className="w-4 h-4 ml-1" />
+      </a>
+    </div>
+  </div>
+</div>
               {/* Event News Section */}
               <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm overflow-hidden border border-gray-100 dark:border-gray-700">
                 <div className="px-6 py-5 border-b border-gray-100 dark:border-gray-700 flex justify-between items-center">

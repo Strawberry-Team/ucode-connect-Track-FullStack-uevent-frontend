@@ -10,6 +10,7 @@ import { EventBasicInfoSchema } from '../../../components/eventValidation';
 import Header from '../../../components/Header';
 import Footer from '../../../components/Footer';
 import { usePromoCodes, PromoCode } from '../../../contexts/PromoCodeContext';
+import LocationPicker from '../../../components/LocationPicker';
 
 // Format and Theme types
 interface Format {
@@ -859,30 +860,20 @@ const handleSubmit = async (e: React.FormEvent) => {
                     </div>
                     
                     {/* Location Coordinates */}
-                    <div>
-                      <label htmlFor="locationCoordinates" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-                        Location Coordinates <span className="text-gray-400 dark:text-gray-500 font-normal">(optional)</span>
-                      </label>
-                      <div className="relative group">
-                        <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none text-gray-400 dark:text-gray-500">
-                          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
-                            <path fillRule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clipRule="evenodd" />
-                          </svg>
-                        </div>
-                        <input
-                          type="text"
-                          id="locationCoordinates"
-                          name="locationCoordinates"
-                          value={eventData.locationCoordinates || ''}
-                          onChange={handleInputChange}
-                          className="w-full pl-12 px-4 py-3 rounded-xl border-2 border-gray-200 dark:border-gray-700 group-hover:border-emerald-300 dark:group-hover:border-emerald-700 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all duration-200 dark:bg-gray-800 dark:text-white"
-                          placeholder="e.g., 50.4501,30.5234"
-                        />
-                      </div>
-                      <p className="mt-1.5 text-xs text-gray-500 dark:text-gray-400">
-                        Format: latitude,longitude (will be used for map display)
-                      </p>
-                    </div>
+<div className="md:col-span-2">
+  <label htmlFor="locationCoordinates" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+    Location <span className="text-red-500">*</span>
+  </label>
+  <LocationPicker 
+    initialCoordinates={eventData.locationCoordinates} 
+    onLocationSelect={(coordinates) => {
+      setEventData(prev => ({
+        ...prev,
+        locationCoordinates: coordinates
+      }));
+    }} 
+  />
+</div>
                     
                     {/* Start Date */}
                     <div>

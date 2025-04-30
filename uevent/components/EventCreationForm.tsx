@@ -16,7 +16,8 @@ import {
   EventTicket
 } from './eventValidation';
 import { usePromoCodes } from '../contexts/PromoCodeContext';
-
+import LocationPicker from '../components/LocationPicker';
+import  {useCallback } from 'react';
 // Step type definition
 type Step = 'basicInfo' | 'themes' | 'tickets' | 'promoCodes' | 'review';
 
@@ -42,33 +43,33 @@ const EventCreationForm: React.FC<{}> = () => {
   const [currentStep, setCurrentStep] = useState<Step>('basicInfo');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [animationDirection, setAnimationDirection] = useState<'forward' | 'backward'>('forward');
-  
+
   // State for form data
-  const [formData, setFormData] = useState<EventFormData>({
-    basicInfo: {
-      title: '',
-      description: '',
-      venue: '',
-      locationCoordinates: '',
-      startedAt: '',
-      endedAt: '',
-      publishedAt: '',
-      ticketsAvailableFrom: '',
-      attendeeVisibility: 'EVERYONE',
-      status: 'DRAFT',
-      companyId: company?.id || 0,
-      formatId: 0
-    },
-    themes: {
-      themes: []
-    },
-    tickets: {
-      tickets: []
-    },
-    promoCodes: {
-      promoCodes: []
-    }
-  });
+  const [formData, setFormData] = useState<EventFormData>(() => ({
+  basicInfo: {
+    title: '',
+    description: '',
+    venue: '',
+    locationCoordinates: '',
+    startedAt: '',
+    endedAt: '',
+    publishedAt: '',
+    ticketsAvailableFrom: '',
+    attendeeVisibility: 'EVERYONE',
+    status: 'DRAFT',
+    companyId: company?.id || 0, // ID устанавливается только один раз при инициализации
+    formatId: 0
+  },
+  themes: {
+    themes: []
+  },
+  tickets: {
+    tickets: []
+  },
+  promoCodes: {
+    promoCodes: []
+  }
+}));
   
   // State for validation errors
   const [errors, setErrors] = useState<{
@@ -163,17 +164,20 @@ const formatDateForInput = (dateString) => {
   }, []);
   
   // Set company ID when company data changes
-  useEffect(() => {
-    if (company?.id) {
-      setFormData(prev => ({
-        ...prev,
-        basicInfo: {
-          ...prev.basicInfo,
-          companyId: company.id || 0
-        }
-      }));
-    }
-  }, [company]);
+   // Effect to sync company ID, but only run when company.id changes
+  //  useEffect(() => {
+  //   // Выполняется только при первичной загрузке или изменении ID компании
+  //   if (company?.id && !formData.basicInfo.companyId) {
+  //     console.log('Установка ID компании:', company.id);
+  //     setFormData((prev) => ({
+  //       ...prev,
+  //       basicInfo: {
+  //         ...prev.basicInfo,
+  //         companyId: company.id,
+  //       },
+  //     }));
+  //   }
+  // }, [company?.id]);
   
   // File validation helper function
   const validatePosterFile = (file: File): boolean => {
@@ -292,7 +296,24 @@ const formatDateForInput = (dateString) => {
       }));
     }
   };
-  
+  const onLocationSelect = useCallback((newCoordinates) => {
+    setFormData(prevFormData => {
+      // Проверяем, действительно ли изменились координаты
+      if (prevFormData.basicInfo.locationCoordinates === newCoordinates) {
+        return prevFormData; // Возвращаем прежнее состояние без изменений
+      }
+      
+      // Только если координаты изменились, обновляем состояние
+      return {
+        ...prevFormData,
+        basicInfo: {
+          ...prevFormData.basicInfo,
+          locationCoordinates: newCoordinates
+        }
+      };
+    });
+  }, []); // Пустой массив зависимостей для стабильности
+
   // Handle theme selection
   const handleThemeChange = (themeId: number) => {
     setFormData(prev => {
@@ -594,6 +615,7 @@ const handleRemovePromoCode = (index: number) => {
       
       // Redirect to the event detail page after a short delay
       setTimeout(() => {
+        console.log('Redirecting to event page:', eventId);
         router.push(`/events/${eventId}`);
       }, 1500);
       
@@ -1039,30 +1061,15 @@ const formatDate = (dateString) => {
                 </div>
                 
                 {/* Location Coordinates */}
-                <div>
-                  <label htmlFor="locationCoordinates" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-                    Location Coordinates <span className="text-gray-400 dark:text-gray-500 font-normal">(optional)</span>
-                  </label>
-                  <div className="relative group">
-                    <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none text-gray-400 dark:text-gray-500">
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
-                        <path fillRule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clipRule="evenodd" />
-                      </svg>
-                    </div>
-                    <input
-                      type="text"
-                      id="locationCoordinates"
-                      name="locationCoordinates"
-                      value={formData.basicInfo.locationCoordinates || ''}
-                      onChange={handleBasicInfoChange}
-                      className="w-full pl-12 px-4 py-3 rounded-xl border-2 border-gray-200 dark:border-gray-700 group-hover:border-emerald-300 dark:group-hover:border-emerald-700 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all duration-200 dark:bg-gray-800 dark:text-white"
-                      placeholder="e.g., 50.4501,30.5234"
-                    />
-                  </div>
-                  <p className="mt-1.5 text-xs text-gray-500 dark:text-gray-400">
-                    Format: latitude,longitude (will be used for map display)
-                  </p>
-                </div>
+                <div className="md:col-span-2">
+  <label htmlFor="locationCoordinates" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+    Location Map <span className="text-red-500">*</span>
+  </label>
+  <LocationPicker
+    initialCoordinates={formData.basicInfo.locationCoordinates}
+    onLocationSelect={onLocationSelect}
+  />
+</div>
                 
                 {/* Start Date */}
                 <div>
