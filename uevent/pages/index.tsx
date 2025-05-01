@@ -796,14 +796,7 @@ const handleFormatChange = (formatId: string) => {
                 <MapPin className="absolute right-3 top-2.5 h-4 w-4 text-gray-400" />
               </div>
               
-              <div className="mt-3 flex flex-wrap gap-2">
-                <button className="px-3 py-1.5 text-sm rounded-full border border-gray-300 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-700 dark:text-gray-200">
-                  Near me
-                </button>
-                <button className="px-3 py-1.5 text-sm rounded-full border border-gray-300 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-700 dark:text-gray-200">
-                  Online events
-                </button>
-              </div>
+              
             </div>
             
             {/* Format filter - updated to use checkboxes like themes */}

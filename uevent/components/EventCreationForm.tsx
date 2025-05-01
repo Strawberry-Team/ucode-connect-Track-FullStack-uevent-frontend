@@ -578,37 +578,50 @@ const handleRemovePromoCode = (index: number) => {
       }
       
       // Step 4: Create promo codes if any
-      if (formData.promoCodes.promoCodes.length > 0) {
-        try {
-          const promoCodePromises = formData.promoCodes.promoCodes.map(promoCode => 
-            createPromoCode(eventId, {
-              eventId,
-              title: promoCode.title,
-              code: promoCode.code.toUpperCase(),
-              discountPercent: promoCode.discountPercent / 100, // Convert from percentage to decimal
-              isActive: promoCode.isActive
-            })
-          );
-          
-          const promoCodesResults = await Promise.all(promoCodePromises);
-          
-          const failedPromoCodes = promoCodesResults.filter(result => !result.success);
-          if (failedPromoCodes.length > 0) {
-            console.warn(`${failedPromoCodes.length} promo code(s) failed to create`);
-            toast.warning(`${failedPromoCodes.length} promo code(s) failed to create`, {
-              position: 'top-right',
-              autoClose: 4000,
-            });
-          }
-        } catch (error) {
-          console.error('Error creating promo codes:', error);
-          toast.warning('Event created, but some promo codes may not have been created', {
-            position: 'top-right',
-            autoClose: 4000,
-          });
-          // We continue the event creation process despite promo code errors
+      // Step 4: Create promo codes if any
+if (formData.promoCodes.promoCodes.length > 0) {
+  try {
+    // Process promo codes sequentially instead of in parallel
+    const failedPromoCodes = [];
+    for (const promoCode of formData.promoCodes.promoCodes) {
+      try {
+        const result = await createPromoCode(eventId, {
+          eventId,
+          title: promoCode.title,
+          code: promoCode.code.toUpperCase(),
+          discountPercent: promoCode.discountPercent / 100, // Convert from percentage to decimal
+          isActive: promoCode.isActive
+        });
+        
+        if (!result.success) {
+          failedPromoCodes.push(promoCode);
+          console.warn(`Failed to create promo code: ${promoCode.code}`, result);
         }
+      } catch (error) {
+        failedPromoCodes.push(promoCode);
+        console.error(`Error creating promo code ${promoCode.code}:`, error);
       }
+      
+      // Add a small delay between requests to prevent overwhelming the API
+      await new Promise(resolve => setTimeout(resolve, 200));
+    }
+    
+    if (failedPromoCodes.length > 0) {
+      console.warn(`${failedPromoCodes.length} promo code(s) failed to create`);
+      toast.warning(`${failedPromoCodes.length} promo code(s) failed to create`, {
+        position: 'top-right',
+        autoClose: 4000,
+      });
+    }
+  } catch (error) {
+    console.error('Error creating promo codes:', error);
+    toast.warning('Event created, but some promo codes may not have been created', {
+      position: 'top-right',
+      autoClose: 4000,
+    });
+    // We continue the event creation process despite promo code errors
+  }
+}
       
       // Upload poster if available
       if (posterFile) {

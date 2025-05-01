@@ -417,13 +417,18 @@ export default function Header() {
                     <NotificationDropdown />
                     
                     {user && user.role === 'ADMIN' && (
-            <Link href="http://localhost:3001/admin/login" className="px-4 py-2 text-sm font-medium text-emerald-600 bg-white dark:bg-black border border-emerald-600 rounded-md hover:bg-emerald-50 dark:hover:bg-emerald-800/30 flex items-center gap-2">
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-              </svg>
-              <span>Admin Panel</span>
-            </Link>
-          )} 
+  <Link 
+    href="http://localhost:3001/admin/login" 
+    target="_blank" 
+    rel="noopener noreferrer" 
+    className="px-4 py-2 text-sm font-medium text-emerald-600 bg-white dark:bg-black border border-emerald-600 rounded-md hover:bg-emerald-50 dark:hover:bg-emerald-800/30 flex items-center gap-2"
+  >
+    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+    </svg>
+    <span>Admin Panel</span>
+  </Link>
+)}
                   </>
                 )}
               </>

@@ -91,6 +91,7 @@ const PaymentPage: React.FC = () => {
   // Options for Stripe Elements
   const options: StripeElementsOptions = {
     clientSecret: clientSecret ?? undefined,
+    locale: 'en',
     appearance: {
       theme: 'flat',
       variables: {
