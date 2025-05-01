@@ -2,6 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { useOrders } from '../contexts/OrderContext';
 import { useAuth } from '../contexts/AuthContext';
 import Link from 'next/link';
+TicketsSkeletonLoader
+import TicketsSkeletonLoader from './TicketsSkeletonLoader';
 import { toast } from 'react-toastify';
 import {
   CheckCircle,
@@ -13,7 +15,8 @@ import {
   Ticket,
   ChevronDown,
   Eye,
-  AlertCircle
+  AlertCircle,
+  Lock
 } from 'lucide-react';
 // Define types based on the actual API response structure
 interface Ticket {
@@ -40,7 +43,7 @@ interface OrderItem {
 interface Order {
   id: number;
   totalAmount: number;
-  paymentStatus: 'PENDING' | 'COMPLETED' | 'FAILED' | 'CANCELED';
+  paymentStatus: 'PENDING' | 'COMPLETED' | 'FAILED' | 'CANCELED' | 'PAID';
   paymentMethod: string;
   createdAt: string;
   orderItems: OrderItem[];
@@ -95,13 +98,19 @@ const statusColors = {
     border: 'border-emerald-200 dark:border-emerald-800',
     icon: <CheckCircle className="h-4 w-4" />
   },
+  COMPLETED: {
+    bg: 'bg-emerald-100 dark:bg-emerald-900/30',
+    text: 'text-emerald-800 dark:text-emerald-300',
+    border: 'border-emerald-200 dark:border-emerald-800',
+    icon: <CheckCircle className="h-4 w-4" />
+  },
   FAILED: {
     bg: 'bg-red-100 dark:bg-red-900/30',
     text: 'text-red-800 dark:text-red-300',
     border: 'border-red-200 dark:border-red-800',
     icon: <XCircle className="h-4 w-4" />
   },
-  CANCELLED: {
+  CANCELED: {
     bg: 'bg-gray-100 dark:bg-gray-800',
     text: 'text-gray-800 dark:text-gray-300',
     border: 'border-gray-200 dark:border-gray-700',
@@ -178,16 +187,7 @@ const MyTicketsSection: React.FC<MyTicketsSectionProps> = ({ user }) => {
 
   // Show loading state if loading or no user is available yet
   if (isLoading || !currentUser) {
-    return (
-      <div className="bg-white dark:bg-black rounded-2xl shadow-sm dark:shadow-none overflow-hidden border border-gray-100 dark:border-gray-800 p-8">
-        <div className="flex justify-center items-center h-40">
-          <div className="flex flex-col items-center">
-            <div className="animate-spin w-10 h-10 border-4 border-emerald-500 border-t-transparent rounded-full"></div>
-            <p className="mt-4 text-emerald-600 font-medium">Loading your tickets...</p>
-          </div>
-        </div>
-      </div>
-    );
+    return <TicketsSkeletonLoader />;
   }
 
   if (error) {
@@ -290,6 +290,8 @@ const MyTicketsSection: React.FC<MyTicketsSectionProps> = ({ user }) => {
             const event = getEventFromOrder(order);
             // Count total tickets
             const ticketCount = countTickets(orderItems);
+            // Check if payment is completed
+            const isPaid = order.paymentStatus === 'PAID' || order.paymentStatus === 'COMPLETED';
             
             return (
               <div key={order.id} className="p-0">
@@ -391,26 +393,6 @@ const MyTicketsSection: React.FC<MyTicketsSectionProps> = ({ user }) => {
                       </div>
 {(order.paymentStatus === 'PENDING' || order.paymentStatus === 'FAILED') && (
   <div className="flex flex-col md:flex-row gap-2">
-    {/* {order.paymentStatus === 'PENDING' && (
-      <button
-        onClick={() => handleCancelOrder(order.id as number)}
-        disabled={cancelingOrderId === order.id}
-        className="mt-3 md:mt-0 inline-flex items-center justify-center px-4 py-2 border border-red-300 dark:border-red-700 text-red-700 dark:text-red-400 bg-white dark:bg-black hover:bg-red-50 dark:hover:bg-red-900/20 font-medium rounded-lg transition-colors shadow-sm dark:shadow-none"
-      >
-        {cancelingOrderId === order.id ? (
-          <>
-            <div className="animate-spin h-4 w-4 mr-2 border-2 border-red-500 rounded-full border-t-transparent"></div>
-            <span>Cancelling...</span>
-          </>
-        ) : (
-          <>
-            <XCircle className="h-4 w-4 mr-1.5" />
-            <span>Cancel Order</span>
-          </>
-        )}
-      </button>
-    )} */}
-    
     <Link 
       href={`/stripe/payment/${order.id}`}
       className="mt-3 md:mt-0 inline-flex items-center justify-center px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-medium rounded-lg transition-colors shadow-sm"
@@ -420,30 +402,6 @@ const MyTicketsSection: React.FC<MyTicketsSectionProps> = ({ user }) => {
     </Link>
   </div>
 )}
-                      {/* {order.paymentStatus === 'PENDING' && (
-                        <button
-                          onClick={() => handleCancelOrder(order.id as number)}
-                          disabled={cancelingOrderId === order.id}
-                          className="mt-3 md:mt-0 w-full md:w-auto inline-flex items-center justify-center px-4 py-2 border border-red-300 dark:border-red-700 text-red-700 dark:text-red-400 bg-white dark:bg-black hover:bg-red-50 dark:hover:bg-red-900/20 font-medium rounded-lg transition-colors shadow-sm dark:shadow-none"
-                        >
-                          {cancelingOrderId === order.id ? (
-                            <>
-                              <svg className="animate-spin -ml-1 mr-2 h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                              </svg>
-                              Cancelling...
-                            </>
-                          ) : (
-                            <>
-                              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                              </svg>
-                              Cancel Order
-                            </>
-                          )}
-                        </button>
-                      )} */}
                     </div>
 
                     {/* Expanded Tickets List */}
@@ -459,6 +417,7 @@ const MyTicketsSection: React.FC<MyTicketsSectionProps> = ({ user }) => {
                                 <th scope="col" className="px-3 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Number</th>
                                 <th scope="col" className="px-3 py-2 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Quantity</th>
                                 <th scope="col" className="px-3 py-2 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Price</th>
+                                <th scope="col" className="px-3 py-2 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Actions</th>
                               </tr>
                             </thead>
                             <tbody className="divide-y divide-gray-200 dark:divide-gray-800">
@@ -475,6 +434,27 @@ const MyTicketsSection: React.FC<MyTicketsSectionProps> = ({ user }) => {
                                   </td>
                                   <td className="px-3 py-3 whitespace-nowrap text-sm text-right font-medium text-gray-900 dark:text-white">
                                     ${(item.finalPrice || item.ticket.price || 0).toFixed(2)}
+                                  </td>
+                                  <td className="px-3 py-3 whitespace-nowrap text-sm text-center">
+                                    {isPaid ? (
+                                      // Show view ticket button if payment is completed
+                                      <Link 
+                                        href={`/orders/${order.id}/items/${item.id}/ticket`}
+                                        target="_blank"
+                                        className="inline-flex items-center justify-center p-2 bg-emerald-100 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-400 rounded-lg hover:bg-emerald-200 dark:hover:bg-emerald-900/40 transition-colors"
+                                        title="View Ticket"
+                                      >
+                                        <Eye className="h-4 w-4" />
+                                      </Link>
+                                    ) : (
+                                      // Show a disabled button with a different style if payment is not completed
+                                      <div 
+                                        className="inline-flex items-center justify-center p-2 bg-gray-100 dark:bg-gray-800 text-gray-400 dark:text-gray-500 rounded-lg cursor-not-allowed"
+                                        title="Payment required to view ticket"
+                                      >
+                                        <Lock className="h-4 w-4" />
+                                      </div>
+                                    )}
                                   </td>
                                 </tr>
                               ))}

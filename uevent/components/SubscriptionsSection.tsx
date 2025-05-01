@@ -251,12 +251,49 @@ const SubscriptionsSection = () => {
   if (isLoading) {
     return (
       <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-sm dark:shadow-none overflow-hidden border border-gray-100 dark:border-gray-800">
-        <div className="p-10 flex flex-col justify-center items-center">
-          <div className="w-16 h-16 relative">
-            <div className="w-16 h-16 rounded-full border-4 border-emerald-100 dark:border-emerald-900/30"></div>
-            <div className="w-16 h-16 rounded-full border-4 border-emerald-500 dark:border-emerald-400 border-t-transparent animate-spin absolute top-0 left-0"></div>
+        {/* Header */}
+        <div className="border-b border-gray-100 dark:border-gray-800 px-6 pt-4">
+          <div className="flex flex-wrap items-center justify-between mb-4">
+            <div className="h-8 bg-gray-200 dark:bg-gray-700 rounded w-1/3 animate-pulse"></div>
+            <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded w-1/4 animate-pulse"></div>
           </div>
-          <p className="mt-6 text-gray-600 dark:text-gray-300 text-lg">Loading your subscriptions...</p>
+          
+          {/* Tabs */}
+          <div className="flex space-x-2">
+            {['All', 'Events', 'Companies'].map((tab, index) => (
+              <div 
+                key={tab} 
+                className="h-12 bg-gray-100 dark:bg-gray-800 rounded-t-lg flex items-center px-4 animate-pulse"
+              >
+                <div className="h-5 bg-gray-200 dark:bg-gray-700 rounded w-20"></div>
+              </div>
+            ))}
+          </div>
+        </div>
+        
+        {/* Subscription Cards */}
+        <div className="p-6 space-y-4">
+          {[1, 2, 3].map((_, index) => (
+            <div 
+              key={index} 
+              className="bg-gray-50 dark:bg-gray-800 rounded-xl p-5 flex items-center space-x-4 animate-pulse"
+            >
+              {/* Image Placeholder */}
+              <div className="w-14 h-14 bg-gray-200 dark:bg-gray-700 rounded-xl"></div>
+              
+              {/* Text Placeholders */}
+              <div className="flex-1 space-y-3">
+                <div className="h-5 bg-gray-200 dark:bg-gray-700 rounded w-3/4"></div>
+                <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-1/2"></div>
+              </div>
+              
+              {/* Action Buttons */}
+              <div className="flex space-x-3">
+                <div className="h-10 w-24 bg-gray-200 dark:bg-gray-700 rounded"></div>
+                <div className="h-10 w-24 bg-gray-200 dark:bg-gray-700 rounded"></div>
+              </div>
+            </div>
+          ))}
         </div>
       </div>
     );

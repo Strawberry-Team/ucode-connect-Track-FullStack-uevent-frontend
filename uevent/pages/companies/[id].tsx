@@ -425,14 +425,14 @@ const CompanyPage: React.FC = () => {
             {company?.id && (
               <div className="mb-6 flex justify-between items-center">
                 <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Latest News</h2>
-                <Link href={`/companies/${company.id}/news`}>
+                {/* <Link href={`/companies/${company.id}/news`}>
                   <button className="inline-flex items-center px-4 py-2 text-sm font-medium text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 transition-colors">
                     View All
                     <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 ml-1.5" viewBox="0 0 20 20" fill="currentColor">
                       <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd" />
                     </svg>
                   </button>
-                </Link>
+                </Link> */}
               </div>
             )}
             <CompanyPublicNewsSection companyId={company.id || ''} />

@@ -158,16 +158,16 @@ export const CompanyPublicNewsSection: React.FC<CompanyPublicNewsSectionProps> =
               </div>
               
               <p className="text-gray-600 dark:text-gray-300">
-                {truncateText(item.description || '', 250)}
+                {truncateText(item.description || '', 10000)}
               </p>
               
-              <div className="mt-4 text-emerald-600 dark:text-emerald-400 font-medium text-sm flex items-center group-hover:text-emerald-700 dark:group-hover:text-emerald-300 transition-colors">
+              {/* <div className="mt-4 text-emerald-600 dark:text-emerald-400 font-medium text-sm flex items-center group-hover:text-emerald-700 dark:group-hover:text-emerald-300 transition-colors">
                 Read more
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 ml-1.5 group-hover:translate-x-1 transition-transform" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M5 12h14"></path>
                   <path d="M12 5l7 7-7 7"></path>
                 </svg>
-              </div>
+              </div> */}
             </div>
           </div>
         </Link>

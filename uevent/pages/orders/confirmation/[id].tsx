@@ -37,6 +37,10 @@ const OrderConfirmationPage: React.FC = () => {
   };
 
   useEffect(() => {
+
+    const isStripeRedirect = router.query.payment_intent && router.query.redirect_status;
+  
+    
     // Function to request order status from backend
     const checkOrderStatus = async (): Promise<boolean> => { // Returns true if status is final
       if (!orderId || typeof orderId !== 'string') {
@@ -72,7 +76,11 @@ const OrderConfirmationPage: React.FC = () => {
         return true; // Consider as final on error
       }
     };
-
+    if (isStripeRedirect) {
+      console.log('Processing redirect from Stripe with status:', router.query.redirect_status);
+      // Prioritize immediate status check for Stripe redirects
+      checkOrderStatus();
+    }
     // --- Logic for starting checks and polling ---
     if (router.isReady) { // Make sure query parameters are available
       setLoading(true);

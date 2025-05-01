@@ -251,10 +251,17 @@ export default function Header() {
         <div className="flex items-center justify-between h-16">
           {/* Logo и бренд */}
           <div className="pl-4 md:pl-6">
-            <Link href="/" className="text-xl font-bold text-emerald-600 hover:text-emerald-700 transition-colors">
-            TripUp
-            </Link>
-          </div>
+  <Link href="/" className="flex items-center">
+    <img 
+      src="/logo.png" 
+      alt="TripUp Logo" 
+      className="h-8 w-8 mr-2" 
+    />
+    <span className="text-xl font-bold text-emerald-600 hover:text-emerald-700 transition-colors">
+      TripUp
+    </span>
+  </Link>
+</div>
 
           {/* Десктопная навигация */}
           <div className="hidden md:flex items-center space-x-4">
@@ -393,20 +400,20 @@ export default function Header() {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                   </svg>
                 </button>
-                <Link href="/events" className="p-2 rounded-md text-gray-600 dark:text-gray-200 hover:text-emerald-600 hover:bg-gray-100 dark:hover:bg-gray-900 flex items-center gap-2">
+                {/* <Link href="/events" className="p-2 rounded-md text-gray-600 dark:text-gray-200 hover:text-emerald-600 hover:bg-gray-100 dark:hover:bg-gray-900 flex items-center gap-2">
                   <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
                   </svg>
                   <span className="hidden lg:inline">Explore</span>
-                </Link>
+                </Link> */}
                 {isAuthenticated && (
                   <>
-                    <Link href="/calendar" className="p-2 rounded-md text-gray-600 dark:text-gray-200 hover:text-emerald-600 hover:bg-gray-100 dark:hover:bg-gray-900 flex items-center gap-2">
+                    {/* <Link href="/calendar" className="p-2 rounded-md text-gray-600 dark:text-gray-200 hover:text-emerald-600 hover:bg-gray-100 dark:hover:bg-gray-900 flex items-center gap-2">
                       <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                       </svg>
                       <span className="hidden lg:inline">Calendar</span>
-                    </Link>
+                    </Link> */}
                     <NotificationDropdown />
                     
                     {user && user.role === 'ADMIN' && (
@@ -466,7 +473,7 @@ export default function Header() {
                         <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z" />
                         </svg>
-                        My Tickets
+                        My Orders
                       </Link>
                       <Link href="/profile" className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-900 flex items-center" onClick={() => setIsDropdownOpen(false)}>
                         <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -739,7 +746,7 @@ export default function Header() {
                   <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-3 text-gray-500 dark:text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z" />
                   </svg>
-                  My Tickets
+                  My Orders
                 </Link>
                 <Link 
                   href="/settings" 

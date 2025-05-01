@@ -229,113 +229,8 @@ export default function HomePage() {
   };
   
   // Fetch events with filters and pagination
-  const fetchEvents = async () => {
-    setIsLoading(true);
-    setError(null);
-    
-    try {
-      // Construct query parameters
-      const params: any = {
-        take: limit,
-        skip: (page - 1) * limit
-      };
-      
-      // Add filters if they exist
-      if (searchQuery) {
-        // Search by title or description
-        params.title = searchQuery;
-        params.description = searchQuery;
-      }
-      
-      if (venue) params.venue = venue;
-      
-      // Only add formats param if we have selected format IDs
-      if (formatIds.length > 0) {
-        params.formats = formatIds.join(',');
-      }
-      // Don't include an empty formats parameter!
-      
-      // Theme filtering
-      if (themeIds.length > 0) {
-        params.themes = themeIds.join(',');
-      }
-      
-      if (minPrice !== '') params.minPrice = minPrice;
-      if (maxPrice !== '') params.maxPrice = maxPrice;
-      if (statuses.length > 0) params.status = statuses.join(',');
-      
-      // Date range filtering
-      if (startDate) {
-        params.startedAt = format(parseISO(startDate), "yyyy-MM-dd'T'00:00:00.000'Z'");
-      }
-      if (endDate) {
-        params.endedAt = format(parseISO(endDate), "yyyy-MM-dd'T'23:59:59.999'Z'");
-      }
-      
-      // Add sorting
-      if (sortBy === 'date') {
-        params.sortBy = 'startedAt';
-        params.sortOrder = 'desc';
-      } else if (sortBy === 'date-asc') {
-        params.sortBy = 'startedAt';
-        params.sortOrder = 'asc';
-      } else if (sortBy === 'price-asc') {
-        params.sortBy = 'minPrice';
-        params.sortOrder = 'asc';
-      } else if (sortBy === 'price-desc') {
-        params.sortBy = 'minPrice';
-        params.sortOrder = 'desc';
-      } else if (sortBy === 'popularity') {
-        params.sortBy = 'popularity';
-        params.sortOrder = 'desc';
-      }
-      
-      // Get auth headers
-      const token = localStorage.getItem('token');
-      const headers = token ? { Authorization: `Bearer ${token}` } : {};
-      
-      console.log('Fetching events with params:', params);
-      
-      // Make API request
-      const response = await axios.get(`${API_URL}/events`, {
-        params,
-        headers
-      });
-      
-      // Update state with response data
-      let eventData: Event[] = [];
-      if (response.data.items) {
-        eventData = response.data.items;
-        setTotalEvents(response.data.total);
-      } else if (Array.isArray(response.data)) {
-        eventData = response.data;
-        setTotalEvents(response.data.length);
-      } else {
-        eventData = [];
-        setTotalEvents(0);
-      }
-      
-      setEvents(eventData);
-      
-      // Set featured event if we have events and no featured event is set yet
-      if (eventData.length > 0 && !featuredEvent) {
-        // Find an event with SALES_STARTED or PUBLISHED status for featuring
-        const featureCandidate = eventData.find(event => 
-          event.status === 'SALES_STARTED' || event.status === 'PUBLISHED'
-        ) || eventData[0]; // Fallback to the first event if no suitable event is found
-        
-        setFeaturedEvent(featureCandidate);
-      }
-      
-      console.log('Events fetched successfully:', eventData);
-    } catch (error) {
-      console.error('Error fetching events:', error);
-      setError('Failed to fetch events. Please try again later.');
-      setEvents([]);
-      setTotalEvents(0);
-    } finally {
-      setIsLoading(false);
-    }
+  const fetchEvents = () => {
+    fetchEventsWithSort(sortBy);
   };
   
   // Fetch formats and themes for filters
@@ -651,16 +546,128 @@ const handleFormatChange = (formatId: string) => {
       applyFilters();
     }
   };
-  
+  const fetchEventsWithSort = async (sortValue: string = sortBy) => {
+    setIsLoading(true);
+    setError(null);
+    
+    try {
+      // Конструируем параметры запроса
+      const params: any = {
+        take: limit,
+        skip: (page - 1) * limit
+      };
+      
+      // Добавляем фильтры
+      if (searchQuery) {
+        params.title = searchQuery;
+        params.description = searchQuery;
+      }
+      
+      if (venue) params.venue = venue;
+      
+      if (formatIds.length > 0) {
+        params.formats = formatIds.join(',');
+      }
+      
+      if (themeIds.length > 0) {
+        params.themes = themeIds.join(',');
+      }
+      
+      if (minPrice !== '') params.minPrice = minPrice;
+      if (maxPrice !== '') params.maxPrice = maxPrice;
+      if (statuses.length > 0) params.status = statuses.join(',');
+      
+      // Фильтрация по датам
+      if (startDate) {
+        params.startDate = format(parseISO(startDate), "yyyy-MM-dd'T'00:00:00.000'Z'");
+      }
+      if (endDate) {
+        params.endDate = format(parseISO(endDate), "yyyy-MM-dd'T'23:59:59.999'Z'");
+      }
+      
+      // Используем параметр, переданный в функцию, а не состояние
+      switch (sortValue) {
+        case 'date':
+          params.sortBy = 'startedAt';
+          params.sortOrder = 'desc';
+          break;
+        case 'date-asc':
+          params.sortBy = 'startedAt';
+          params.sortOrder = 'asc';
+          break;
+        case 'price-asc':
+          params.sortBy = 'minPrice';
+          params.sortOrder = 'asc';
+          break;
+        case 'price-desc':
+          params.sortBy = 'minPrice';
+          params.sortOrder = 'desc';
+          break;
+        case 'popularity':
+          params.sortBy = 'popularity';
+          params.sortOrder = 'desc';
+          break;
+        default:
+          params.sortBy = 'startedAt';
+          params.sortOrder = 'desc';
+      }
+      
+      // Логирование для отладки
+      console.log('Fetching events with sort:', sortValue);
+      console.log('Params:', params);
+      
+      // Получаем заголовки авторизации
+      const token = localStorage.getItem('token');
+      const headers = token ? { Authorization: `Bearer ${token}` } : {};
+      
+      // Выполняем API запрос
+      const response = await axios.get(`${API_URL}/events`, {
+        params,
+        headers
+      });
+      
+      // Обрабатываем данные ответа
+      let eventData: Event[] = [];
+      if (response.data.items) {
+        eventData = response.data.items;
+        setTotalEvents(response.data.total);
+      } else if (Array.isArray(response.data)) {
+        eventData = response.data;
+        setTotalEvents(response.data.length);
+      } else {
+        eventData = [];
+        setTotalEvents(0);
+      }
+      
+      setEvents(eventData);
+      
+      // Устанавливаем избранное событие если нужно
+      if (eventData.length > 0 && !featuredEvent) {
+        const featureCandidate = eventData.find(event => 
+          event.status === 'SALES_STARTED' || event.status === 'PUBLISHED'
+        ) || eventData[0];
+        
+        setFeaturedEvent(featureCandidate);
+      }
+      
+      console.log('Events fetched successfully with sort:', sortValue);
+    } catch (error) {
+      console.error('Error fetching events:', error);
+      setError('Failed to fetch events. Please try again later.');
+      setEvents([]);
+      setTotalEvents(0);
+    } finally {
+      setIsLoading(false);
+    }
+  };
   // Handle sort change
   const handleSortChange = (value: string) => {
+    // Устанавливаем состояние для UI
     setSortBy(value);
-    setPage(1); // Reset to first page when sorting changes
+    setPage(1); // Сбрасываем на первую страницу
     
-    // Fetch events with new sort
-    setTimeout(() => {
-      fetchEvents();
-    }, 0);
+    // Передаем значение сортировки напрямую вместо использования состояния
+    fetchEventsWithSort(value);
   };
   
   // Effect to fetch events on component mount and when pagination changes
@@ -982,10 +989,10 @@ const handleFormatChange = (formatId: string) => {
                       >
                         View Event
                       </Link>
-                      <button className="px-6 py-3 border border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-200 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors flex items-center justify-center gap-2">
+                      {/* <button className="px-6 py-3 border border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-200 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors flex items-center justify-center gap-2">
                         <Share2 className="h-4 w-4" />
                         <span>Share</span>
-                      </button>
+                      </button> */}
                     </div>
                   </div>
                   
@@ -1132,11 +1139,43 @@ const handleFormatChange = (formatId: string) => {
           
           {/* Loading state */}
           {isLoading && (
-            <div className="flex flex-col items-center justify-center py-20">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-600 mb-4"></div>
-              <p className="text-gray-700 dark:text-gray-300">Loading events...</p>
-            </div>
-          )}
+  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    {[1, 2, 3, 4, 5, 6].map((_, index) => (
+      <div 
+        key={index} 
+        className="bg-white rounded-2xl overflow-hidden shadow-sm border border-gray-100 dark:border-gray-800 dark:bg-gray-900 animate-pulse relative"
+      >
+        {/* Image Placeholder */}
+        <div className="h-48 w-full bg-gray-200 dark:bg-gray-700"></div>
+        
+        {/* Badge Placeholder */}
+        <div className="absolute top-3 left-3 h-6 w-24 bg-gray-300 dark:bg-gray-600 rounded-full"></div>
+        
+        {/* Bookmark Icon Placeholder */}
+        <div className="absolute top-3 right-3 h-8 w-8 bg-gray-200 dark:bg-gray-700 rounded-full"></div>
+        
+        {/* Content */}
+        <div className="p-4 space-y-3">
+          {/* Date Placeholder */}
+          <div className="h-4 w-1/3 bg-gray-200 dark:bg-gray-700 rounded"></div>
+          
+          {/* Title Placeholder */}
+          <div className="h-6 w-3/4 bg-gray-200 dark:bg-gray-700 rounded"></div>
+          
+          {/* Description Placeholder */}
+          <div className="h-4 w-full bg-gray-200 dark:bg-gray-700 rounded"></div>
+          <div className="h-4 w-5/6 bg-gray-200 dark:bg-gray-700 rounded"></div>
+          
+          {/* Location Placeholder */}
+          <div className="h-4 w-1/2 bg-gray-200 dark:bg-gray-700 rounded"></div>
+          
+          {/* Price Placeholder */}
+          <div className="h-5 w-1/4 bg-gray-200 dark:bg-gray-700 rounded"></div>
+        </div>
+      </div>
+    ))}
+  </div>
+)}
           
           {/* Error state */}
           {error && !isLoading && (

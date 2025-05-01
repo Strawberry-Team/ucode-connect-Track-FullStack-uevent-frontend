@@ -1094,15 +1094,24 @@ const renderAttendeesModal = () => {
                   
                   {/* Event status badge */}
                   <div className="absolute top-4 right-4">
-                    <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium
-                      ${event.status === 'PUBLISHED' ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' : 
-                        event.status === 'CANCELLED' ? 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200' : 
-                        'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200'}`}
-                    >
-                      {event.status === 'PUBLISHED' ? 'Published' : 
-                        event.status === 'CANCELLED' ? 'Cancelled' : 'Draft'}
-                    </span>
-                  </div>
+  <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium
+    ${event.status === 'PUBLISHED' ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' : 
+      event.status === 'CANCELLED' ? 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200' : 
+      event.status === 'DRAFT' ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200' :
+      event.status === 'SALES_STARTED' ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200' :
+      event.status === 'ONGOING' ? 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200' :
+      event.status === 'FINISHED' ? 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300' :
+      'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200'}`}
+  >
+    {event.status === 'PUBLISHED' ? 'Published' : 
+      event.status === 'CANCELLED' ? 'Cancelled' : 
+      event.status === 'DRAFT' ? 'Draft' :
+      event.status === 'SALES_STARTED' ? 'Sales Started' :
+      event.status === 'ONGOING' ? 'Ongoing' :
+      event.status === 'FINISHED' ? 'Finished' :
+      event.status}
+  </span>
+</div>
                 </div>
               </div>
               
@@ -1445,29 +1454,49 @@ const renderAttendeesModal = () => {
           </p>
         </div>
       ) : (
-        <>
-          <div className="mb-6">
-            <div className="flex justify-between items-center mb-2">
-              <span className="text-gray-600 dark:text-gray-400">Tickets Available From</span>
-              <span className="text-gray-900 dark:text-white font-medium">{formatDate(event.ticketsAvailableFrom)}</span>
+        // Проверяем доступность билетов по дате
+        new Date(event.ticketsAvailableFrom) > new Date() ? (
+          // Билеты еще не доступны
+          <div className="text-center py-4">
+            <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-amber-100 dark:bg-amber-900/30 text-amber-600 dark:text-amber-300 mb-3">
+              <Clock className="h-6 w-6" />
             </div>
-            <div className="flex justify-between items-center">
-              <span className="text-gray-600 dark:text-gray-400">Type</span>
-              <span className="text-gray-900 dark:text-white font-medium">Conference Pass</span>
-            </div>
+            <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-1">
+              Tickets Not Yet Available
+            </h3>
+            <p className="text-gray-600 dark:text-gray-400 mb-2">
+              Tickets will be available from:
+            </p>
+            <p className="text-emerald-600 dark:text-emerald-400 font-medium">
+              {formatDate(event.ticketsAvailableFrom)}
+            </p>
           </div>
-          
-          <button 
-            onClick={() => setPurchaseModalOpen(true)}
-            className="w-full py-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg font-semibold transition-colors"
-          >
-            Register Now
-          </button>
-          
-          <p className="text-sm text-gray-500 dark:text-gray-400 mt-3">
-            Secure your spot at this event. Limited seats available.
-          </p>
-        </>
+        ) : (
+          // Билеты доступны, показываем кнопку регистрации
+          <>
+            <div className="mb-6">
+              <div className="flex justify-between items-center mb-2">
+                <span className="text-gray-600 dark:text-gray-400">Tickets Available From</span>
+                <span className="text-gray-900 dark:text-white font-medium">{formatDate(event.ticketsAvailableFrom)}</span>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="text-gray-600 dark:text-gray-400">Type</span>
+                <span className="text-gray-900 dark:text-white font-medium">Conference Pass</span>
+              </div>
+            </div>
+            
+            <button 
+              onClick={() => setPurchaseModalOpen(true)}
+              className="w-full py-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg font-semibold transition-colors"
+            >
+              Register Now
+            </button>
+            
+            <p className="text-sm text-gray-500 dark:text-gray-400 mt-3">
+              Secure your spot at this event. Limited seats available.
+            </p>
+          </>
+        )
       )}
     </div>
   </div>
@@ -1497,12 +1526,6 @@ const renderAttendeesModal = () => {
           >
             Sign In
           </Link>
-          {/* <Link 
-            href="/sign-up" 
-            className="px-4 py-2 bg-white border border-gray-300 text-gray-700 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200 rounded-lg font-medium hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors"
-          >
-            Sign Up
-          </Link> */}
         </div>
       </div>
     </div>
@@ -1576,42 +1599,7 @@ const renderAttendeesModal = () => {
               </div>
               
               {/* Share Widget */}
-              <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm overflow-hidden border border-gray-100 dark:border-gray-700">
-                <div className="px-6 py-5 border-b border-gray-100 dark:border-gray-700">
-                  <h2 className="text-xl font-semibold text-gray-900 dark:text-white">Share This Event</h2>
-                </div>
-                <div className="p-6">
-                  <div className="flex justify-center space-x-4">
-                    {/* Facebook */}
-                    <button className="w-10 h-10 rounded-full bg-blue-600 text-white flex items-center justify-center hover:bg-blue-700 transition-colors">
-                      <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-                        <path d="M18.77 7.46H14.5v-1.9c0-.9.6-1.1 1-1.1h3V.5h-4.33C10.24.5 9.5 3.44 9.5 5.32v2.15h-3v4h3v12h5v-12h3.85l.42-4z" />
-                      </svg>
-                    </button>
-                    
-                    {/* Twitter */}
-                    <button className="w-10 h-10 rounded-full bg-blue-400 text-white flex items-center justify-center hover:bg-blue-500 transition-colors">
-                      <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-                        <path d="M23.44 4.83c-.8.37-1.5.38-2.22.02.93-.56.98-.96 1.32-2.02-.88.52-1.86.9-2.9 1.1-.82-.88-2-1.43-3.3-1.43-2.5 0-4.55 2.04-4.55 4.54 0 .36.03.7.1 1.04-3.77-.2-7.12-2-9.36-4.75-.4.67-.6 1.45-.6 2.3 0 1.56.8 2.95 2 3.77-.74-.03-1.44-.23-2.05-.57v.06c0 2.2 1.56 4.03 3.64 4.44-.67.2-1.37.2-2.06.08.58 1.8 2.26 3.12 4.25 3.16C5.78 18.1 3.37 18.74 1 18.46c2 1.3 4.4 2.04 6.97 2.04 8.35 0 12.92-6.92 12.92-12.93 0-.2 0-.4-.02-.6.9-.63 1.96-1.22 2.56-2.14z" />
-                      </svg>
-                    </button>
-                    
-                    {/* LinkedIn */}
-                    <button className="w-10 h-10 rounded-full bg-blue-800 text-white flex items-center justify-center hover:bg-blue-900 transition-colors">
-                      <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-                        <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z" />
-                      </svg>
-                    </button>
-                    
-                    {/* Email */}
-                    <button className="w-10 h-10 rounded-full bg-gray-600 text-white flex items-center justify-center hover:bg-gray-700 transition-colors">
-                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                      </svg>
-                    </button>
-                  </div>
-                </div>
-              </div>
+              
             </div>
           </div>
         </div>
@@ -1751,7 +1739,7 @@ const renderAttendeesModal = () => {
             {validPromoCode && (
               <div className="mt-2 text-sm text-green-600 dark:text-green-400 flex items-center">
                 <Check className="w-4 h-4 mr-1" />
-                <span>{validPromoCode.discountPercent}% discount applied</span>
+                <span>{validPromoCode.discountPercent * 100}% discount applied</span>
               </div>
             )}
           </div>

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useLayoutEffect  } from 'react';
 import { useRouter } from 'next/router';
 import { Elements } from '@stripe/react-stripe-js';
 import { loadStripe, StripeElementsOptions } from '@stripe/stripe-js';
@@ -9,7 +9,7 @@ import Head from 'next/head';
 import { 
   CreditCard, ArrowLeft, CheckCircle, Shield 
 } from 'lucide-react';
-
+import { useRef } from 'react';
 // Global variable for Stripe Promise
 let stripePromise: ReturnType<typeof loadStripe> | null = null;
 
@@ -22,9 +22,18 @@ const PaymentPage: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [orderStatus, setOrderStatus] = useState<string | null>(null);
   const [orderDetails, setOrderDetails] = useState<any>(null);
-
-  useEffect(() => {
+  const initializedRef = useRef(false);
+  useLayoutEffect(() => {
+    // Предотвращаем выполнение в режиме SSR
+    if (typeof window === 'undefined') return;
+    
     const initializePayment = async () => {
+      // Проверяем, был ли уже инициализирован платеж
+      if (initializedRef.current) {
+        console.log('Payment already initialized, skipping duplicate initialization');
+        return;
+      }
+
       if (!id || typeof id !== 'string') {
         if (router.isReady) {
           setError('Order ID is missing or invalid.');
@@ -38,8 +47,11 @@ const PaymentPage: React.FC = () => {
       setClientSecret(null);
 
       try {
+        // Устанавливаем флаг перед запросом
+        initializedRef.current = true;
+        
         const response = await paymentService.createPaymentIntent(id);
-        console.log('response', response);
+        console.log('Payment intent initialized once:', response);
         const { clientSecret: cs, publishableKey: pk, orderDetails: details } = response;
         
         if (details) {
@@ -59,6 +71,8 @@ const PaymentPage: React.FC = () => {
       } catch (err: any) {
         console.error('Error initializing payment:', err);
         setError(err.response?.data?.message || 'Failed to load payment details. Please try again later.');
+        // Сбрасываем флаг только в случае ошибки, чтобы можно было повторить попытку
+        initializedRef.current = false;
       } finally {
         setLoading(false);
       }
@@ -67,6 +81,11 @@ const PaymentPage: React.FC = () => {
     if (router.isReady) {
       initializePayment();
     }
+    
+    // Функция очистки, которая выполнится при размонтировании компонента
+    return () => {
+      console.log('Payment page unmounted');
+    };
   }, [id, router.isReady]);
 
   // Options for Stripe Elements

@@ -313,7 +313,23 @@ const formatDateForInput = (dateString) => {
       };
     });
   }, []); // Пустой массив зависимостей для стабильности
-
+  const onAddressFound = useCallback((address) => {
+    // Update the venue field with the found address
+    setFormData(prevFormData => {
+      // Check if the venue field is already filled
+      if (prevFormData.basicInfo.venue && prevFormData.basicInfo.venue !== address) {
+        // If venue is already set with a different value, we'll update it
+        return {
+          ...prevFormData,
+          basicInfo: {
+            ...prevFormData.basicInfo,
+            venue: address
+          }
+        };
+      }
+      return prevFormData; // Return unchanged if venue already equals address
+    });
+  }, []);
   // Handle theme selection
   const handleThemeChange = (themeId: number) => {
     setFormData(prev => {

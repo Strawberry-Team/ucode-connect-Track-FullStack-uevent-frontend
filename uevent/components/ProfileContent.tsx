@@ -24,7 +24,7 @@ const ProfileContent = ({ user }) => {
   const { isDarkMode } = useTheme(); 
   const router = useRouter();
   const fileInputRef = useRef<HTMLInputElement>(null);
-  
+  const { logout} = useAuth();
   // States
   const [activeSection, setActiveSection] = useState<TabType>('profile');
   const [isEditing, setIsEditing] = useState(false);
@@ -308,8 +308,9 @@ const handleChangePassword = async () => {
 };
 
   // Handle logout
-  const handleLogout = () => {
-    // Here would be the logout function
+  const handleLogout = async () => {
+    await logout();
+
     router.push('/login');
   };
 
@@ -427,7 +428,7 @@ const handleChangePassword = async () => {
                     <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path>
                     <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path>
                   </svg>
-                  My Tickets
+                  My Orders
                 </button>
                 
                 <button
@@ -472,7 +473,7 @@ const handleChangePassword = async () => {
                   <polyline points="16 17 21 12 16 7"></polyline>
                   <line x1="21" y1="12" x2="9" y2="12"></line>
                 </svg>
-                Sign Out
+                Log Out
               </button>
             </div>
           </div>
@@ -632,7 +633,7 @@ const handleChangePassword = async () => {
             <header className="mb-8">
               <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
                 {activeSection === 'profile' && 'Your Profile'}
-                {activeSection === 'tickets' && 'Your Tickets'}
+                {activeSection === 'tickets' && 'Your Orders'}
                 {activeSection === 'subscriptions' && 'Your Subscriptions'}
                 {activeSection === 'company' && 'Your Company'}
               </h1>
@@ -959,7 +960,7 @@ const handleChangePassword = async () => {
                         </div>
                         
                         <div className="space-y-4">
-                          <div className="bg-gray-50 dark:bg-black dark:bg-black rounded-lg p-4 flex items-center justify-between">
+                          {/* <div className="bg-gray-50 dark:bg-black dark:bg-black rounded-lg p-4 flex items-center justify-between">
                             <div className="flex items-center">
                               <div className="p-2 bg-emerald-100 dark:bg-emerald-900/40 rounded-full">
                                 <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-emerald-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -978,9 +979,9 @@ const handleChangePassword = async () => {
                             >
                               Change
                             </button>
-                          </div>
+                          </div> */}
                           
-                          <div className="bg-gray-50 dark:bg-black dark:bg-black rounded-lg p-4 flex items-center justify-between">
+                          {/* <div className="bg-gray-50 dark:bg-black dark:bg-black rounded-lg p-4 flex items-center justify-between">
                             <div className="flex items-center">
                               <div className="p-2 bg-emerald-100 dark:bg-emerald-900/40 rounded-full">
                                 <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-emerald-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -997,7 +998,7 @@ const handleChangePassword = async () => {
                             >
                               Setup
                             </button>
-                          </div>
+                          </div> */}
                         </div>
                       </div>
                     )}
@@ -1005,7 +1006,7 @@ const handleChangePassword = async () => {
                 </div>
 {/* Theme Settings Card */}
 <ThemeSwitch />
-                {/* Connected Accounts Card */}
+                {/* Connected Accounts Card
                 <div className="bg-white dark:bg-black rounded-2xl shadow-sm dark:shadow-none overflow-hidden border border-gray-100 dark:border-gray-800">
                   <div className="px-6 py-5 bg-gray-50 dark:bg-black dark:bg-black border-b border-gray-100 dark:border-gray-800">
                     <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Connected Accounts</h2>
@@ -1067,7 +1068,7 @@ const handleChangePassword = async () => {
                       </div>
                     </div>
                   </div>
-                </div>
+                </div> */}
               </div>
             )}
 

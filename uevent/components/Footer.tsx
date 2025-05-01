@@ -38,7 +38,7 @@ export default function Footer() {
           {/* Links grid - Now in a more compact horizontal layout */}
           <div className="grid grid-cols-3 gap-8 md:gap-16">
             {/* Company Links */}
-            <div>
+            {/* <div>
               <h3 className="text-xs font-semibold text-gray-900 dark:text-white uppercase tracking-wider">
                 COMPANY
               </h3>
@@ -54,7 +54,7 @@ export default function Footer() {
                   </Link>
                 </li>
               </ul>
-            </div>
+            </div> */}
 
             {/* Events Links */}
             <div>

@@ -4,6 +4,9 @@ export default function Document() {
   return (
     <Html lang="en">
       <Head>
+        {/* Добавляем фавиконку */}
+        <link rel="icon" href="/logo.png" />
+        
         {/* Предзагрузка темы перед рендерингом страницы, чтобы избежать мигания */}
         <script
           dangerouslySetInnerHTML={{
