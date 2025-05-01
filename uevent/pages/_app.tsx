@@ -18,7 +18,8 @@ import { SubscriptionProvider } from '../contexts/SubscriptionContext';
 import { PromoCodeProvider } from '../contexts/PromoCodeContext';
 import { NotificationProvider } from '../contexts/NotificationContext';
 import { OrderProvider } from '../contexts/OrderContext';
-
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 // Список публичных путей, которые не требуют аутентификации
 const publicPaths = ['/login', '/register', '/forgot-password', '/reset-password'];
 
@@ -82,6 +83,19 @@ function MyApp({ Component, pageProps }: AppProps) {
               <Component {...pageProps} />
             </main>
             <Footer />
+            {/* Add ToastContainer here */}
+            <ToastContainer 
+              position="top-right"
+              autoClose={5000}
+              hideProgressBar={false}
+              newestOnTop
+              closeOnClick
+              rtl={false}
+              pauseOnFocusLoss
+              draggable
+              pauseOnHover
+              theme="colored"
+            />
           </div>
           </OrderProvider>
           </PromoCodeProvider>

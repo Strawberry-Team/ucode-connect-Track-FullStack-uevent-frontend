@@ -137,35 +137,45 @@ export const PromoCodeProvider: React.FC<{ children: ReactNode }> = ({ children 
 
 
 // Validate a promo code
+// Validate a promo code
 const handleValidatePromoCode = useCallback(async (eventId: number, code: string) => {
-    setIsLoading(true);
-    setError(null);
-    try {
-      const result = await promoCodeService.validatePromoCode(eventId, code);
-      
-      return {
-        success: true,
-        discountPercent: result.discountPercent
-      };
-    } catch (error) {
-      console.error('Error validating promo code:', error);
-      
-      // Extract the meaningful error message
-      const errorMessage = error instanceof Error 
-        ? error.message 
-        : 'Failed to validate promo code';
-      
+  setIsLoading(true);
+  setError(null);
+  try {
+    const result = await promoCodeService.validatePromoCode(eventId, code);
+    
+    // If service returns success: false, handle it here
+    if (!result.success) {
+      const errorMessage = result.message || 'Invalid promo code';
       setError(errorMessage);
       
-      // Return the error message in the response
-      return { 
-        success: false, 
+      return {
+        success: false,
         message: errorMessage
       };
-    } finally {
-      setIsLoading(false);
     }
-  }, []);
+    
+    return {
+      success: true,
+      discountPercent: result.discountPercent
+    };
+  } catch (error) {
+    console.error('Error validating promo code:', error);
+    
+    const errorMessage = error instanceof Error 
+      ? error.message 
+      : 'Failed to validate promo code';
+    
+    setError(errorMessage);
+    
+    return { 
+      success: false, 
+      message: errorMessage
+    };
+  } finally {
+    setIsLoading(false);
+  }
+}, []);
 
   // Context value
   const value: PromoCodeContextType = {

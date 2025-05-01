@@ -63,33 +63,40 @@ export const promoCodeService = {
   },
 
   // Validate a promo code for an event
-  async validatePromoCode(eventId: number, code: string): Promise<{ discountPercent: number }> {
-    try {
-      const response = await axios.post(
-        `${API_URL}/promo-codes/validate`, 
-        { eventId, code }, 
-        getAuthHeaders()
-      );
-      
-      // Extract the discount percent from the nested structure
-      return {
-        discountPercent: response.data.promoCode?.discountPercent || 0
-      };
-    } catch (error) {
-      // Extract and propagate the error message from the server
-      if (axios.isAxiosError(error) && error.response) {
-        const serverError = error.response.data;
-        const errorMessage = serverError.message || 'Failed to validate promo code';
+  // Validate a promo code for an event
+async validatePromoCode(eventId: number, code: string): Promise<{ success: boolean, discountPercent?: number, message?: string }> {
+  try {
+    const response = await axios.post(
+      `${API_URL}/promo-codes/validate`,
+      { eventId, code },
+      getAuthHeaders()
+    );
         
-        // Create a custom error with the server message
-        const customError = new Error(errorMessage);
-        throw customError;
-      }
-      
-      // For other types of errors, just propagate them
-      console.error('Error validating promo code:', error);
-      throw error;
+    // Return success response with discount percent
+    return {
+      success: true,
+      discountPercent: response.data.promoCode?.discountPercent || 0
+    };
+  } catch (error) {
+    // Handle Axios errors
+    if (axios.isAxiosError(error) && error.response) {
+      const serverError = error.response.data;
+      const errorMessage = serverError.message || 'Failed to validate promo code';
+            
+      // Return structured error response instead of throwing
+      return {
+        success: false,
+        message: errorMessage
+      };
     }
+        
+    // For other types of errors, also return structured response
+    console.error('Error validating promo code:', error);
+    return {
+      success: false,
+      message: error instanceof Error ? error.message : 'Failed to validate promo code'
+    };
   }
+}
   
 };

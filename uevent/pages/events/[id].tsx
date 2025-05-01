@@ -195,6 +195,7 @@ const handleQuantityChange = (ticketTitle, change) => {
 };
 
 // Validate promo code
+// Validate promo code
 const handleValidatePromoCode = async (e) => {
   e.preventDefault();
   if (!promoCode.trim()) {
@@ -216,19 +217,18 @@ const handleValidatePromoCode = async (e) => {
       const displayPercent = (result.discountPercent * 100).toFixed(0);
       toast.success(`Promo code applied: ${displayPercent}% discount`);
     } else {
-      // Display the specific error message from the server
+      // Explicitly show error toast with the message from the result
       toast.error(result.message || 'Invalid promo code');
       setValidPromoCode(null);
     }
   } catch (error) {
-    // If something unexpected happens, still provide a good error message
     console.error('Error validating promo code:', error);
     
-    // Try to extract a meaningful message
     const errorMessage = error instanceof Error
       ? error.message
       : 'Failed to validate promo code';
       
+    // Make sure this toast is displayed
     toast.error(errorMessage);
     setValidPromoCode(null);
   } finally {
