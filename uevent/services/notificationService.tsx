@@ -1,9 +1,7 @@
 import axios from 'axios';
 
-// Base API URL
 const API_URL = 'http://localhost:8080/api';
 
-// Helper function to get auth headers
 const getAuthHeaders = () => {
   const token = localStorage.getItem('token');
   return {
@@ -38,8 +36,8 @@ export interface Notification {
 }
 
 export const notificationService = {
-  // Get all notifications for a user
-  // In notificationService.ts - update the getUserNotifications method
+
+
 async getUserNotifications(userId?: number): Promise<Notification[]> {
     try {
       const userIdToUse = userId || this.getCurrentUserId();
@@ -50,17 +48,17 @@ async getUserNotifications(userId?: number): Promise<Notification[]> {
          getAuthHeaders()
       );
       
-      // Check if the response has an items property (pagination structure)
+
       if (response.data && Array.isArray(response.data.items)) {
         return response.data.items;
       }
       
-      // Fallback if the response is directly an array
+
       if (Array.isArray(response.data)) {
         return response.data;
       }
       
-      // Return empty array if neither condition is met
+
       console.error('Unexpected API response format:', response.data);
       return [];
     } catch (error) {
@@ -69,7 +67,7 @@ async getUserNotifications(userId?: number): Promise<Notification[]> {
     }
   },
 
-  // Mark a notification as read
+
   async markAsRead(notificationId: number): Promise<boolean> {
     try {
       await axios.patch(
@@ -85,7 +83,7 @@ async getUserNotifications(userId?: number): Promise<Notification[]> {
     }
   },
 
-  // Mark all notifications as read
+
   async markAllAsRead(): Promise<boolean> {
     try {
       const userId = this.getCurrentUserId();
@@ -104,7 +102,7 @@ async getUserNotifications(userId?: number): Promise<Notification[]> {
     }
   },
 
-  // Get unread notification count
+
   async getUnreadCount(): Promise<number> {
     try {
       const userId = this.getCurrentUserId();
@@ -118,7 +116,7 @@ async getUserNotifications(userId?: number): Promise<Notification[]> {
     }
   },
 
-  // Helper method to get current user ID
+
   getCurrentUserId(): number | null {
     const userData = localStorage.getItem('user');
     if (userData) {
@@ -132,3 +130,4 @@ async getUserNotifications(userId?: number): Promise<Notification[]> {
     return null;
   }
 };
+

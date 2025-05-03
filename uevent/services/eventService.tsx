@@ -1,10 +1,8 @@
 import axios from 'axios';
 import { Event, Ticket, Theme } from '../contexts/EventContext';
 
-// API base URL
 const API_URL = 'http://localhost:8080/api';
 
-// Helper function to get auth headers
 const getAuthHeaders = () => {
   const token = localStorage.getItem('token');
   return {
@@ -16,9 +14,9 @@ const getAuthHeaders = () => {
   };
 };
 
-// Event service methods
+
 export const eventService = {
-  // Get all events
+
   async getEvents(): Promise<Event[]> {
     try {
       
@@ -31,7 +29,7 @@ export const eventService = {
     }
   },
 
-  // Get event by ID
+
   async getEventById(id: number): Promise<Event> {
     try {
       const response = await axios.get(`${API_URL}/events/${id}`, getAuthHeaders());
@@ -42,7 +40,7 @@ export const eventService = {
     }
   },
 
-  // Create a new event
+
   async createEvent(eventData: Partial<Event>): Promise<Event> {
     try {
       const response = await axios.post(`${API_URL}/events`, eventData, getAuthHeaders());
@@ -53,7 +51,7 @@ export const eventService = {
     }
   },
 
-  // Update an existing event
+
   async updateEvent(id: number, eventData: Partial<Event>): Promise<Event> {
     try {
       const response = await axios.patch(`${API_URL}/events/${id}`, eventData, getAuthHeaders());
@@ -64,7 +62,7 @@ export const eventService = {
     }
   },
 
-  // Delete an event
+
   async deleteEvent(id: number): Promise<void> {
     try {
       await axios.delete(`${API_URL}/events/${id}`, getAuthHeaders());
@@ -74,7 +72,7 @@ export const eventService = {
     }
   },
 
-  // Upload event poster
+
   async uploadEventPoster(file: File, eventId: number): Promise<{posterName: string}> {
     try {
       const token = localStorage.getItem('token');
@@ -96,7 +94,7 @@ export const eventService = {
     }
   },
 
-  // Sync event themes
+
   async syncEventThemes(eventId: number, themeIds: number[]): Promise<void> {
     try {
       await axios.post(
@@ -110,7 +108,7 @@ export const eventService = {
     }
   },
 
-  // Create event tickets
+
   async createEventTickets(eventId: number, tickets: Ticket[]): Promise<Ticket[]> {
     try {
       const promises = tickets.map(ticket => 
@@ -125,14 +123,14 @@ export const eventService = {
     }
   },
 
-  // Get formats (for dropdown selection)
+
   async getFormats(): Promise<{ id: number; title: string; }[]> {
     try {
       const response = await axios.get(`${API_URL}/formats`, getAuthHeaders());
       return response.data;
     } catch (error) {
       console.error('Error fetching formats:', error);
-      // Return some mock data for local development
+
       return [
         { id: 1, title: 'Conference' },
         { id: 2, title: 'Workshop' },
@@ -143,14 +141,14 @@ export const eventService = {
     }
   },
 
-  // Get themes (for dropdown selection)
+
   async getThemes(): Promise<{id: number, title: string}[]> {
     try {
       const response = await axios.get(`${API_URL}/themes`, getAuthHeaders());
       return response.data;
     } catch (error) {
       console.error('Error fetching themes:', error);
-      // Return some mock data for local development 
+
       return [
         { id: 1, title: 'Technology' },
         { id: 2, title: 'Business' },
@@ -162,9 +160,9 @@ export const eventService = {
     }
   },
 
-  // НОВЫЕ МЕТОДЫ ДЛЯ РАБОТЫ С НОВОСТЯМИ СОБЫТИЙ
+
   
-  // Получить новости события
+
   async getEventNews(eventId: number): Promise<any[]> {
     try {
       const response = await axios.get(`${API_URL}/events/${eventId}/news`, getAuthHeaders());
@@ -175,7 +173,7 @@ export const eventService = {
     }
   },
 
-  // Создать новость события
+
   async createEventNews(eventId: number, newsData: { title: string; description: string }): Promise<any> {
     try {
       const response = await axios.post(`${API_URL}/events/${eventId}/news`, newsData, getAuthHeaders());
@@ -186,7 +184,7 @@ export const eventService = {
     }
   },
   
-  // Обновить новость события
+
   async updateEventNews(eventId: number, newsId: string, newsData: { title: string; description: string }): Promise<any> {
     try {
       const response = await axios.patch(`${API_URL}/news/${newsId}`, newsData, getAuthHeaders());
@@ -197,7 +195,7 @@ export const eventService = {
     }
   },
   
-  // Удалить новость события
+
   async deleteEventNews(eventId: number, newsId: string): Promise<void> {
     try {
       await axios.delete(`${API_URL}/news/${newsId}`, getAuthHeaders());
@@ -207,7 +205,7 @@ export const eventService = {
     }
   },
 
-  // Get event attendees
+
 async getEventAttendees(eventId: number): Promise<any[]> {
   try {
     const response = await axios.get(`${API_URL}/events/${eventId}/attendees`, getAuthHeaders());
@@ -218,7 +216,7 @@ async getEventAttendees(eventId: number): Promise<any[]> {
   }
 },
 
-// Update attendee visibility
+
 async updateAttendeeVisibility(attendeeId: number, isVisible: boolean): Promise<any> {
   try {
     const response = await axios.patch(
@@ -233,7 +231,7 @@ async updateAttendeeVisibility(attendeeId: number, isVisible: boolean): Promise<
   }
 },
 
-// Get ticket types for an event
+
 async getTicketTypes(eventId: number): Promise<any[]> {
   try {
     const response = await axios.get(`${API_URL}/events/${eventId}/ticket-types`, getAuthHeaders());
@@ -244,7 +242,7 @@ async getTicketTypes(eventId: number): Promise<any[]> {
   }
 },
 
-// Get all tickets for an event
+
 async getEventTickets(eventId: number, filters?: { title?: string, status?: string }): Promise<any[]> {
   try {
     let url = `${API_URL}/events/${eventId}/tickets`;
@@ -268,7 +266,7 @@ async getEventTickets(eventId: number, filters?: { title?: string, status?: stri
   }
 },
 
-// Get a specific ticket
+
 async getTicketById(eventId: number, ticketId: number): Promise<any> {
   try {
     const response = await axios.get(`${API_URL}/events/${eventId}/tickets/${ticketId}`, getAuthHeaders());
@@ -279,5 +277,5 @@ async getTicketById(eventId: number, ticketId: number): Promise<any> {
   }
 },
 
-
 };
+

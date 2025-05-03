@@ -12,7 +12,6 @@ const EventsPage: React.FC = () => {
   
   const isLoading = eventsLoading || companyLoading;
   
-  // Format date for display
   const formatDate = (dateString: string) => {
     if (!dateString) return '';
     
@@ -28,7 +27,6 @@ const EventsPage: React.FC = () => {
     }
   };
   
-  // Format time for display
   const formatTime = (dateString: string) => {
     if (!dateString) return '';
     
@@ -43,21 +41,17 @@ const EventsPage: React.FC = () => {
     }
   };
   
-  // Get image URL with correct domain
   const getImageUrl = (path: string | undefined) => {
     if (!path) return null;
     
-    // Check if path is already a full URL
     if (path.startsWith('http://') || path.startsWith('https://')) {
       return path;
     }
     
-    // If it's a relative path, prepend the backend URL with correct path structure
     const baseUrl = 'http://localhost:8080';
     return `${baseUrl}/uploads/event-posters/${path.startsWith('/') ? path.substring(1) : path}`;
   };
-  
-  // Check if event belongs to the user's company
+
   const isUserEvent = (event) => {
     return company && event.companyId === company.id;
   };
@@ -336,3 +330,4 @@ const EventsPage: React.FC = () => {
 };
 
 export default EventsPage;
+

@@ -1,9 +1,7 @@
 import axios from 'axios';
 
-// Base API URL
 const API_URL = 'http://localhost:8080/api';
 
-// Helper function to get auth headers
 const getAuthHeaders = () => {
   const token = localStorage.getItem('token');
   return {
@@ -15,9 +13,8 @@ const getAuthHeaders = () => {
   };
 };
 
-
 export const paymentService = {
-// Update an existing promo code
+
   async createPaymentIntent(orderId: number) {
     try {
       const response = await axios.post(`${API_URL}/payments/stripe/payment-intents`, {orderId}, getAuthHeaders());
@@ -28,3 +25,4 @@ export const paymentService = {
     }
   },
 };
+

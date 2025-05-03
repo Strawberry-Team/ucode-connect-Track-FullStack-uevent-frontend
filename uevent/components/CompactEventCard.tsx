@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import { EventNewsModal } from './EventNewsModal';
 
-// Компактная карточка события для отображения в секции "My Events" на странице компании
 interface CompactEventCardProps {
   event: {
     id: number;
@@ -18,14 +17,11 @@ interface CompactEventCardProps {
 }
 
 export const CompactEventCard: React.FC<CompactEventCardProps> = ({ event, getImageUrlEventPosters }) => {
-  // Состояние для модального окна создания новости
   const [isNewsModalOpen, setIsNewsModalOpen] = useState(false);
 
-  // Функции для открытия/закрытия модального окна
   const openNewsModal = () => setIsNewsModalOpen(true);
   const closeNewsModal = () => setIsNewsModalOpen(false);
 
-  // Получить цвет статуса
   const getStatusColor = (status: string) => {
     switch(status) {
       case 'PUBLISHED':
@@ -38,7 +34,6 @@ export const CompactEventCard: React.FC<CompactEventCardProps> = ({ event, getIm
     }
   };
 
-  // Форматировать дату
   const formatDate = (dateString: string) => {
     const options: Intl.DateTimeFormatOptions = { year: 'numeric', month: 'short', day: 'numeric' };
     return new Date(dateString).toLocaleDateString(undefined, options);
@@ -70,7 +65,6 @@ export const CompactEventCard: React.FC<CompactEventCardProps> = ({ event, getIm
             </span>
           </div>
 
-          {/* Кнопка добавления новости в верхнем левом углу */}
           <div className="absolute top-3 left-3">
             <button 
               onClick={openNewsModal}
@@ -144,7 +138,6 @@ export const CompactEventCard: React.FC<CompactEventCardProps> = ({ event, getIm
               Edit
             </Link>
             
-            {/* Кнопка для создания новости */}
             <button
               onClick={openNewsModal}
               className="flex items-center justify-center bg-blue-100 dark:bg-blue-900/30 hover:bg-blue-200 dark:hover:bg-blue-900/50 text-blue-700 dark:text-blue-400 font-medium rounded-lg py-2 transition-colors"
@@ -161,7 +154,6 @@ export const CompactEventCard: React.FC<CompactEventCardProps> = ({ event, getIm
         </div>
       </div>
 
-      {/* Модальное окно для создания новости */}
       <EventNewsModal 
         isOpen={isNewsModalOpen} 
         onClose={closeNewsModal} 
@@ -171,3 +163,4 @@ export const CompactEventCard: React.FC<CompactEventCardProps> = ({ event, getIm
     </>
   );
 };
+

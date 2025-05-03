@@ -16,24 +16,20 @@ export default function ResetPassword() {
   const { resetPassword, loading, error, clearError } = useAuth();
 
   useEffect(() => {
-    // Clear errors when component mounts
     clearError();
   }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Clear previous messages
     setMessage('');
     clearError();
     
-    // Validate password match
     if (password !== confirmPassword) {
       setMessage('Passwords do not match');
       return;
     }
     
-    // Validate password strength (at least 8 chars, 1 uppercase, 1 lowercase, 1 number)
     const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/;
     if (!passwordRegex.test(password)) {
       setMessage('Password must be at least 8 characters long and include at least one uppercase letter, one lowercase letter, and one number');
@@ -42,7 +38,6 @@ export default function ResetPassword() {
     
     try {
       if (token && typeof token === 'string') {
-        // Reset password
         await resetPassword(token, password);
         setIsSuccess(true);
         setMessage('Your password has been successfully reset. You can now log in with your new password.');
@@ -189,3 +184,4 @@ export default function ResetPassword() {
     </>
   );
 }
+

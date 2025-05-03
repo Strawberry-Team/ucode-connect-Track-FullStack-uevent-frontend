@@ -1,4 +1,3 @@
-// pages/_app.tsx
 import { useEffect } from 'react';
 import '../styles/globals.css';
 import type { AppProps } from 'next/app';
@@ -20,22 +19,22 @@ import { NotificationProvider } from '../contexts/NotificationContext';
 import { OrderProvider } from '../contexts/OrderContext';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-// Список публичных путей, которые не требуют аутентификации
+
 const publicPaths = ['/login', '/register', '/forgot-password', '/reset-password'];
 
 function MyApp({ Component, pageProps }: AppProps) {
   const router = useRouter();
   
-  // Проверяем, является ли текущий путь публичным
+  
   const isPublicPath = publicPaths.some(path => 
     router.pathname === path || router.pathname.startsWith('/reset-password/')
   );
 
   useEffect(() => {
-    // Инициализация интерсепторов при загрузке приложения
+    
     authService.setupInterceptors();
     
-    //Попытка получить CSRF-токен для защиты от CSRF-атак
+    
     const fetchCsrfToken = async () => {
       try {
         await csrfService.fetchCsrfToken();
@@ -45,7 +44,7 @@ function MyApp({ Component, pageProps }: AppProps) {
       }
     };
     
-    // Установить токен из сессии, если он есть
+    
     const accessToken = sessionStorage.getItem('accessToken');
     if (accessToken) {
       axios.defaults.headers.common['Authorization'] = `Bearer ${accessToken}`;
@@ -54,7 +53,7 @@ function MyApp({ Component, pageProps }: AppProps) {
     fetchCsrfToken();
   }, []);
   
-  // Проверка темы при загрузке на стороне клиента
+  
   useEffect(() => {
     if (typeof window !== 'undefined') {
       const savedTheme = localStorage.getItem('theme') || 'system';
@@ -109,3 +108,4 @@ function MyApp({ Component, pageProps }: AppProps) {
 }
 
 export default MyApp;
+

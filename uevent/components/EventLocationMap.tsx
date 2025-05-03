@@ -16,14 +16,11 @@ const EventLocationMap = ({ coordinates, venueName }) => {
       googleLoadAttemptedRef.current = true;
       loadGoogleMap();
     } else if (!useGoogleMap) {
-      // Reset flag if we switch back from OpenStreetMap
       googleLoadAttemptedRef.current = false;
     }
     
-    // Cleanup function
     return () => {
       if (mapInstanceRef.current && window.google && window.google.maps) {
-        // Clear event listeners
         google.maps.event.clearInstanceListeners(mapInstanceRef.current);
         
         if (markerRef.current) {
@@ -34,16 +31,13 @@ const EventLocationMap = ({ coordinates, venueName }) => {
   }, [coordinates, useGoogleMap]);
   
   const loadGoogleMap = () => {
-    // If Google Maps API script is already loaded
     if (window.google && window.google.maps) {
       initializeGoogleMap();
       return;
     }
     
-    // Check if script is already being loaded by another component
     const existingScript = document.getElementById('google-maps-script');
     if (existingScript) {
-      // Wait until it loads
       const checkGoogleInterval = setInterval(() => {
         if (window.google && window.google.maps) {
           clearInterval(checkGoogleInterval);
@@ -51,7 +45,6 @@ const EventLocationMap = ({ coordinates, venueName }) => {
         }
       }, 100);
       
-      // Clear interval after 10 seconds (timeout)
       setTimeout(() => {
         clearInterval(checkGoogleInterval);
         if (!window.google || !window.google.maps) {
@@ -65,12 +58,10 @@ const EventLocationMap = ({ coordinates, venueName }) => {
       return;
     }
     
-    // Define global callback
     window.googleMapCallback = () => {
       initializeGoogleMap();
     };
     
-    // Load Google Maps API script
     const script = document.createElement('script');
     script.id = 'google-maps-script';
     script.src = `https://maps.googleapis.com/maps/api/js?key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}&libraries=places&callback=googleMapCallback`;
@@ -78,7 +69,6 @@ const EventLocationMap = ({ coordinates, venueName }) => {
     script.defer = true;
     
     script.onload = () => {
-      // Script loaded but callback not fired - do nothing, callback will handle it
     };
     
     script.onerror = () => {
@@ -95,7 +85,6 @@ const EventLocationMap = ({ coordinates, venueName }) => {
     try {
       if (!coordinates || !mapRef.current) return;
       
-      // If map is already initialized, just update it
       if (mapInstanceRef.current) {
         updateGoogleMap();
         return;
@@ -119,7 +108,6 @@ const EventLocationMap = ({ coordinates, venueName }) => {
       const map = new window.google.maps.Map(mapRef.current, mapOptions);
       mapInstanceRef.current = map;
       
-      // Add marker for the event location
       const marker = new window.google.maps.Marker({
         position: { lat, lng },
         map: map,
@@ -142,7 +130,6 @@ const EventLocationMap = ({ coordinates, venueName }) => {
     }
   };
   
-  // Update map when coordinates change
   const updateGoogleMap = () => {
     if (!coordinates || !mapInstanceRef.current || !markerRef.current) return;
     
@@ -157,7 +144,6 @@ const EventLocationMap = ({ coordinates, venueName }) => {
       mapInstanceRef.current.setCenter(position);
       markerRef.current.setPosition(position);
       
-      // Update venue name if changed
       if (markerRef.current.getTitle() !== venueName) {
         markerRef.current.setTitle(venueName || 'Event Location');
       }
@@ -166,7 +152,6 @@ const EventLocationMap = ({ coordinates, venueName }) => {
     }
   };
   
-  // Fallback to OpenStreetMap
   const renderOpenStreetMap = () => {
     if (!coordinates) return null;
     
@@ -181,7 +166,6 @@ const EventLocationMap = ({ coordinates, venueName }) => {
         );
       }
       
-      // Use a static approach for OpenStreetMap to prevent excessive reloads
       return (
         <iframe 
           width="100%" 
@@ -242,3 +226,4 @@ const EventLocationMap = ({ coordinates, venueName }) => {
 };
 
 export default EventLocationMap;
+

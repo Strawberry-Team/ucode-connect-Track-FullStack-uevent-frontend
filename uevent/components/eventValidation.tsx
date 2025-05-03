@@ -1,6 +1,5 @@
 import { z } from 'zod';
 
-// Event basic information validation schema (Step 1)
 export const EventBasicInfoSchema = z.object({
   title: z
     .string()
@@ -56,14 +55,12 @@ export const EventBasicInfoSchema = z.object({
     .positive({ message: "Please select a format" }),
 });
 
-// Event themes validation schema (Step 2)
 export const EventThemesSchema = z.object({
   themes: z.array(
     z.number().positive()
   ).min(1, { message: "Please select at least one theme" }),
 });
 
-// Single ticket validation schema
 const TicketSchema = z.object({
   title: z
     .string()
@@ -84,20 +81,16 @@ const TicketSchema = z.object({
     .positive({ message: "Quantity must be at least 1" }),
 });
 
-// Event tickets validation schema (Step 3)
 export const EventTicketsSchema = z.object({
   tickets: z.array(TicketSchema)
     .min(1, { message: "Please add at least one ticket type" }),
 });
 
-// Types inferred from the schemas
 export type EventBasicInfo = z.infer<typeof EventBasicInfoSchema>;
 export type EventThemes = z.infer<typeof EventThemesSchema>;
 export type EventTicket = z.infer<typeof TicketSchema>;
 export type EventTickets = z.infer<typeof EventTicketsSchema>;
 
-// Combined event form data type
-// Add to your EventFormData interface
 export interface EventFormData {
   basicInfo: EventBasicInfo;
   themes: EventThemes;
@@ -111,3 +104,4 @@ export interface EventFormData {
     }[];
   };
 }
+

@@ -3,14 +3,12 @@ import Link from 'next/link';
 import { Calendar, MapPin, Tag, ArrowRight, Clock } from 'lucide-react';
 import axios from 'axios';
 
-// API base URL (same as original)
 const API_URL = 'http://localhost:8080/api';
 
 const SimilarEventsSection = ({ event, maxEvents = 3 }) => {
   const [similarEvents, setSimilarEvents] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Original data fetching logic
   useEffect(() => {
     const fetchSimilarEvents = async () => {
       if (!event?.id || !event?.themes || event.themes.length === 0) return;
@@ -18,27 +16,22 @@ const SimilarEventsSection = ({ event, maxEvents = 3 }) => {
       try {
         setIsLoading(true);
         
-        // Get theme ID from current event
         const themeId = event.themes[0]?.id;
         if (!themeId) return;
         
-        // Request parameters 
         const params = {
           themes: themeId.toString(),
           take: maxEvents + 1,
         };
         
-        // Auth headers
         const token = localStorage.getItem('token');
         const headers = token ? { Authorization: `Bearer ${token}` } : {};
-        
-        // API request
+      
         const response = await axios.get(`${API_URL}/events`, {
           params,
           headers
         });
         
-        // Process response data
         let eventsData = [];
         if (response.data.items) {
           eventsData = response.data.items;
@@ -46,7 +39,6 @@ const SimilarEventsSection = ({ event, maxEvents = 3 }) => {
           eventsData = response.data;
         }
         
-        // Filter out current event
         const filtered = eventsData
           .filter(e => e.id !== event.id)
           .slice(0, maxEvents);
@@ -63,7 +55,6 @@ const SimilarEventsSection = ({ event, maxEvents = 3 }) => {
     fetchSimilarEvents();
   }, [event?.id, event?.themes, maxEvents]);
 
-  // Format date function
   const formatDate = (dateString) => {
     const date = new Date(dateString);
     return date.toLocaleDateString('en-US', {
@@ -73,7 +64,6 @@ const SimilarEventsSection = ({ event, maxEvents = 3 }) => {
     });
   };
 
-  // Get image URL function
   const getImageUrl = (path) => {
     if (!path) return null;
     
@@ -85,7 +75,6 @@ const SimilarEventsSection = ({ event, maxEvents = 3 }) => {
     return `${baseUrl}/uploads/event-posters/${path}`;
   };
 
-  // Helper function for status badge styling
   const getStatusClass = (status) => {
     switch(status) {
       case 'PUBLISHED':
@@ -103,7 +92,6 @@ const SimilarEventsSection = ({ event, maxEvents = 3 }) => {
     }
   };
 
-  // Helper function to translate status to English
   const getStatusText = (status) => {
     switch(status) {
       case 'PUBLISHED': return 'Published';
@@ -115,7 +103,6 @@ const SimilarEventsSection = ({ event, maxEvents = 3 }) => {
     }
   };
 
-  // Loading state
   if (isLoading) {
     return (
       <div className="bg-white dark:bg-gray-800 rounded-xl shadow-md overflow-hidden border border-gray-100 dark:border-gray-700">
@@ -142,7 +129,6 @@ const SimilarEventsSection = ({ event, maxEvents = 3 }) => {
     );
   }
 
-  // Empty state (no results)
   if (similarEvents.length === 0) {
     return null;
   }
@@ -154,12 +140,7 @@ const SimilarEventsSection = ({ event, maxEvents = 3 }) => {
           <span className="w-1 h-6 bg-emerald-500 rounded-full mr-3"></span>
           <h2 className="text-xl font-bold text-gray-900 dark:text-white">Similar Events</h2>
         </div>
-        {/* {similarEvents.length > 0 && (
-          <Link href="/events" className="text-emerald-600 dark:text-emerald-400 text-sm font-medium hover:text-emerald-700 dark:hover:text-emerald-300 transition-colors flex items-center group">
-            View all
-            <ArrowRight className="ml-1 w-4 h-4 transform group-hover:translate-x-1 transition-transform" />
-          </Link>
-        )} */}
+        
       </div>
       
       <div className="p-6">
@@ -180,7 +161,7 @@ const SimilarEventsSection = ({ event, maxEvents = 3 }) => {
                     </div>
                   )}
                   
-                  {/* Date badge */}
+                  
                   <div className="absolute top-3 left-3 bg-white dark:bg-gray-900 shadow-md rounded-lg p-1.5 text-center w-14">
                     <div className="text-xs font-semibold bg-emerald-600 text-white rounded-t-sm -mt-1 -mx-1 py-0.5">
                       {new Date(similarEvent.startedAt).toLocaleDateString('en-US', { weekday: 'short' })}
@@ -193,14 +174,14 @@ const SimilarEventsSection = ({ event, maxEvents = 3 }) => {
                     </div>
                   </div>
                   
-                  {/* Status badge */}
+                  
                   <div className="absolute top-3 right-3">
                     <span className={`px-2.5 py-1 rounded-full text-xs font-medium ${getStatusClass(similarEvent.status)}`}>
                       {getStatusText(similarEvent.status)}
                     </span>
                   </div>
                   
-                  {/* Format badge - if available */}
+                  
                   {similarEvent.format && (
                     <div className="absolute bottom-3 left-3 bg-black/70 backdrop-blur-sm text-white text-xs px-2.5 py-1 rounded-full">
                       {similarEvent.format.title}
@@ -213,7 +194,7 @@ const SimilarEventsSection = ({ event, maxEvents = 3 }) => {
                     {similarEvent.title}
                   </h3>
                   
-                  {/* Themes */}
+                  
                   {similarEvent.themes && similarEvent.themes.length > 0 && (
                     <div className="flex flex-wrap gap-1.5 mb-3">
                       {similarEvent.themes.slice(0, 2).map(theme => (
@@ -258,3 +239,4 @@ const SimilarEventsSection = ({ event, maxEvents = 3 }) => {
 };
 
 export default SimilarEventsSection;
+

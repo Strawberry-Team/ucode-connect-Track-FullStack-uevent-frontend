@@ -5,7 +5,7 @@ import { motion } from 'framer-motion';
 const TermsOfServicePage = () => {
   return (
     <div className="bg-white dark:bg-gray-900 min-h-screen">
-      {/* Header */}
+      
       <header className="bg-gradient-to-r from-emerald-600 to-teal-600">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
           <div className="relative z-10">
@@ -22,7 +22,7 @@ const TermsOfServicePage = () => {
             </motion.div>
           </div>
         </div>
-        {/* Curved divider */}
+        
         <div className="relative h-16">
           <svg viewBox="0 0 1200 120" preserveAspectRatio="none" className="absolute bottom-0 left-0 w-full h-16 text-white dark:text-gray-900 fill-current">
             <path d="M321.39,56.44c58-10.79,114.16-30.13,172-41.86,82.39-16.72,168.19-17.73,250.45-.39C823.78,31,906.67,72,985.66,92.83c70.05,18.48,146.53,26.09,214.34,3V120H0V0Z"></path>
@@ -30,12 +30,12 @@ const TermsOfServicePage = () => {
         </div>
       </header>
 
-      {/* Main Content */}
+      
       <main className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl dark:shadow-2xl dark:shadow-emerald-900/5 overflow-hidden">
           <div className="p-8 md:p-12">
             <div className="prose dark:prose-invert max-w-none prose-headings:font-semibold prose-headings:text-gray-900 dark:prose-headings:text-white prose-headings:mt-8 prose-headings:mb-4">
-              {/* Last Updated */}
+              
               <div className="flex items-center mb-8 text-sm text-gray-500 dark:text-gray-400">
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
@@ -166,7 +166,7 @@ const TermsOfServicePage = () => {
           </div>
         </div>
 
-        {/* Back to Home Button */}
+        
         <div className="mt-10 flex justify-center">
           <Link href="/">
             <motion.div
@@ -189,3 +189,4 @@ const TermsOfServicePage = () => {
 };
 
 export default TermsOfServicePage;
+

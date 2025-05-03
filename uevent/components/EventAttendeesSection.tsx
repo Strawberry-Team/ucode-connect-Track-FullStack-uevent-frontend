@@ -14,7 +14,6 @@ const EventAttendeesSection = ({
 }) => {
   const [showAllAttendees, setShowAllAttendees] = useState(false);
   
-  // Get avatar URL
   const getAvatarUrl = (path) => {
     if (!path) return null;
     if (path.startsWith('http://') || path.startsWith('https://')) {
@@ -24,13 +23,12 @@ const EventAttendeesSection = ({
     return `${baseUrl}/uploads/avatars/${path}`;
   };
   
-  // Get user display name
+
   const getUserDisplayName = (attendee) => {
     if (!attendee.user) return 'Unknown User';
     return `${attendee.user.firstName} ${attendee.user.lastName}`;
   };
   
-  // Get user role for display
   const getUserRole = (attendee) => {
     if (attendee.isOrganizer) return 'Organizer';
     if (attendee.isHost) return 'Host';
@@ -38,7 +36,6 @@ const EventAttendeesSection = ({
     return 'Member';
   };
   
-  // If users can't view attendees
   if (!canViewAttendees) {
     return (
       <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm overflow-hidden border border-gray-100 dark:border-gray-700">
@@ -69,7 +66,6 @@ const EventAttendeesSection = ({
     );
   }
   
-  // Loading state
   if (attendeesLoading) {
     return (
       <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm overflow-hidden border border-gray-100 dark:border-gray-700">
@@ -85,14 +81,12 @@ const EventAttendeesSection = ({
       </div>
     );
   }
-  
-  // Calculate visible attendees
+
   const visibleAttendees = attendees.filter(
     attendee => attendee.isVisible || (user && attendee.userId === user.id)
   );
   
-  // Determine the preview and remaining count
-  const previewCount = 4; // Show first 4 attendees in preview
+  const previewCount = 4;
   const previewAttendees = visibleAttendees.slice(0, previewCount);
   const remainingCount = Math.max(0, visibleAttendees.length - previewCount);
   
@@ -118,7 +112,6 @@ const EventAttendeesSection = ({
         )}
       </div>
       
-      {/* Current user visibility toggle */}
       {currentUserAttendee && (
         <div className="px-6 pt-6">
           <div className="mb-6 bg-emerald-50 dark:bg-emerald-900/20 p-4 rounded-lg">
@@ -151,7 +144,6 @@ const EventAttendeesSection = ({
         </div>
       )}
       
-      {/* Attendees list */}
       <div className="px-6 pb-6">
         {visibleAttendees.length === 0 ? (
           <div className="text-center py-6">
@@ -159,10 +151,8 @@ const EventAttendeesSection = ({
           </div>
         ) : (
           <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-            {/* Show either preview or all attendees based on state */}
             {(showAllAttendees ? visibleAttendees : previewAttendees).map(attendee => (
               <div key={attendee.id} className="flex flex-col items-center text-center">
-                {/* Profile picture with role badge */}
                 <div className="relative mb-2">
                   <div className={`w-20 h-20 rounded-full overflow-hidden ${
                     user && attendee.userId === user.id 
@@ -182,7 +172,6 @@ const EventAttendeesSection = ({
                     )}
                   </div>
                   
-                  {/* Role Badge (Host, Organizer, etc) */}
                   {(attendee.isHost || attendee.isOrganizer || attendee.isSpeaker) && (
                     <div className="absolute -top-1 -right-1">
                       <span className={`px-2 py-1 text-xs font-medium rounded-md 
@@ -193,7 +182,6 @@ const EventAttendeesSection = ({
                     </div>
                   )}
                   
-                  {/* Hidden indicator */}
                   {!attendee.isVisible && (
                     <div className="absolute bottom-0 right-0 bg-gray-800 dark:bg-gray-700 rounded-full p-1">
                       <EyeOff className="w-3 h-3 text-white" />
@@ -201,7 +189,6 @@ const EventAttendeesSection = ({
                   )}
                 </div>
                 
-                {/* Name and role */}
                 <h3 className="font-medium text-gray-900 dark:text-white">
                   {getUserDisplayName(attendee)}
                 </h3>
@@ -209,7 +196,6 @@ const EventAttendeesSection = ({
                   {getUserRole(attendee)}
                 </p>
                 
-                {/* "You" indicator */}
                 {user && attendee.userId === user.id && (
                   <span className="mt-1 text-xs bg-emerald-100 dark:bg-emerald-900/50 text-emerald-800 dark:text-emerald-300 px-2 py-0.5 rounded-full">
                     You
@@ -218,7 +204,6 @@ const EventAttendeesSection = ({
               </div>
             ))}
             
-            {/* Remaining attendees count */}
             {!showAllAttendees && remainingCount > 0 && (
               <div className="flex flex-col items-center justify-center">
                 <div 
@@ -237,7 +222,6 @@ const EventAttendeesSection = ({
           </div>
         )}
         
-        {/* Show less button when expanded */}
         {showAllAttendees && visibleAttendees.length > previewCount && (
           <div className="mt-6 text-center">
             <button 
@@ -254,3 +238,4 @@ const EventAttendeesSection = ({
 };
 
 export default EventAttendeesSection;
+

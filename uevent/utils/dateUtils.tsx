@@ -1,4 +1,3 @@
-// A simple date formatting utility
 export const formatDate = (date: Date, format: string): string => {
     try {
       const day = date.getDate();
@@ -7,7 +6,7 @@ export const formatDate = (date: Date, format: string): string => {
       const hours = date.getHours();
       const minutes = date.getMinutes();
       
-      // Simple formatting options
+
       if (format === 'MMM dd, yyyy') {
         const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
         return `${monthNames[month]} ${day.toString().padStart(2, '0')}, ${year}`;
@@ -26,10 +25,12 @@ export const formatDate = (date: Date, format: string): string => {
         return `${monthNames[month]} ${day.toString().padStart(2, '0')}, ${year} ${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
       }
       
-      // Default format
+
       return date.toLocaleDateString();
     } catch (error) {
       console.error('Error formatting date:', error);
       return 'Invalid Date';
     }
   };
+
+  

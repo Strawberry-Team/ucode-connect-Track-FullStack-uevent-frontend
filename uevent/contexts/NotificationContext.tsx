@@ -1,4 +1,4 @@
-// contexts/NotificationContext.tsx
+
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { notificationService, Notification } from '../services/notificationService';
 import { useAuth } from './AuthContext';
@@ -57,7 +57,7 @@ export const NotificationProvider: React.FC<NotificationProviderProps> = ({ chil
       const success = await notificationService.markAsRead(notificationId);
       
       if (success) {
-        // Update local state instead of fetching again
+        
         setNotifications(prevNotifications =>
           prevNotifications.map(notification =>
             notification.id === notificationId
@@ -77,7 +77,7 @@ export const NotificationProvider: React.FC<NotificationProviderProps> = ({ chil
       const success = await notificationService.markAllAsRead();
       
       if (success) {
-        // Update all notifications to be read
+        
         setNotifications(prevNotifications =>
           prevNotifications.map(notification => ({
             ...notification,
@@ -91,20 +91,20 @@ export const NotificationProvider: React.FC<NotificationProviderProps> = ({ chil
     }
   };
 
-  // Fetch notifications when user changes or on initial load
+  
   useEffect(() => {
     if (user?.id) {
       fetchNotifications();
     }
   }, [user?.id]);
 
-  // Refresh notifications periodically (e.g., every 5 minutes)
+  
   useEffect(() => {
     if (!user?.id) return;
     
     const interval = setInterval(() => {
       fetchNotifications();
-    }, 5 * 60 * 1000); // 5 minutes
+    }, 5 * 60 * 1000); 
     
     return () => clearInterval(interval);
   }, [user?.id]);
@@ -125,3 +125,4 @@ export const NotificationProvider: React.FC<NotificationProviderProps> = ({ chil
     </NotificationContext.Provider>
   );
 };
+

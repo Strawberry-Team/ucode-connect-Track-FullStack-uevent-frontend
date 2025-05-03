@@ -1,4 +1,4 @@
-// contexts/SubscriptionContext.tsx
+
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { toast } from 'react-toastify';
 import { useAuth } from './AuthContext';
@@ -9,7 +9,7 @@ import {
   SubscriptionCreateParams 
 } from '../services/subscriptionService';
 
-// Define the context type
+
 type SubscriptionContextType = {
   subscriptions: Subscription[];
   isLoading: boolean;
@@ -21,7 +21,7 @@ type SubscriptionContextType = {
   toggleSubscription: (entityId: string, entityType: SubscriptionEntityType) => Promise<boolean>;
 };
 
-// Create the context with default values
+
 const SubscriptionContext = createContext<SubscriptionContextType>({
   subscriptions: [],
   isLoading: false,
@@ -33,14 +33,14 @@ const SubscriptionContext = createContext<SubscriptionContextType>({
   toggleSubscription: async () => false,
 });
 
-// Provider component
+
 export const SubscriptionProvider: React.FC<{children: ReactNode}> = ({ children }) => {
   const [subscriptions, setSubscriptions] = useState<Subscription[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const { user } = useAuth();
 
-  // Fetch all subscriptions for the current user
+  
   const fetchSubscriptions = async () => {
     if (!user) {
       setSubscriptions([]);
@@ -61,14 +61,14 @@ export const SubscriptionProvider: React.FC<{children: ReactNode}> = ({ children
     }
   };
 
-  // Check if user is subscribed to an entity
+  
   const isSubscribed = (entityId: string, entityType: SubscriptionEntityType): boolean => {
     return subscriptions.some(sub => 
       sub.entityId === entityId && sub.entityType === entityType
     );
   };
 
-  // Subscribe to an entity
+  
   const subscribe = async (entityId: string, entityType: SubscriptionEntityType): Promise<boolean> => {
     if (!user) {
       toast.warning('Please log in to subscribe');
@@ -84,25 +84,25 @@ export const SubscriptionProvider: React.FC<{children: ReactNode}> = ({ children
       
       const newSubscription = await subscriptionService.createSubscription(params);
       
-      // Update local state - refresh subscriptions to get full data
+      
       await fetchSubscriptions();
       
-      //toast.success(`Successfully subscribed to ${entityType}`);
+      
       return true;
     } catch (error: any) {
       console.error('Error subscribing:', error);
       toast.error(`Failed to subscribe to ${entityType}`);
-      throw error; // Re-throw to allow component to handle specific errors
+      throw error; 
     } finally {
       setIsLoading(false);
     }
   };
 
-  // Unsubscribe from an entity
+  
   const unsubscribe = async (entityId: string, entityType: SubscriptionEntityType): Promise<boolean> => {
     if (!user) return false;
 
-    // Find the subscription to delete
+    
     const subscription = subscriptions.find(sub => 
       sub.entityId === entityId && sub.entityType === entityType
     );
@@ -115,7 +115,7 @@ export const SubscriptionProvider: React.FC<{children: ReactNode}> = ({ children
       setIsLoading(true);
       await subscriptionService.deleteSubscription(subscription.id);
       
-      // Update local state
+      
       setSubscriptions(prev => prev.filter(sub => sub.id !== subscription.id));
       
       toast.success(`Successfully unsubscribed from ${entityType}`);
@@ -123,13 +123,13 @@ export const SubscriptionProvider: React.FC<{children: ReactNode}> = ({ children
     } catch (error: any) {
       console.error('Error unsubscribing:', error);
       toast.error(`Failed to unsubscribe from ${entityType}`);
-      throw error; // Re-throw to allow component to handle specific errors
+      throw error; 
     } finally {
       setIsLoading(false);
     }
   };
 
-  // Toggle subscription (subscribe/unsubscribe)
+  
   const toggleSubscription = async (entityId: string, entityType: SubscriptionEntityType): Promise<boolean> => {
     if (!user) {
       toast.warning('Please log in to subscribe');
@@ -145,12 +145,12 @@ export const SubscriptionProvider: React.FC<{children: ReactNode}> = ({ children
         return await subscribe(entityId, entityType);
       }
     } catch (error) {
-      // Let the error propagate to the component
+      
       throw error;
     }
   };
 
-  // Load subscriptions when user changes
+  
   useEffect(() => {
     if (user) {
       fetchSubscriptions();
@@ -177,5 +177,6 @@ export const SubscriptionProvider: React.FC<{children: ReactNode}> = ({ children
   );
 };
 
-// Custom hook to use the subscription context
+
 export const useSubscription = () => useContext(SubscriptionContext);
+

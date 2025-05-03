@@ -1,10 +1,9 @@
-// components/LoadingProfile.tsx
 import React from 'react';
 
 const LoadingProfile = () => {
   return (
     <div className="min-h-screen flex bg-white dark:bg-black">
-      {/* Левая зеленая боковая панель */}
+      
       <div className="w-64 bg-emerald-600 dark:bg-emerald-700 flex-shrink-0 fixed h-full">
         <div className="p-6 flex items-center space-x-2">
           <div className="w-8 h-8 bg-white rounded-lg animate-pulse"></div>
@@ -12,18 +11,18 @@ const LoadingProfile = () => {
         </div>
         
         <div className="mt-6 flex flex-col items-center">
-          {/* Аватар */}
+          
           <div className="w-24 h-24 bg-yellow-300 dark:bg-yellow-400 rounded-full mb-4 flex items-center justify-center relative animate-pulse">
             <div className="w-12 h-4 bg-yellow-400 dark:bg-yellow-500 rounded"></div>
           </div>
           
-          {/* Имя пользователя */}
+          
           <div className="h-5 bg-emerald-500 rounded w-32 mb-2 animate-pulse"></div>
           
-          {/* Email */}
+          
           <div className="h-4 bg-emerald-500 rounded w-40 mb-8 animate-pulse"></div>
           
-          {/* Навигация */}
+          
           <div className="w-full px-4 space-y-2">
             <div className="h-10 bg-emerald-500 rounded-lg w-full animate-pulse"></div>
             <div className="h-10 bg-emerald-500/60 rounded-lg w-full animate-pulse"></div>
@@ -33,10 +32,10 @@ const LoadingProfile = () => {
         </div>
       </div>
       
-      {/* Основное содержимое */}
+      
       <div className="flex-1 ml-64">
         <div className="p-8">
-          {/* Заголовок страницы */}
+          
           <div className="mb-2">
             <div className="h-8 bg-gray-200 dark:bg-gray-700 rounded w-40 animate-pulse"></div>
           </div>
@@ -44,7 +43,7 @@ const LoadingProfile = () => {
             <div className="h-5 bg-gray-200 dark:bg-gray-700 rounded w-64 animate-pulse"></div>
           </div>
           
-          {/* Секция Personal Information */}
+          
           <div className="mb-8 bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-100 dark:border-gray-800">
             <div className="flex justify-between items-center px-6 py-4 border-b border-gray-100 dark:border-gray-700">
               <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded w-48 animate-pulse"></div>
@@ -71,7 +70,7 @@ const LoadingProfile = () => {
             </div>
           </div>
           
-          {/* Секция Password & Security */}
+          
           <div className="mb-8 bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-100 dark:border-gray-800">
             <div className="flex justify-between items-center px-6 py-4 border-b border-gray-100 dark:border-gray-700">
               <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded w-48 animate-pulse"></div>
@@ -79,7 +78,7 @@ const LoadingProfile = () => {
             </div>
             
             <div className="p-6">
-              {/* Secure account alert */}
+              
               <div className="p-4 bg-green-50 dark:bg-green-900/20 rounded-lg mb-6 flex">
                 <div className="w-5 h-5 bg-green-200 dark:bg-green-700 rounded-full mr-3 animate-pulse"></div>
                 <div className="flex-1">
@@ -88,7 +87,7 @@ const LoadingProfile = () => {
                 </div>
               </div>
               
-              {/* Password info */}
+              
               <div className="flex justify-between items-center py-4 border-b border-gray-100 dark:border-gray-700">
                 <div className="flex items-start">
                   <div className="w-8 h-8 bg-gray-200 dark:bg-gray-700 rounded-lg mr-3 animate-pulse"></div>
@@ -100,7 +99,7 @@ const LoadingProfile = () => {
                 <div className="h-5 w-16 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
               </div>
               
-              {/* 2FA info */}
+              
               <div className="flex justify-between items-center py-4">
                 <div className="flex items-start">
                   <div className="w-8 h-8 bg-gray-200 dark:bg-gray-700 rounded-lg mr-3 animate-pulse"></div>
@@ -114,7 +113,7 @@ const LoadingProfile = () => {
             </div>
           </div>
           
-          {/* Секция Theme Settings */}
+          
           <div className="mb-8 bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-100 dark:border-gray-800">
             <div className="px-6 py-4 border-b border-gray-100 dark:border-gray-700">
               <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded w-32 animate-pulse"></div>
@@ -123,7 +122,7 @@ const LoadingProfile = () => {
             <div className="p-6">
               <div className="h-5 bg-gray-200 dark:bg-gray-700 rounded w-80 mb-6 animate-pulse"></div>
               
-              {/* Theme selector */}
+              
               <div className="h-12 bg-gray-100 dark:bg-gray-700 rounded-lg w-full animate-pulse"></div>
             </div>
           </div>
@@ -134,3 +133,4 @@ const LoadingProfile = () => {
 };
 
 export default LoadingProfile;
+

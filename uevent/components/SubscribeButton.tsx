@@ -21,7 +21,6 @@ export const SubscribeButton: React.FC<SubscribeButtonProps> = ({
   const [isSubscribedState, setIsSubscribedState] = useState<boolean>(false);
   const [isToggling, setIsToggling] = useState<boolean>(false);
 
-  // Check if user is subscribed on mount and when subscriptions change
   useEffect(() => {
     if (entityId) {
       setIsSubscribedState(isSubscribed(entityId, entityType));
@@ -30,8 +29,7 @@ export const SubscribeButton: React.FC<SubscribeButtonProps> = ({
 
   const handleToggleSubscription = async () => {
     if (!user) {
-      // Redirect to login or show login modal
-      // This depends on your application flow
+
       return;
     }
 
@@ -41,7 +39,6 @@ export const SubscribeButton: React.FC<SubscribeButtonProps> = ({
     try {
       const success = await toggleSubscription(entityId, entityType);
       if (success) {
-        // Toggle the local state based on the current state
         setIsSubscribedState(prev => !prev);
       }
     } finally {
@@ -87,3 +84,4 @@ export const SubscribeButton: React.FC<SubscribeButtonProps> = ({
 };
 
 export default SubscribeButton;
+

@@ -10,7 +10,6 @@ import { useNotifications } from '../contexts/NotificationContext';
 import axios from 'axios';
 import { format } from 'date-fns';
 
-// Define Event type
 interface Event {
   id: number;
   title: string;
@@ -41,10 +40,8 @@ export default function Header() {
   const searchInputRef = useRef<HTMLInputElement>(null);
   const isAuthenticated = !!user;
 
-  // API base URL
   const API_URL = 'http://localhost:8080/api';
 
-  // Search for events
   const searchEvents = async (query: string) => {
     if (!query || query.trim().length < 2) {
       setSearchResults([]);
@@ -54,20 +51,17 @@ export default function Header() {
 
     setIsSearching(true);
     try {
-      // Get auth headers
       const token = localStorage.getItem('token');
       const headers = token ? { Authorization: `Bearer ${token}` } : {};
       
-      // Make API request with search parameters
       const response = await axios.get(`${API_URL}/events`, {
         params: {
           title: query,
-          take: 5, // Limit to 5 results in dropdown
+          take: 5,
         },
         headers
       });
       
-      // Update search results
       let eventData: Event[] = [];
       if (response.data.items) {
         eventData = response.data.items;
@@ -85,32 +79,28 @@ export default function Header() {
     }
   };
 
-  // Close search
   const closeSearch = () => {
     setIsSearchActive(false);
     setSearchQuery('');
     setShowSearchResults(false);
   };
 
-  // Handle search input change with debounce
   useEffect(() => {
     const timer = setTimeout(() => {
       if (searchQuery) {
         searchEvents(searchQuery);
       }
-    }, 300); // 300ms debounce
+    }, 300);
 
     return () => clearTimeout(timer);
   }, [searchQuery]);
 
-  // Focus search input when search becomes active
   useEffect(() => {
     if (isSearchActive && searchInputRef.current) {
       searchInputRef.current.focus();
     }
   }, [isSearchActive]);
 
-  // Handle Escape key to close search
   useEffect(() => {
     const handleEscapeKey = (event: KeyboardEvent) => {
       if (event.key === 'Escape' && isSearchActive) {
@@ -124,16 +114,13 @@ export default function Header() {
     };
   }, [isSearchActive]);
 
-  // Format date
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
     return format(date, 'MMM d, yyyy');
   };
 
-  // Format location to show only city/country
   const formatLocation = (venue: string) => {
-    // Extract city/country from full address
-    // This is a simple example - adjust based on your venue format
+
     const parts = venue.split(',');
     if (parts.length > 1) {
       return `${parts[parts.length - 2]?.trim()}, ${parts[parts.length - 1]?.trim()}`;
@@ -141,12 +128,10 @@ export default function Header() {
     return venue;
   };
 
-  // Get a truncated description
   const getTruncatedDescription = (description: string) => {
     return description.length > 80 ? description.substring(0, 80) + '...' : description;
   };
 
-  // Close search results when clicking outside
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
       if (searchRef.current && !searchRef.current.contains(event.target as Node)) {
@@ -160,28 +145,23 @@ export default function Header() {
     };
   }, []);
 
-  // Handle navigation to event page
   const navigateToEvent = (eventId: number) => {
     router.push(`/events/${eventId}`);
     closeSearch();
     setIsMobileMenuOpen(false);
   };
 
-  // Get image URL with correct domain
   const getImageUrl = (path?: string) => {
     if (!path) return null;
     
-    // Check if path is already a full URL
     if (path.startsWith('http://') || path.startsWith('https://')) {
       return path;
     }
     
-    // If it's a relative path, prepend the backend URL
     const baseUrl = 'http://localhost:8080';
     return `${baseUrl}/uploads/event-posters/${path}`;
   };
 
-  // Close dropdown when clicking outside
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
@@ -201,14 +181,12 @@ export default function Header() {
     router.push('/login');
   };
 
-  // Get user initials
   const getInitials = (firstName?: string, lastName?: string) => {
     const first = firstName ? firstName.charAt(0) : '';
     const last = lastName ? lastName.charAt(0) : '';
     return (first + last).toUpperCase();
   };
 
-  // Sync user data on storage changes
   useEffect(() => {
     const handleStorageChange = () => {
       if (user) {
@@ -222,7 +200,6 @@ export default function Header() {
     };
   }, [user, refreshUser]);
 
-  // Toggle theme
   const toggleTheme = () => {
     setTheme(isDarkMode ? 'light' : 'dark');
   };
@@ -249,7 +226,7 @@ export default function Header() {
     <header className="bg-white dark:bg-black border-b border-gray-200 dark:border-gray-800 sticky top-0 z-50">
       <div className="max-w-full mx-auto px-0 sm:px-4">
         <div className="flex items-center justify-between h-16">
-          {/* Logo и бренд */}
+          
           <div className="pl-4 md:pl-6">
   <Link href="/" className="flex items-center">
     <img 
@@ -263,7 +240,7 @@ export default function Header() {
   </Link>
 </div>
 
-          {/* Десктопная навигация */}
+          
           <div className="hidden md:flex items-center space-x-4">
             {isSearchActive ? (
               <div className="relative w-96" ref={searchRef}>
@@ -286,7 +263,7 @@ export default function Header() {
                     onFocus={() => setShowSearchResults(true)}
                   />
                   
-                  {/* Close button */}
+                  
                   <button 
                     className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200"
                     onClick={closeSearch}
@@ -303,7 +280,7 @@ export default function Header() {
                   </div>
                 )}
                 
-                {/* Search dropdown results */}
+                
                 {showSearchResults && searchResults.length > 0 && (
                   <div className="absolute mt-2 w-full bg-white dark:bg-gray-800 rounded-lg shadow-xl max-h-[500px] overflow-y-auto z-50 border border-gray-200 dark:border-gray-700">
                     {searchResults.map((event) => (
@@ -313,7 +290,7 @@ export default function Header() {
                         onClick={() => navigateToEvent(event.id)}
                       >
                         <div className="flex gap-3">
-                          {/* Event image or placeholder */}
+                          
                           <div className="h-16 w-16 bg-emerald-100 dark:bg-emerald-900/30 rounded-md overflow-hidden flex-shrink-0">
                             {event.posterName ? (
                               <img 
@@ -376,7 +353,7 @@ export default function Header() {
                   </div>
                 )}
                 
-                {/* No results found */}
+                
                 {showSearchResults && searchQuery && searchResults.length === 0 && !isSearching && (
                   <div className="absolute mt-2 w-full bg-white dark:bg-gray-800 rounded-lg shadow-lg z-50 border border-gray-200 dark:border-gray-700">
                     <div className="p-6 text-center">
@@ -400,20 +377,10 @@ export default function Header() {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                   </svg>
                 </button>
-                {/* <Link href="/events" className="p-2 rounded-md text-gray-600 dark:text-gray-200 hover:text-emerald-600 hover:bg-gray-100 dark:hover:bg-gray-900 flex items-center gap-2">
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
-                  </svg>
-                  <span className="hidden lg:inline">Explore</span>
-                </Link> */}
+                
                 {isAuthenticated && (
                   <>
-                    {/* <Link href="/calendar" className="p-2 rounded-md text-gray-600 dark:text-gray-200 hover:text-emerald-600 hover:bg-gray-100 dark:hover:bg-gray-900 flex items-center gap-2">
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                      </svg>
-                      <span className="hidden lg:inline">Calendar</span>
-                    </Link> */}
+                  
                     <NotificationDropdown />
                     
                     {user && user.role === 'ADMIN' && (
@@ -435,7 +402,7 @@ export default function Header() {
             )}
           </div>
 
-          {/* Меню профиля (десктоп) */}
+          
           <div className="hidden md:flex items-center">
             {isAuthenticated && user ? (
               <div className="relative" ref={dropdownRef}>
@@ -514,7 +481,7 @@ export default function Header() {
             )}
           </div>
 
-          {/* Мобильное меню */}
+          
           <div className="md:hidden flex items-center">
             {isAuthenticated && user ? (
               <button 
@@ -546,7 +513,7 @@ export default function Header() {
         </div>
       </div>
 
-      {/* Мобильное боковое меню */}
+      
       {isMobileMenuOpen && isAuthenticated && (
         <div className="fixed inset-0 z-50 md:hidden">
           <div className="fixed inset-0 bg-black bg-opacity-50" onClick={() => setIsMobileMenuOpen(false)}></div>
@@ -582,7 +549,7 @@ export default function Header() {
             </div>
 
             <div className="space-y-6">
-              {/* Mobile search with dropdown */}
+              
               <div className="relative mb-4" ref={searchRef}>
                 <div className="flex items-center relative">
                   <svg 
@@ -602,7 +569,7 @@ export default function Header() {
                     onFocus={() => setShowSearchResults(true)}
                   />
                   
-                  {/* Clear button */}
+                  
                   {searchQuery && (
                     <button 
                       className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200"
@@ -621,7 +588,7 @@ export default function Header() {
                   </div>
                 )}
 
-                {/* Mobile search results dropdown */}
+                
                 {showSearchResults && searchResults.length > 0 && (
                   <div className="absolute mt-2 w-full bg-white dark:bg-gray-800 rounded-lg shadow-lg max-h-72 overflow-y-auto z-50 border border-gray-200 dark:border-gray-700">
                     {searchResults.map((event) => (
@@ -634,7 +601,7 @@ export default function Header() {
                         }}
                       >
                         <div className="flex gap-3">
-                          {/* Event image or placeholder */}
+                          
                           <div className="h-14 w-14 bg-emerald-100 dark:bg-emerald-900/30 rounded-md overflow-hidden flex-shrink-0">
                             {event.posterName ? (
                               <img 
@@ -685,7 +652,7 @@ export default function Header() {
                   </div>
                 )}
                 
-                {/* No results found (mobile) */}
+                
                 {showSearchResults && searchQuery && searchResults.length === 0 && !isSearching && (
                   <div className="absolute mt-2 w-full bg-white dark:bg-gray-800 rounded-lg shadow-lg z-50 border border-gray-200 dark:border-gray-700">
                     <div className="p-4 text-center">
@@ -767,16 +734,7 @@ export default function Header() {
               </nav>
 
               <div className="mt-8 space-y-3">
-                {/* <Link 
-                  href="/events/create"
-                  className="block w-full px-4 py-2 text-center font-medium text-white bg-emerald-600 hover:bg-emerald-700 rounded-md transition-colors flex items-center justify-center"
-                  onClick={() => setIsMobileMenuOpen(false)}
-                >
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-                  </svg>
-                  Create Event
-                </Link> */}
+                
                 <button 
                   onClick={handleLogout}
                   className="block w-full px-4 py-2 text-center text-gray-700 dark:text-gray-200 bg-white dark:bg-black border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-900 rounded-md transition-colors flex items-center justify-center"
@@ -794,3 +752,4 @@ export default function Header() {
     </header>
   );
 }
+

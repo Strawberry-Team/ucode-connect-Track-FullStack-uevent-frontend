@@ -83,3 +83,4 @@ const CreateEventPage: React.FC = () => {
 };
 
 export default CreateEventPage;
+

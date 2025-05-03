@@ -11,7 +11,6 @@ export const CompanyPublicNewsSection: React.FC<CompanyPublicNewsSectionProps> =
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   
-  // Function to fetch news for the public company page
   useEffect(() => {
     const fetchCompanyNews = async () => {
       if (!companyId) {
@@ -36,7 +35,6 @@ export const CompanyPublicNewsSection: React.FC<CompanyPublicNewsSectionProps> =
     fetchCompanyNews();
   }, [companyId]);
   
-  // Format date function
   const formatDate = (dateString?: string) => {
     if (!dateString) return '';
     
@@ -45,10 +43,8 @@ export const CompanyPublicNewsSection: React.FC<CompanyPublicNewsSectionProps> =
     const diffTime = Math.abs(now.getTime() - date.getTime());
     const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
     
-    // If less than 7 days, show as "X days ago"
     if (diffDays < 7) {
       if (diffDays === 0) {
-        // Check if it's today
         const hours = Math.floor(diffTime / (1000 * 60 * 60));
         if (hours < 24) {
           if (hours === 0) {
@@ -62,7 +58,6 @@ export const CompanyPublicNewsSection: React.FC<CompanyPublicNewsSectionProps> =
       return diffDays === 1 ? 'Yesterday' : `${diffDays} days ago`;
     }
     
-    // Otherwise, format the date
     return date.toLocaleDateString(undefined, {
       year: 'numeric',
       month: 'short',
@@ -70,7 +65,6 @@ export const CompanyPublicNewsSection: React.FC<CompanyPublicNewsSectionProps> =
     });
   };
   
-  // Truncate text function
   const truncateText = (text: string, maxLength = 150) => {
     if (text.length <= maxLength) return text;
     return text.substr(0, maxLength) + '...';
@@ -161,13 +155,6 @@ export const CompanyPublicNewsSection: React.FC<CompanyPublicNewsSectionProps> =
                 {truncateText(item.description || '', 10000)}
               </p>
               
-              {/* <div className="mt-4 text-emerald-600 dark:text-emerald-400 font-medium text-sm flex items-center group-hover:text-emerald-700 dark:group-hover:text-emerald-300 transition-colors">
-                Read more
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 ml-1.5 group-hover:translate-x-1 transition-transform" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M5 12h14"></path>
-                  <path d="M12 5l7 7-7 7"></path>
-                </svg>
-              </div> */}
             </div>
           </div>
         </Link>

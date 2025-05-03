@@ -1,4 +1,3 @@
-// pages/profile.tsx
 import { useState, useEffect, useRef, Suspense } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useRouter } from 'next/router';
@@ -22,7 +21,6 @@ export default function Profile() {
   const { user, loading, initialLoading } = useAuth();
   const [minLoadingTime, setMinLoadingTime] = useState(true);
   
-  // Устанавливаем минимальное время показа скелета (4 секунды)
   useEffect(() => {
     const timer = setTimeout(() => {
       setMinLoadingTime(false);
@@ -31,7 +29,6 @@ export default function Profile() {
     return () => clearTimeout(timer);
   }, []);
   
-  // Редирект на страницу входа
   useEffect(() => {
     if (!initialLoading && !loading && !user) {
       const returnUrl = router.asPath;
@@ -40,9 +37,6 @@ export default function Profile() {
     }
   }, [user, loading, initialLoading, router]);
 
-  // Показываем скелет, если:
-  // 1. Идет проверка авторизации ИЛИ
-  // 2. Минимальное время загрузки еще не истекло
   if (initialLoading || loading || minLoadingTime) {
     return (
       <>
@@ -54,7 +48,6 @@ export default function Profile() {
     );
   }
 
-  // Если пользователь не аутентифицирован, но редирект ещё не произошёл
   if (!user) {
     return (
       <>
@@ -78,3 +71,4 @@ export default function Profile() {
     </>
   );
 }
+

@@ -12,13 +12,13 @@ export default function Document() {
           dangerouslySetInnerHTML={{
             __html: `
               (function() {
-                // Проверяем, есть ли сохраненная тема
+                
                 const savedTheme = localStorage.getItem('theme');
                 
-                // Если темы нет, проверяем настройки системы
+                
                 const prefersDarkMode = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
                 
-                // Устанавливаем класс dark на html если нужно
+                
                 if (savedTheme === 'dark' || (!savedTheme && prefersDarkMode) || 
                     (savedTheme === 'system' && prefersDarkMode)) {
                   document.documentElement.classList.add('dark');
@@ -37,3 +37,4 @@ export default function Document() {
     </Html>
   );
 }
+

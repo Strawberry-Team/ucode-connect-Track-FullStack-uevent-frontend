@@ -43,21 +43,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
 
-  // Инициализация интерсепторов для автоматического обновления токенов
   useEffect(() => {
-    // Установка существующего токена при загрузке
     const accessToken = sessionStorage.getItem('accessToken');
     if (accessToken) {
       axios.defaults.headers.common['Authorization'] = `Bearer ${accessToken}`;
     }
 
-    // Настройка интерсептора для ответов
     const responseInterceptor = axios.interceptors.response.use(
       (response) => response,
       async (error) => {
         const originalRequest = error.config;
         
-        // FIX: Better check for auth endpoints
         const isAuthEndpoint = originalRequest.url && (
           originalRequest.url.includes('/auth/login') ||
           originalRequest.url.includes('/auth/register') ||
@@ -65,7 +61,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           originalRequest.url.includes('/register')
         );
         
-        // FIX: Only try to refresh token if we have one and it's not an auth endpoint
         const hasRefreshToken = localStorage.getItem('refreshToken') !== null;
         
         if (
@@ -86,7 +81,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             axios.defaults.headers.common['Authorization'] = `Bearer ${refreshedTokenData.accessToken}`;
             return axios(originalRequest);
           } catch (refreshError) {
-            // Сброс данных пользователя при неудачном обновлении токена
             setUser(null);
             localStorage.removeItem('user');
             sessionStorage.removeItem('accessToken');
@@ -99,7 +93,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
     );
 
-    // Загрузка пользователя из localStorage
     const storedUser = localStorage.getItem('user');
     if (storedUser) {
       try {
@@ -108,18 +101,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         console.error('Failed to parse user from localStorage', err);
         localStorage.removeItem('user');
       } finally {
-        // Всегда устанавливаем initialLoading в false после завершения проверки
         setInitialLoading(false);
       }
     }
 
-    // Очистка интерсептора при размонтировании
     return () => {
       axios.interceptors.response.eject(responseInterceptor);
     };
   }, [router]);
-  // Обновите этот метод в вашем файле AuthContext.tsx
-// Обновленный метод register в AuthContext.tsx
+
 const register = async (firstName: string, lastName: string, email: string, password: string) => {
   try {
     setLoading(true);
@@ -134,17 +124,14 @@ const register = async (firstName: string, lastName: string, email: string, pass
     
     try {
       const response = await authService.register(userData);
-      // В случае успеха, просто возвращаем ответ
       return response;
     } catch (apiError: any) {
-      // Обрабатываем ошибку API без повторной генерации исключения
       console.error('API registration error handled in AuthContext:', apiError.message);
       
-      // Устанавливаем сообщение об ошибке из ответа API
       const errorMessage = apiError.response?.data?.message || 'Registration failed. Please try again.';
       setError(errorMessage);
       
-      // Важно: Вместо Promise.reject возвращаем объект с информацией об ошибке
+
       return {
         error: true,
         message: errorMessage,
@@ -152,13 +139,11 @@ const register = async (firstName: string, lastName: string, email: string, pass
       };
     }
   } catch (err: any) {
-    // Это перехватит любые другие непредвиденные ошибки
     console.error('Unexpected registration error in AuthContext:', err);
     
     const errorMessage = 'An unexpected error occurred. Please try again.';
     setError(errorMessage);
     
-    // Возвращаем объект с информацией об ошибке вместо Promise.reject
     return {
       error: true,
       message: errorMessage
@@ -173,38 +158,31 @@ const login = async (email: string, password: string) => {
     setLoading(true);
     setError(null);
     
-    // Реальный запрос для других пользователей
     try {
       const response = await authService.login({ email, password });
       if (response.user) {
         setUser(response.user);
         localStorage.setItem('user', JSON.stringify(response.user));
         
-        // Установка заголовка Authorization
         if (response.accessToken) {
           axios.defaults.headers.common['Authorization'] = `Bearer ${response.accessToken}`;
         }
       }
       return response;
     } catch (apiError: any) {
-      // Обработка ошибки API без повторной генерации исключения
       console.error('Login error handled in AuthContext:', apiError.message);
       
-      // Устанавливаем сообщение об ошибке
       setError(apiError.message || 'Login failed. Try test@example.com / Test@1234');
       
-      // Важно: Возвращаем объект с ошибкой, а не выбрасываем исключение
       return {
         error: true,
         message: apiError.message || 'Login failed'
       };
     }
   } catch (err: any) {
-    // Перехватываем любые непредвиденные ошибки
     console.error('Unexpected login error in AuthContext:', err);
     setError('An unexpected error occurred. Please try again.');
     
-    // Возвращаем объект с информацией об ошибке вместо Promise.reject
     return {
       error: true,
       message: 'An unexpected error occurred'
@@ -219,17 +197,16 @@ const login = async (email: string, password: string) => {
       setLoading(true);
       const refreshToken = localStorage.getItem('refreshToken');
       
-      // FIX: Only attempt to call logout API if we have a refresh token
+
       if (refreshToken) {
         try {
           await authService.logout();
         } catch (error) {
           console.error('Logout API error:', error);
-          // Continue with local cleanup even if API call fails
+
         }
       }
       
-      // Always clean up local storage and state
       setUser(null);
       localStorage.removeItem('user');
       sessionStorage.removeItem('accessToken');
@@ -239,8 +216,7 @@ const login = async (email: string, password: string) => {
     } catch (err: any) {
       console.error('Logout error:', err);
       setError(err.response?.data?.message || 'Logout failed');
-      
-      // Even if there's an error, clean up
+
       setUser(null);
       localStorage.removeItem('user');
       sessionStorage.removeItem('accessToken');
@@ -252,7 +228,7 @@ const login = async (email: string, password: string) => {
     }
   };
 
-  // Rest of the code remains the same...
+
   const verifyEmail = async (token: string) => {
     try {
       setLoading(true);
@@ -271,9 +247,7 @@ const login = async (email: string, password: string) => {
     try {
       setLoading(true);
       setError(null);
-      console.log('tyt1');
       const data = await authService.sendPasswordResetLink(email);
-      console.log('tyt2', data);
       setLoading(false);
       return data;
     } catch (err: any) {
@@ -301,9 +275,6 @@ const login = async (email: string, password: string) => {
     setError(null);
   };
 
-  // НОВЫЕ МЕТОДЫ ДЛЯ РАБОТЫ С ПРОФИЛЕМ ПОЛЬЗОВАТЕЛЯ
-
-  // Общий метод для обновления состояния пользователя
   const updateUserState = (updatedUserData: Partial<User>) => {
     if (user) {
       const newUserData = { ...user, ...updatedUserData };
@@ -312,8 +283,7 @@ const login = async (email: string, password: string) => {
     }
   };
 
-  // Метод для обновления профиля пользователя
-  // Обновленный метод updateUserProfile
+
 const updateUserProfile = async (userData: any) => {
   try {
     setLoading(true);
@@ -328,8 +298,7 @@ const updateUserProfile = async (userData: any) => {
 
     try {
       const updatedUserData = await userService.updateCurrentUser(userData, user.id);
-      
-      // Обновляем локальное состояние пользователя
+
       updateUserState(updatedUserData);
       
       return {
@@ -338,18 +307,14 @@ const updateUserProfile = async (userData: any) => {
         data: updatedUserData
       };
     } catch (apiError: any) {
-      // Обрабатываем ошибку API, извлекаем сообщение
       console.error('API profile update error:', apiError.response?.status, apiError.response?.data);
       
-      // Формируем понятное сообщение об ошибке
       const errorMessage = apiError.response?.data?.message || 
                          (apiError.response?.status === 403 ? 'Permission denied' : 
                           'Failed to update profile. Please try again.');
       
-      // Устанавливаем сообщение об ошибке в состояние
       setError(errorMessage);
       
-      // Возвращаем объект с информацией об ошибке вместо Promise.reject
       return {
         error: true,
         message: errorMessage,
@@ -370,7 +335,6 @@ const updateUserProfile = async (userData: any) => {
   }
 };
 
-  // Обновленный метод updateUserPassword
 const updateUserPassword = async (userData: any) => {
   try {
     setLoading(true);
@@ -392,10 +356,8 @@ const updateUserPassword = async (userData: any) => {
         data: response
       };
     } catch (apiError: any) {
-      // Обрабатываем ошибку API, извлекаем сообщение
       console.error('API password update error:', apiError.response?.status, apiError.response?.data);
       
-      // Формируем понятное сообщение об ошибке с учетом разных типов ошибок
       let errorMessage = 'Failed to update password. Please try again.';
       
       if (apiError.response?.data?.message) {
@@ -406,10 +368,8 @@ const updateUserPassword = async (userData: any) => {
         errorMessage = 'Permission denied';
       }
       
-      // Устанавливаем сообщение об ошибке в состояние
       setError(errorMessage);
       
-      // Возвращаем объект с информацией об ошибке вместо Promise.reject
       return {
         error: true,
         message: errorMessage,
@@ -430,7 +390,6 @@ const updateUserPassword = async (userData: any) => {
   }
 };
 
- // Обновленный метод uploadUserAvatar
 const uploadUserAvatar = async (formData: FormData, userId: string) => {
   try {
     setLoading(true);
@@ -444,16 +403,12 @@ const uploadUserAvatar = async (formData: FormData, userId: string) => {
     }
     
     try {
-      // Загружаем аватар
       const response = await userService.uploadAvatar(formData, userId);
       
-      // Если получили имя файла с сервера
       if (response.server_filename) {
-        // Формируем URL на основе имени файла
         const baseUrl = 'http://localhost:8080/uploads/user-avatars/';
         const profilePictureUrl = `${baseUrl}${response.server_filename}`;
         
-        // Обновляем локальное состояние пользователя
         setUser(prevUser => {
           if (!prevUser) return prevUser;
           return { 
@@ -463,7 +418,6 @@ const uploadUserAvatar = async (formData: FormData, userId: string) => {
           };
         });
         
-        // Обновляем localStorage
         const storedUser = localStorage.getItem('user');
         if (storedUser) {
           try {
@@ -475,7 +429,6 @@ const uploadUserAvatar = async (formData: FormData, userId: string) => {
             };
             localStorage.setItem('user', JSON.stringify(mergedUser));
             
-            // Вызываем событие storage для обновления UI в других компонентах
             window.dispatchEvent(new Event('storage'));
           } catch (err) {
             console.error('Failed to update user in localStorage', err);
@@ -495,15 +448,12 @@ const uploadUserAvatar = async (formData: FormData, userId: string) => {
         };
       }
     } catch (apiError: any) {
-      // Обрабатываем ошибку API
       console.error('API avatar upload error:', apiError.response?.status, apiError.response?.data);
       
-      // Формируем сообщение об ошибке
       const errorMessage = apiError.response?.data?.message || 
                          (apiError.response?.status === 413 ? 'Image is too large' : 
                           'Failed to upload avatar. Please try again.');
       
-      // Устанавливаем сообщение об ошибке
       setError(errorMessage);
       
       return {
@@ -528,7 +478,6 @@ const uploadUserAvatar = async (formData: FormData, userId: string) => {
 
 
 const refreshUser = () => {
-  // Получаем пользователя из localStorage
   const storedUser = localStorage.getItem('user');
   if (storedUser) {
     try {
@@ -569,3 +518,4 @@ export const useAuth = () => {
   }
   return context;
 };
+

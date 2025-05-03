@@ -25,20 +25,16 @@ const CompanyPage: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'about' | 'events' | 'testimonials' | 'news'>('about');
   const [isLoadingEvents, setIsLoadingEvents] = useState<boolean>(false);
   
-  // Используем useRef для отслеживания предыдущего ID и предотвращения повторных загрузок
   const previousIdRef = useRef<string | null>(null);
 
-  // Fetch the company when the ID changes in the URL
   useEffect(() => {
     if (id && typeof id === 'string' && id !== previousIdRef.current) {
-      // Сохраняем текущий ID, чтобы не загружать повторно при последующих рендерах
       previousIdRef.current = id;
       fetchCompanyById(id);
     }
     
   }, [id, fetchCompanyById]);
 
-  // Fetch company events
   const fetchEvents = async () => {
     if (!company?.id) return;
     
@@ -46,59 +42,48 @@ const CompanyPage: React.FC = () => {
     try {
 
       const fetchedEvents = await companyService.getCompanyEvents(company.id);
-      console.log('schas tyt',fetchedEvents );
       setEvents(fetchedEvents);
     } catch (error) {
       console.error('Error fetching company events:', error);
-      // Optionally show an error toast
     } finally {
       setIsLoadingEvents(false);
     }
   };
 
-  // Load events when company changes, используем useEffect с проверкой на наличие ID
   useEffect(() => {
     if (company?.id) {
       fetchEvents();
     }
   }, [company?.id]);
 
-  // Helper function for event poster images
   const getEventImageUrl = (path: string | undefined) => {
     if (!path) return null;
     
-    // Check if path is already a full URL
     if (path.startsWith('http://') || path.startsWith('https://')) {
       return path;
     }
     
-    // If it's a relative path, prepend the backend URL
     const baseUrl = 'http://localhost:8080';
     return `${baseUrl}/uploads/event-posters/${path}`;
   };
 
-  // Function to get image URL with correct path
   const getImageUrl = (path: string | undefined) => {
     if (!path) return null;
     
-    // Check if path is already a full URL
     if (path.startsWith('http://') || path.startsWith('https://')) {
       return path;
     }
     
-    // If it's a relative path, prepend the backend URL with correct path structure
     const baseUrl = 'http://localhost:8080';
     return `${baseUrl}/uploads/company-logos/${path.startsWith('/') ? path.substring(1) : path}`;
   };
 
-  // Open Gmail with company email
   const openGmailCompose = () => {
     if (company?.email) {
       window.open(`https://mail.google.com/mail/?view=cm&fs=1&to=${company.email}`, '_blank');
     }
   };
 
-  // Show loading state
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-white dark:bg-black">
@@ -110,7 +95,6 @@ const CompanyPage: React.FC = () => {
     );
   }
 
-  // Show error state
   if (error) {
     return (
       <div className="min-h-screen bg-white dark:bg-black py-12 px-4 sm:px-6 lg:px-8 flex flex-col items-center justify-center">
@@ -140,7 +124,6 @@ const CompanyPage: React.FC = () => {
     );
   }
 
-  // Show not found state
   if (!company) {
     return (
       <div className="min-h-screen bg-white dark:bg-black py-12 px-4 sm:px-6 lg:px-8 flex flex-col items-center justify-center">
@@ -174,7 +157,7 @@ const CompanyPage: React.FC = () => {
 
   return (
     <div className="bg-white dark:bg-black">
-      {/* Header */}
+      
       <header className="relative bg-emerald-700 overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-r from-emerald-800 to-teal-700 opacity-90"></div>
         <div className="absolute inset-0 opacity-20 bg-[radial-gradient(#fff_1px,transparent_1px)] [background-size:20px_20px]"></div>
@@ -221,7 +204,7 @@ const CompanyPage: React.FC = () => {
     Founded {new Date(company.createdAt || '').getFullYear()}
   </span>
 
-  {/* Add Subscribe Button */}
+  
   <SubscribeButton 
     entityId={company.id || ''} 
     entityType="company"
@@ -233,7 +216,7 @@ const CompanyPage: React.FC = () => {
         </div>
       </header>
       
-      {/* Navigation Tabs */}
+      
       <div className="border-b border-gray-200 dark:border-gray-800">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-center sm:justify-start -mb-px overflow-x-auto">
@@ -267,23 +250,14 @@ const CompanyPage: React.FC = () => {
             >
               Events
             </button>
-            {/* <button
-              onClick={() => setActiveTab('testimonials')}
-              className={`py-4 px-6 font-medium text-sm border-b-2 whitespace-nowrap ${
-                activeTab === 'testimonials'
-                  ? 'border-emerald-500 text-emerald-600 dark:text-emerald-400'
-                  : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300 dark:hover:border-gray-700'
-              }`}
-            >
-              Testimonials
-            </button> */}
+            
           </div>
         </div>
       </div>
       
-      {/* Content */}
+      
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        {/* About Tab Content */}
+        
         {activeTab === 'about' && (
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             <div className="lg:col-span-2">
@@ -310,7 +284,7 @@ const CompanyPage: React.FC = () => {
                 </div>
               </div>
               
-              {/* Company Stats */}
+              
               <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 gap-6">
                 <div className="bg-white dark:bg-black rounded-lg shadow-sm dark:shadow-none border border-gray-100 dark:border-gray-800 p-6">
                   <div className="flex items-start">
@@ -337,7 +311,7 @@ const CompanyPage: React.FC = () => {
     </div>
     <div className="ml-4">
       <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-        {/* Replace the hardcoded 0 with the actual count */}
+        
         {events.length}
       </h3>
       <p className="text-sm text-gray-600 dark:text-gray-400">Events Hosted</p>
@@ -419,27 +393,20 @@ const CompanyPage: React.FC = () => {
           </div>
         )}
         
-        {/* News Tab Content */}
+        
         {activeTab === 'news' && (
           <div>
             {company?.id && (
               <div className="mb-6 flex justify-between items-center">
                 <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Latest News</h2>
-                {/* <Link href={`/companies/${company.id}/news`}>
-                  <button className="inline-flex items-center px-4 py-2 text-sm font-medium text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 transition-colors">
-                    View All
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 ml-1.5" viewBox="0 0 20 20" fill="currentColor">
-                      <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd" />
-                    </svg>
-                  </button>
-                </Link> */}
+                
               </div>
             )}
             <CompanyPublicNewsSection companyId={company.id || ''} />
           </div>
         )}
         
-        {/* Events Tab Content */}
+        
         {activeTab === 'events' && (
           <div>
             {isLoadingEvents ? (
@@ -545,7 +512,7 @@ const CompanyPage: React.FC = () => {
           </div>
         )}
         
-        {/* Testimonials Tab Content */}
+        
         {activeTab === 'testimonials' && (
           <div>
             <div className="py-16 flex flex-col items-center">
@@ -567,3 +534,4 @@ const CompanyPage: React.FC = () => {
 };
 
 export default CompanyPage;
+

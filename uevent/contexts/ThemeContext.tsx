@@ -1,4 +1,3 @@
-// contexts/ThemeContext.tsx
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 
@@ -17,17 +16,17 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   const [isDarkMode, setIsDarkMode] = useState<boolean>(false);
   const router = useRouter();
 
-  // На клиенте, загружаем сохраненную тему при инициализации
+  
   useEffect(() => {
-    // Загружаем сохраненную тему из localStorage
+    
     const savedTheme = localStorage.getItem('theme') as Theme || 'light';
     setTheme(savedTheme);
 
-    // Проверяем системные настройки для 'system' темы
+    
     const prefersDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches;
     setIsDarkMode(savedTheme === 'dark' || (savedTheme === 'system' && prefersDarkMode));
 
-    // Слушаем изменения системных настроек
+    
     const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
     const handleChange = (e: MediaQueryListEvent) => {
       if (theme === 'system') {
@@ -39,7 +38,7 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     return () => mediaQuery.removeEventListener('change', handleChange);
   }, []);
 
-  // Обновляем классы документа и сохраняем тему при изменении
+  
   useEffect(() => {
     if (typeof window !== 'undefined') {
       localStorage.setItem('theme', theme);
@@ -77,3 +76,4 @@ export const useTheme = () => {
   }
   return context;
 };
+

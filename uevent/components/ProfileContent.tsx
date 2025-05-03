@@ -11,10 +11,8 @@ import { CompanySection } from '../components/CompanySection';
 import SubscriptionsSection from '../components/SubscriptionsSection';
 import { SubscriptionProvider } from '../contexts/SubscriptionContext';
 import MyTicketsSection from '../components/MyTicketsSection';
-// Types for tabs
 type TabType = 'profile' | 'tickets' | 'subscriptions' | 'company';
 
-// Constants for empty states
 const EMPTY_TICKETS_MESSAGE = "You don't have any purchased tickets yet. Start exploring available events!";
 const EMPTY_SUBSCRIPTIONS_MESSAGE = "You're not subscribed to any organizers yet. Subscribe to organizers you're interested in to stay updated on their new events!";
 const EMPTY_COMPANY_MESSAGE = "You don't have a company yet. Create one to start organizing your own events!";
@@ -25,7 +23,6 @@ const ProfileContent = ({ user }) => {
   const router = useRouter();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { logout} = useAuth();
-  // States
   const [activeSection, setActiveSection] = useState<TabType>('profile');
   const [isEditing, setIsEditing] = useState(false);
   const [profileData, setProfileData] = useState({
@@ -60,10 +57,8 @@ const ProfileContent = ({ user }) => {
   const [showCurrentPassword, setShowCurrentPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  // Initialize profile data on load
   useEffect(() => {
     if (!user) {
-      //router.push('/login');
       return;
     }
 
@@ -74,23 +69,15 @@ const ProfileContent = ({ user }) => {
         email: user.email || '',
       });
       
-      // Here you would add API requests to get data about tickets, subscriptions, and company
-      // Using empty arrays for simplification
-      
-      // Check if user has a company
-      // This would be replaced with a real API request
       setHasCompany(false);
     }
   }, [user]);
 
-  // Handle section change
   const handleSectionChange = (section: TabType) => {
     setActiveSection(section);
-    setIsMobileMenuOpen(false); // Close mobile menu when changing sections
+    setIsMobileMenuOpen(false);
   };
 
-  // Handle profile save
-  // Обновленный метод handleSaveProfile в компоненте Profile
 const handleSaveProfile = async () => {
   try {
     setIsSaving(true);
@@ -100,7 +87,6 @@ const handleSaveProfile = async () => {
     });
     
     if (response.error) {
-      // Если вернулась ошибка, показываем сообщение в toast
       toast.error(response.message, {
         position: "bottom-right",
         autoClose: 4000,
@@ -110,7 +96,6 @@ const handleSaveProfile = async () => {
         draggable: true,
       });
     } else {
-      // Если успех, показываем сообщение об успехе
       toast.success(response.message || 'Profile successfully updated', {
         position: "bottom-right",
         autoClose: 3000,
@@ -122,7 +107,6 @@ const handleSaveProfile = async () => {
       setIsEditing(false);
     }
   } catch (error) {
-    // На случай непредвиденной ошибки
     console.error('Error updating profile:', error);
     toast.error('Unable to update profile. Please try again.', {
       position: "bottom-right",
@@ -133,29 +117,23 @@ const handleSaveProfile = async () => {
   }
 };
 
-  // Handle avatar button click
   const handleAvatarButtonClick = () => {
     fileInputRef.current?.click();
   };
 
-  // Handle avatar change
   const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      // Show preview
       const reader = new FileReader();
       reader.onloadend = () => {
         setAvatarPreview(reader.result as string);
       };
       reader.readAsDataURL(file);
       
-      // Upload file
       handleAvatarUpload(file);
     }
   };
 
-  // Handle avatar upload
- // Обновленный метод handleAvatarUpload в компоненте Profile
 const handleAvatarUpload = async (file: File) => {
   try {
     setIsUploading(true);
@@ -168,7 +146,6 @@ const handleAvatarUpload = async (file: File) => {
       const response = await uploadUserAvatar(formData, userId);
       
       if (response.error) {
-        // Если вернулась ошибка, показываем сообщение в toast
         toast.error(response.message, {
           position: "bottom-right",
           autoClose: 4000,
@@ -177,9 +154,8 @@ const handleAvatarUpload = async (file: File) => {
           pauseOnHover: true,
           draggable: true,
         });
-        setAvatarPreview(null); // Сбрасываем превью при ошибке
+        setAvatarPreview(null);
       } else {
-        // Если успех, показываем сообщение об успехе
         toast.success('Avatar successfully updated', {
           position: "bottom-right",
           autoClose: 3000,
@@ -202,18 +178,16 @@ const handleAvatarUpload = async (file: File) => {
       position: "bottom-right",
       autoClose: 4000,
     });
-    setAvatarPreview(null); // Сбрасываем превью при ошибке
+    setAvatarPreview(null);
   } finally {
     setIsUploading(false);
   }
 };
-  // Handle company creation
+
   const handleCreateCompany = async () => {
     try {
       setIsSaving(true);
-      // Here would be the API request to create a company
-      
-      // Simulating successful response
+
       setTimeout(() => {
         setHasCompany(true);
         setCompany({
@@ -234,15 +208,10 @@ const handleAvatarUpload = async (file: File) => {
     }
   };
 
-  // Handle password change
-  // Handle password change
-// Handle password change
-// Обновленный метод handleChangePassword в компоненте Profile
 const handleChangePassword = async () => {
   try {
     setIsSaving(true);
     
-    // Валидация
     if (passwordData.newPassword !== passwordData.confirmPassword) {
       toast.error('New passwords do not match', {
         position: "bottom-right",
@@ -261,14 +230,12 @@ const handleChangePassword = async () => {
       return;
     }
     
-    // Отправка запроса на изменение пароля через AuthContext
     const response = await updateUserPassword({
       oldPassword: passwordData.currentPassword,
       newPassword: passwordData.newPassword,
     });
     
     if (response.error) {
-      // Показываем ошибку от сервера
       toast.error(response.message, {
         position: "bottom-right",
         autoClose: 4000,
@@ -278,7 +245,6 @@ const handleChangePassword = async () => {
         draggable: true,
       });
     } else {
-      // Очистка формы после успешного изменения
       setPasswordData({
         currentPassword: '',
         newPassword: '',
@@ -296,7 +262,6 @@ const handleChangePassword = async () => {
       });
     }
   } catch (error) {
-    // Более общая обработка ошибок
     console.error('Unexpected error:', error);
     toast.error('An unexpected error occurred. Please try again later.', {
       position: "bottom-right",
@@ -307,23 +272,11 @@ const handleChangePassword = async () => {
   }
 };
 
-  // Handle logout
   const handleLogout = async () => {
     await logout();
 
     router.push('/login');
   };
-
-  // if (loading) {
-  //   return (
-  //     <div className="flex items-center justify-center h-screen bg-gray-50 dark:bg-black dark:bg-black">
-  //       <div className="flex flex-col items-center">
-  //         <div className="animate-spin w-16 h-16 border-4 border-emerald-500 border-t-transparent rounded-full"></div>
-  //         <p className="mt-4 text-emerald-600 font-medium">Loading your profile...</p>
-  //       </div>
-  //     </div>
-  //   );
-  // }
 
   return (
     <>
@@ -334,9 +287,9 @@ const handleChangePassword = async () => {
 
       <ToastContainer position="bottom-right" autoClose={3000} />
 
-      {/* Removed the white gap by making the flex container fill the entire screen without gaps */}
+      
       <div className="min-h-screen bg-white dark:bg-black flex overflow-hidden">
-        {/* Side Navigation - Desktop - Removed border/margin causing white line */}
+        
         <div className="hidden md:flex md:flex-col md:w-64 bg-gradient-to-b from-emerald-600 to-emerald-800 text-white flex-shrink-0">
           <div className="p-6">
             <Link href="/" className="flex items-center space-x-2">
@@ -479,7 +432,7 @@ const handleChangePassword = async () => {
           </div>
         </div>
 
-        {/* Mobile Header */}
+        
         <div className="md:hidden fixed top-0 left-0 right-0 bg-white dark:bg-black z-10 shadow-sm dark:shadow-none">
           <div className="flex justify-between items-center p-4">
             <Link href="/" className="flex items-center space-x-2">
@@ -514,7 +467,7 @@ const handleChangePassword = async () => {
             </div>
           </div>
           
-          {/* Mobile Menu */}
+          
           {isMobileMenuOpen && (
             <div className="border-t border-gray-200 dark:border-gray-800 bg-white dark:bg-black">
               <div className="p-4 flex items-center space-x-4">
@@ -604,7 +557,7 @@ const handleChangePassword = async () => {
                     Company
                   </button>
                 </div>
-                {/* Добавляем переключатель темы */}
+                
       <div className="mt-4 mb-4">
         <ThemeSwitch compact />
       </div>
@@ -626,10 +579,10 @@ const handleChangePassword = async () => {
           )}
         </div>
 
-        {/* Main Content - Removed margin/padding that was causing the gap */}
+        
         <div className="flex-1 md:pl-0 bg-gray-50 dark:bg-black dark:bg-black">
           <div className="md:p-10 p-4 md:pt-10 pt-20">
-            {/* Section heading */}
+            
             <header className="mb-8">
               <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
                 {activeSection === 'profile' && 'Your Profile'}
@@ -645,10 +598,10 @@ const handleChangePassword = async () => {
               </p>
             </header>
 
-            {/* Profile Section */}
+            
             {activeSection === 'profile' && (
               <div className="space-y-8">
-                {/* Edit Profile Card */}
+                
                 <div className="bg-white dark:bg-black rounded-2xl shadow-sm dark:shadow-none overflow-hidden border border-gray-100 dark:border-gray-800">
                   <div className="flex justify-between items-center px-6 py-5 bg-gray-50 dark:bg-black dark:bg-black border-b border-gray-100 dark:border-gray-800">
                     <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Personal Information</h2>
@@ -767,7 +720,7 @@ const handleChangePassword = async () => {
                   </div>
                 </div>
 
-                {/* Password Card */}
+                
                 <div className="bg-white dark:bg-black rounded-2xl shadow-sm dark:shadow-none overflow-hidden border border-gray-100 dark:border-gray-800">
                   <div className="flex justify-between items-center px-6 py-5 bg-gray-50 dark:bg-black dark:bg-black border-b border-gray-100 dark:border-gray-800">
                     <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Password & Security</h2>
@@ -960,133 +913,33 @@ const handleChangePassword = async () => {
                         </div>
                         
                         <div className="space-y-4">
-                          {/* <div className="bg-gray-50 dark:bg-black dark:bg-black rounded-lg p-4 flex items-center justify-between">
-                            <div className="flex items-center">
-                              <div className="p-2 bg-emerald-100 dark:bg-emerald-900/40 rounded-full">
-                                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-emerald-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                  <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
-                                  <path d="M7 11V7a5 5 0 0110 0v4"></path>
-                                </svg>
-                              </div>
-                              <div className="ml-4">
-                                <p className="text-sm font-medium text-gray-900 dark:text-white">Password</p>
-                                <p className="text-sm text-gray-500 dark:text-gray-400">Last changed 30 days ago</p>
-                              </div>
-                            </div>
-                            <button
-                              onClick={() => setShowPasswordSection(true)}
-                              className="text-sm text-emerald-600 hover:text-emerald-700"
-                            >
-                              Change
-                            </button>
-                          </div> */}
                           
-                          {/* <div className="bg-gray-50 dark:bg-black dark:bg-black rounded-lg p-4 flex items-center justify-between">
-                            <div className="flex items-center">
-                              <div className="p-2 bg-emerald-100 dark:bg-emerald-900/40 rounded-full">
-                                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-emerald-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                  <path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72 12.84 12.84 0 00.7 2.81 2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45 12.84 12.84 0 002.81.7A2 2 0 0122 16.92z"></path>
-                                </svg>
-                              </div>
-                              <div className="ml-4">
-                                <p className="text-sm font-medium text-gray-900 dark:text-white">Two-Factor Authentication</p>
-                                <p className="text-sm text-gray-500 dark:text-gray-400">Add an extra layer of security</p>
-                              </div>
-                            </div>
-                            <button
-                              className="text-sm text-emerald-600 hover:text-emerald-700"
-                            >
-                              Setup
-                            </button>
-                          </div> */}
                         </div>
                       </div>
                     )}
                   </div>
                 </div>
-{/* Theme Settings Card */}
+
 <ThemeSwitch />
-                {/* Connected Accounts Card
-                <div className="bg-white dark:bg-black rounded-2xl shadow-sm dark:shadow-none overflow-hidden border border-gray-100 dark:border-gray-800">
-                  <div className="px-6 py-5 bg-gray-50 dark:bg-black dark:bg-black border-b border-gray-100 dark:border-gray-800">
-                    <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Connected Accounts</h2>
-                  </div>
-                  
-                  <div className="p-6">
-                    <p className="text-gray-600 dark:text-gray-200 mb-6">Connect your social accounts to enable quick login</p>
-                    
-                    <div className="space-y-4">
-                      <div className="flex items-center justify-between p-4 border border-gray-200 dark:border-gray-800 rounded-lg">
-                        <div className="flex items-center">
-                          <div className="w-10 h-10 flex items-center justify-center bg-blue-100 rounded-full">
-                            <svg className="w-6 h-6 text-blue-600" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                              <path d="M22.675 0h-21.35c-.732 0-1.325.593-1.325 1.325v21.351c0 .731.593 1.324 1.325 1.324h11.495v-9.294h-3.128v-3.622h3.128v-2.671c0-3.1 1.893-4.788 4.659-4.788 1.325 0 2.463.099 2.795.143v3.24l-1.918.001c-1.504 0-1.795.715-1.795 1.763v2.313h3.587l-.467 3.622h-3.12v9.293h6.116c.73 0 1.323-.593 1.323-1.325v-21.35c0-.732-.593-1.325-1.325-1.325z" />
-                            </svg>
-                          </div>
-                          <div className="ml-4">
-                            <p className="text-sm font-medium text-gray-900 dark:text-white">Facebook</p>
-                            <p className="text-xs text-gray-500 dark:text-gray-400">Not connected</p>
-                          </div>
-                        </div>
-                        <button className="px-3 py-1.5 text-xs font-medium text-white bg-emerald-600 rounded-lg hover:bg-emerald-700">
-                          Connect
-                        </button>
-                      </div>
-                      
-                      <div className="flex items-center justify-between p-4 border border-gray-200 dark:border-gray-800 rounded-lg">
-                        <div className="flex items-center">
-                          <div className="w-10 h-10 flex items-center justify-center bg-blue-100 rounded-full">
-                            <svg className="w-6 h-6 text-blue-400" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                              <path d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723 10.054 10.054 0 01-3.127 1.184 4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z" />
-                            </svg>
-                          </div>
-                          <div className="ml-4">
-                            <p className="text-sm font-medium text-gray-900 dark:text-white">Twitter</p>
-                            <p className="text-xs text-gray-500 dark:text-gray-400">Not connected</p>
-                          </div>
-                        </div>
-                        <button className="px-3 py-1.5 text-xs font-medium text-white bg-emerald-600 rounded-lg hover:bg-emerald-700">
-                          Connect
-                        </button>
-                      </div>
-                      
-                      <div className="flex items-center justify-between p-4 border border-gray-200 dark:border-gray-800 rounded-lg">
-                        <div className="flex items-center">
-                          <div className="w-10 h-10 flex items-center justify-center bg-red-100 rounded-full">
-                            <svg className="w-6 h-6 text-red-600" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                              <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z" />
-                            </svg>
-                          </div>
-                          <div className="ml-4">
-                            <p className="text-sm font-medium text-gray-900 dark:text-white">GitHub</p>
-                            <p className="text-xs text-gray-500 dark:text-gray-400">Connected</p>
-                          </div>
-                        </div>
-                        <button className="px-3 py-1.5 text-xs font-medium text-gray-700 dark:text-gray-200 bg-gray-100 dark:bg-black rounded-lg hover:bg-gray-200">
-                          Disconnect
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                </div> */}
+                
               </div>
             )}
 
-           {/* Tickets Section */}
+           
 {activeSection === 'tickets' && (
   <MyTicketsSection />
 )}
 
 
-           {/* Subscriptions Section */}
+           
 {activeSection === 'subscriptions' && (
 
     <SubscriptionsSection />
 
 )}
 
-            {/* Company Section */}
-            {/* Company Section */}
+            
+            
             {activeSection === 'company' && <CompanySection />}
           </div>
         </div>
@@ -1096,3 +949,4 @@ const handleChangePassword = async () => {
 }
 
 export default ProfileContent;
+

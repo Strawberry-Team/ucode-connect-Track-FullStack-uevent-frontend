@@ -7,7 +7,6 @@ const CompanyEventsSection = ({ event, maxEvents = 3 }) => {
   const [companyEvents, setCompanyEvents] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Keeping the original data fetching logic exactly as it was
   useEffect(() => {
     const fetchCompanyEvents = async () => {
       if (!event?.companyId) return;
@@ -15,8 +14,7 @@ const CompanyEventsSection = ({ event, maxEvents = 3 }) => {
       try {
         setIsLoading(true);
         const events = await companyService.getCompanyEvents(event.companyId.toString());
-        
-        // Filter to exclude current event and limit quantity
+
         const filteredEvents = events
           .filter(e => e.id !== event.id)
           .slice(0, maxEvents);
@@ -32,7 +30,6 @@ const CompanyEventsSection = ({ event, maxEvents = 3 }) => {
     fetchCompanyEvents();
   }, [event?.companyId, event?.id, maxEvents]);
 
-  // Format date function
   const formatDate = (dateString) => {
     const date = new Date(dateString);
     return date.toLocaleDateString('en-US', {
@@ -42,7 +39,6 @@ const CompanyEventsSection = ({ event, maxEvents = 3 }) => {
     });
   };
 
-  // Get image URL function
   const getImageUrl = (path) => {
     if (!path) return null;
     
@@ -54,7 +50,6 @@ const CompanyEventsSection = ({ event, maxEvents = 3 }) => {
     return `${baseUrl}/uploads/event-posters/${path}`;
   };
 
-  // Helper function for status badge styling
   const getStatusClass = (status) => {
     switch(status) {
       case 'PUBLISHED':
@@ -72,7 +67,6 @@ const CompanyEventsSection = ({ event, maxEvents = 3 }) => {
     }
   };
 
-  // Helper function to translate status to English
   const getStatusText = (status) => {
     switch(status) {
       case 'PUBLISHED': return 'Published';
@@ -84,7 +78,6 @@ const CompanyEventsSection = ({ event, maxEvents = 3 }) => {
     }
   };
 
-  // Loading state
   if (isLoading) {
     return (
       <div className="bg-white dark:bg-gray-800 rounded-xl shadow-md overflow-hidden border border-gray-100 dark:border-gray-700">
@@ -111,7 +104,6 @@ const CompanyEventsSection = ({ event, maxEvents = 3 }) => {
     );
   }
 
-  // Empty state (no results)
   if (companyEvents.length === 0) {
     return null;
   }
@@ -149,7 +141,6 @@ const CompanyEventsSection = ({ event, maxEvents = 3 }) => {
                     </div>
                   )}
                   
-                  {/* Date badge */}
                   <div className="absolute top-3 left-3 bg-white dark:bg-gray-900 shadow-md rounded-lg p-1.5 text-center w-14">
                     <div className="text-xs font-semibold bg-emerald-600 text-white rounded-t-sm -mt-1 -mx-1 py-0.5">
                       {new Date(companyEvent.startedAt).toLocaleDateString('en-US', { weekday: 'short' })}
@@ -169,7 +160,6 @@ const CompanyEventsSection = ({ event, maxEvents = 3 }) => {
                     </span>
                   </div>
                   
-                  {/* Format badge - if available */}
                   {companyEvent.format && (
                     <div className="absolute bottom-3 left-3 bg-black/70 backdrop-blur-sm text-white text-xs px-2.5 py-1 rounded-full">
                       {companyEvent.format.title}
@@ -182,7 +172,6 @@ const CompanyEventsSection = ({ event, maxEvents = 3 }) => {
                     {companyEvent.title}
                   </h3>
                   
-                  {/* Themes - if available */}
                   {companyEvent.themes && companyEvent.themes.length > 0 && (
                     <div className="flex flex-wrap gap-1.5 mb-3">
                       {companyEvent.themes.slice(0, 2).map(theme => (
@@ -227,3 +216,4 @@ const CompanyEventsSection = ({ event, maxEvents = 3 }) => {
 };
 
 export default CompanyEventsSection;
+

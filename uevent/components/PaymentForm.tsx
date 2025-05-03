@@ -20,12 +20,10 @@ const PaymentForm: React.FC<PaymentFormProps> = ({ orderId, clientSecret }) => {
 
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [isSubmitting, setIsSubmitting] = useState<boolean>(false); // Track submission state
+  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
-  // Prevent double submissions
   useEffect(() => {
     return () => {
-      // Cleanup function to ensure we don't have lingering state
       setIsSubmitting(false);
       setIsLoading(false);
     };
@@ -40,7 +38,6 @@ const PaymentForm: React.FC<PaymentFormProps> = ({ orderId, clientSecret }) => {
     }
     
     isProcessingRef.current = true;
-    // Prevent double-clicks and multiple submissions
     if (isSubmitting || isLoading) {
       console.log('Payment already in progress, ignoring duplicate submission');
       return;
@@ -53,43 +50,33 @@ const PaymentForm: React.FC<PaymentFormProps> = ({ orderId, clientSecret }) => {
     }
 
     setIsLoading(true);
-    setIsSubmitting(true); // Mark as submitting to prevent duplicates
+    setIsSubmitting(true);
     setErrorMessage(null);
 
     console.log(`Attempting to confirm payment for order ${orderId}`);
 
     try {
-      // Call confirmPayment
-      // In PaymentForm.tsx, modify your confirmPayment call:
 const { error, paymentIntent } = await stripe.confirmPayment({
   elements,
   confirmParams: {
     return_url: `${window.location.origin}/orders/confirmation/${orderId}?source=stripe_redirect`,
   },
-  redirect: 'if_required', // Change from 'if_required' to 'always'
+  redirect: 'if_required',
 });
-console.log("HYETAEBANAY",error, paymentIntent);
-      // This code will execute ONLY if there was NO redirect (error or rare success without 3DS)
       if (error) {
-        // Card validation errors, bank rejections (without 3DS), network issues, etc.
         console.error('Stripe confirmPayment error:', error);
         setErrorMessage(error.message || 'An unexpected payment error occurred.');
         setIsLoading(false);
-        setIsSubmitting(false); // Allow user to try again
+        setIsSubmitting(false);
       } else if (paymentIntent && paymentIntent.status === 'succeeded') {
-        // Very rare case for confirmPayment with redirect: 'if_required',
-        // but in case success happens immediately without 3DS.
+
         console.log('Payment succeeded immediately (no redirect). Redirecting to confirmation...');
-        // Redirect to confirmation page for backend status verification
         router.push(`/orders/confirmation/${orderId}?status=processing`);
       } else {
-        // If there's no error and no 'succeeded' status, and no redirect -
-        // this is most likely a redirect about to happen
         console.log('Payment processing started, waiting for redirect or completion...');
         
-        // If we reach here and no redirect happens within 3 seconds, show a message
         setTimeout(() => {
-          if (isSubmitting) { // Check if we're still on this page
+          if (isSubmitting) {
             console.warn('Expected redirect did not occur');
             setErrorMessage('Payment processing started. Please wait for the secure payment page or check your order status.');
             setIsLoading(false);
@@ -137,7 +124,6 @@ console.log("HYETAEBANAY",error, paymentIntent);
         type="submit"
         disabled={isLoading || isSubmitting || !stripe || !elements}
         onClick={() => {
-          // Немедленно отключить кнопку через DOM, если React не успевает
           event.currentTarget.disabled = true;
         }}
         className={`
@@ -169,3 +155,4 @@ console.log("HYETAEBANAY",error, paymentIntent);
 };
 
 export default PaymentForm;
+

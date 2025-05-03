@@ -13,15 +13,12 @@ const LocationPicker = ({
   const googleMapsLoadedRef = useRef(false);
   const mapInitializedRef = useRef(false);
 
-  // Используем локальное состояние, полностью независимое от пропсов
   const [coordinates, setCoordinates] = useState(initialCoordinates);
   const [searchValue, setSearchValue] = useState('');
   const [isMapLoaded, setIsMapLoaded] = useState(false);
   const [isSearching, setIsSearching] = useState(false);
   const isInitializedRef = useRef(false);
-  // Мемоизируем начальные координаты для инициализации карты
   const initialLocation = useMemo(() => {
-    // Если координаты не переданы или невалидны, используем координаты Киева
     const defaultLocation = { lat: 50.450001, lng: 30.523333 };
     
     if (!initialCoordinates) {
@@ -36,9 +33,8 @@ const LocationPicker = ({
     } catch {
       return defaultLocation;
     }
-  }, []); // Вычисляем только один раз при монтировании
+  }, []);
 
-  // Обновляем внутренние координаты только при первом рендере или при значимом изменении initialCoordinates
   useEffect(() => {
     if (initialCoordinates !== coordinates && initialCoordinates !== lastReportedCoordinatesRef.current && initialCoordinates !== '') {
       setCoordinates(initialCoordinates);
@@ -46,11 +42,9 @@ const LocationPicker = ({
     }
   }, [initialCoordinates]);
 
-  // Загрузка Google Maps API - выполняется только ОДИН раз
   useEffect(() => {
     if (isInitializedRef.current) return;
   isInitializedRef.current = true;
-    // Проверяем, загружен ли уже Google Maps
     if (window.google?.maps) {
       googleMapsLoadedRef.current = true;
       if (!mapInitializedRef.current) {
@@ -59,10 +53,8 @@ const LocationPicker = ({
       return;
     }
 
-    // Проверяем, был ли скрипт уже добавлен на страницу
     const existingScript = document.querySelector('script[src*="maps.googleapis.com"]');
     if (existingScript) {
-      // Если скрипт уже загружается, ждем его завершения
       const checkGoogle = setInterval(() => {
         if (window.google?.maps) {
           clearInterval(checkGoogle);
@@ -75,7 +67,6 @@ const LocationPicker = ({
       return;
     }
 
-    // Если скрипт еще не загружен, добавляем его
     const script = document.createElement('script');
     script.src = `https://maps.googleapis.com/maps/api/js?key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}&libraries=places`;
     script.async = true;
@@ -94,11 +85,9 @@ const LocationPicker = ({
     document.head.appendChild(script);
 
     return () => {
-      // Ничего не удаляем при размонтировании - пусть скрипт остается для переиспользования
     };
-  }, []); // Пустой массив зависимостей - выполняется только один раз
+  }, []);
 
-  // Инициализация карты - убедимся, что запускается только один раз
   const initializeMap = () => {
     if (!mapRef.current || !window.google || mapInitializedRef.current) return;
 
@@ -122,21 +111,18 @@ const LocationPicker = ({
       });
       markerRef.current = marker;
       
-      // Обработчики событий для маркера
       marker.addListener('dragend', () => {
         const position = marker.getPosition();
         const newCoordinates = `${position.lat()},${position.lng()}`;
         updateCoordinates(newCoordinates);
       });
       
-      // Клик по карте
       map.addListener('click', (e) => {
         marker.setPosition(e.latLng);
         const newCoordinates = `${e.latLng.lat()},${e.latLng.lng()}`;
         updateCoordinates(newCoordinates);
       });
       
-      // Автодополнение
       const autocomplete = new window.google.maps.places.Autocomplete(
         document.getElementById('location-search-input'),
         { types: ['geocode', 'establishment'] }
@@ -172,15 +158,11 @@ const LocationPicker = ({
     }
   };
 
-  // Обновление координат с минимизацией циклов обновления
   const updateCoordinates = (newCoordinates) => {
-    // Обновляем только если есть реальные изменения
     if (newCoordinates !== lastReportedCoordinatesRef.current) {
       setCoordinates(newCoordinates);
       lastReportedCoordinatesRef.current = newCoordinates;
       
-      // Уведомляем родительский компонент об изменении
-      // Но делаем это асинхронно, чтобы избежать циклов обновлений
       if (onLocationSelect) {
         setTimeout(() => {
           onLocationSelect(newCoordinates);
@@ -189,7 +171,7 @@ const LocationPicker = ({
     }
   };
 
-  // Обновление карты при изменении координат (с проверкой на реальное изменение)
+
   useEffect(() => {
     if (isMapLoaded && coordinates && googleMapRef.current && markerRef.current) {
       try {
@@ -198,7 +180,6 @@ const LocationPicker = ({
         if (!isNaN(lat) && !isNaN(lng)) {
           const location = { lat, lng };
           
-          // Проверяем, действительно ли изменились координаты
           const currentPos = markerRef.current.getPosition();
           if (!currentPos || 
               Math.abs(currentPos.lat() - lat) > 0.0000001 || 
@@ -214,7 +195,6 @@ const LocationPicker = ({
     }
   }, [coordinates, isMapLoaded]);
 
-  // Обработчики ввода
   const handleCoordinatesChange = (e) => {
     setCoordinates(e.target.value);
   };
@@ -227,7 +207,6 @@ const LocationPicker = ({
     setSearchValue(e.target.value);
   };
 
-  // Обратное геокодирование
   const handleReverseGeocode = async () => {
     if (!coordinates || !window.google) return;
     
@@ -260,7 +239,7 @@ const LocationPicker = ({
 
   return (
     <div className="space-y-4">
-      {/* Search box */}
+      
       <div className="relative group">
         <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none text-gray-400 dark:text-gray-500">
           <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
@@ -277,11 +256,11 @@ const LocationPicker = ({
         />
       </div>
 
-      {/* Map container */}
+      
       <div className="w-full h-[400px] rounded-xl overflow-hidden border-2 border-gray-200 dark:border-gray-700 hover:border-emerald-300 dark:hover:border-emerald-700 transition-all bg-gray-100 dark:bg-gray-800 relative">
         <div ref={mapRef} className="w-full h-full"></div>
         
-        {/* Loading indicator */}
+        
         {!isMapLoaded && (
           <div className="absolute inset-0 flex items-center justify-center bg-gray-100 dark:bg-gray-800 bg-opacity-70 dark:bg-opacity-70">
             <div className="flex flex-col items-center">
@@ -292,7 +271,7 @@ const LocationPicker = ({
         )}
       </div>
 
-      {/* Coordinates input */}
+      
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <div className="md:col-span-3 relative group">
           <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none text-gray-400 dark:text-gray-500">
@@ -333,8 +312,7 @@ const LocationPicker = ({
   );
 };
 
-// Используем мемоизацию с пользовательской функцией сравнения props
 export default React.memo(LocationPicker, (prevProps, nextProps) => {
-  // Ререндерим только при действительном изменении координат
   return prevProps.initialCoordinates === nextProps.initialCoordinates;
 });
+

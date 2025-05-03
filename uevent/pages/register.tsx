@@ -19,20 +19,15 @@ export default function Register() {
   const router = useRouter();
 
   useEffect(() => {
-    // Очищаем ошибки при монтировании компонента
     clearError();
     
-    // Редиректим залогиненного пользователя
     if (user) {
       router.push('/');
     }
-  }, [user, router]);  // Removed clearError dependency to prevent unnecessary rerenders
+  }, [user, router]);
 
-  // Больше не реагируем на ошибки контекста, обрабатываем их локально
-  // вместо этого используем localError в handleSubmit
 
   const validatePassword = (password: string): boolean => {
-    // Минимум 8 символов, содержит заглавные, строчные, цифру и спецсимвол
     const regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^\da-zA-Z]).{8,}$/;
     return regex.test(password);
   };
@@ -63,7 +58,6 @@ export default function Register() {
     }
   };
 
-  // Функция для обработки ошибок API регистрации
   const handleApiError = (errorMessage) => {
     if (errorMessage.includes('email already') || errorMessage.includes('already exists') || errorMessage.includes('already registered')) {
       setStatusMessage({
@@ -88,14 +82,10 @@ export default function Register() {
     }
   };
 
-  // Обновленный метод handleSubmit в компоненте Register
 const handleSubmit = async (e: React.FormEvent) => {
   e.preventDefault();
-  
-  // Очищаем предыдущие сообщения об ошибках
   setStatusMessage({ type: '', message: '' });
   
-  // Валидация
   if (!firstName || !lastName || !email || !password) {
     setStatusMessage({
       type: 'error',
@@ -115,38 +105,30 @@ const handleSubmit = async (e: React.FormEvent) => {
   }
   
   try {
-    // Вызываем метод регистрации из контекста
     const response = await register(firstName, lastName, email, password);
-    
-    // Проверяем, вернулась ли ошибка из метода register
+
     if (response && response.error) {
-      // Если register вернул объект с ошибкой, обрабатываем его здесь
       handleApiError(response.message || 'Registration failed');
-      return; // Прекращаем выполнение функции
+      return; 
     }
     
-    // Если мы дошли до этой точки без ошибок, значит регистрация прошла успешно
     setRegistrationSuccess(true);
     setStatusMessage({
       type: 'success',
       message: 'Registration successful! Please check your email to verify your account.'
     });
     
-    // Очищаем форму
     setFirstName('');
     setLastName('');
     setEmail('');
     setPassword('');
     setConfirmPassword('');
     
-    // Редирект на страницу входа произойдет через несколько секунд
     setTimeout(() => {
       router.push('/login?registered=true');
     }, 5000);
     
   } catch (err: any) {
-    // Этот блок больше не должен выполняться, так как register не выбрасывает исключения
-    // Но на всякий случай оставляем, чтобы перехватить любые непредвиденные ошибки
     console.error('Unexpected error in Register handleSubmit:', err);
     handleApiError(err.message || 'An unexpected error occurred');
   }
@@ -161,7 +143,7 @@ const handleSubmit = async (e: React.FormEvent) => {
 
       <div className="min-h-screen flex items-center justify-center dark:bg-dark-bg">
         <div className="grid grid-cols-1 lg:grid-cols-5 w-full max-w-screen-xl shadow-2xl rounded-xl overflow-hidden">
-          {/* Левая панель с иллюстрацией */}
+          
           <div className="col-span-2 hidden lg:block relative bg-emerald-700">
             <div className="absolute inset-0 bg-opacity-70 bg-emerald-700 flex flex-col justify-center p-12">
               <div className="text-white space-y-6">
@@ -199,7 +181,7 @@ const handleSubmit = async (e: React.FormEvent) => {
             </div>
           </div>
 
-          {/* Правая панель с формой */}
+          
           <div className="col-span-3 p-8 md:p-12 lg:p-16 bg-white dark:bg-black">
             <div className="mb-10">
               <Link href="/" className="inline-flex items-center space-x-2">
@@ -467,3 +449,4 @@ const handleSubmit = async (e: React.FormEvent) => {
     </>
   );
 }
+

@@ -8,10 +8,7 @@ class CsrfService {
     async fetchCsrfToken(): Promise<string | null> {
         try {
             const response = await axios.get(`${API_URL}/csrf-token`, {
-                withCredentials: true // Important for cookie handling
             });
-            
-            // Token might be in header or response body
             this.csrfToken = response.data.csrfToken;
             return this.csrfToken;
         } catch (error) {
@@ -24,10 +21,10 @@ class CsrfService {
         return this.csrfToken;
     }
     
-    // Setup axios to automatically add token
+
     setupAxiosInterceptors(): void {
         axios.interceptors.request.use(config => {
-            // Add token only to unsafe methods
+
             if (
                 this.csrfToken &&
                 ['POST', 'PUT', 'PATCH', 'DELETE'].includes(config.method?.toUpperCase() || '')
@@ -41,3 +38,5 @@ class CsrfService {
 }
 
 export default new CsrfService();
+
+

@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 import { useOrders } from '../contexts/OrderContext';
 import { useAuth } from '../contexts/AuthContext';
 import Link from 'next/link';
-TicketsSkeletonLoader
 import TicketsSkeletonLoader from './TicketsSkeletonLoader';
 import { toast } from 'react-toastify';
 import {
@@ -18,7 +17,6 @@ import {
   AlertCircle,
   Lock
 } from 'lucide-react';
-// Define types based on the actual API response structure
 interface Ticket {
   id: number;
   title: string;
@@ -37,7 +35,7 @@ interface OrderItem {
   id: number;
   finalPrice: number;
   ticket: Ticket;
-  quantity?: number; // Adding quantity in case it exists
+  quantity?: number;
 }
 
 interface Order {
@@ -49,7 +47,6 @@ interface Order {
   orderItems: OrderItem[];
 }
 
-// Helper function to format dates
 const formatDate = (dateString: string | undefined): string => {
   if (!dateString) return 'N/A';
   
@@ -67,7 +64,6 @@ const formatDate = (dateString: string | undefined): string => {
   }
 };
 
-// Helper function to format time
 const formatTime = (dateString: string | undefined): string => {
   if (!dateString) return '';
   
@@ -84,7 +80,6 @@ const formatTime = (dateString: string | undefined): string => {
   }
 };
 
-// Status color mapping
 const statusColors = {
   PENDING: {
     bg: 'bg-amber-100 dark:bg-amber-900/30',
@@ -118,7 +113,6 @@ const statusColors = {
   }
 };
 
-// Props interface to accept user data
 interface MyTicketsSectionProps {
   user?: {
     id: number;
@@ -131,14 +125,12 @@ interface MyTicketsSectionProps {
 
 const MyTicketsSection: React.FC<MyTicketsSectionProps> = ({ user }) => {
   const { getUserOrders, orders: contextOrders, isLoading, error, cancelOrder } = useOrders();
-  const { user: authUser } = useAuth(); // Fallback to Auth context if no user prop is provided
+  const { user: authUser } = useAuth();
   const [expandedOrders, setExpandedOrders] = useState<Record<number, boolean>>({});
   const [cancelingOrderId, setCancelingOrderId] = useState<number | null>(null);
 
-  // Use the user prop if provided, otherwise fallback to auth context
   const currentUser = user || authUser;
 
-  // Cast to match our expected format - the actual data structure in the API response
   const orders = contextOrders as unknown as Order[];
 
   useEffect(() => {
@@ -185,7 +177,6 @@ const MyTicketsSection: React.FC<MyTicketsSectionProps> = ({ user }) => {
     }
   };
 
-  // Show loading state if loading or no user is available yet
   if (isLoading || !currentUser) {
     return <TicketsSkeletonLoader />;
   }
@@ -258,14 +249,12 @@ const MyTicketsSection: React.FC<MyTicketsSectionProps> = ({ user }) => {
     );
   }
 
-  // Helper to get the event from the order
   const getEventFromOrder = (order: Order) => {
     if (!order.orderItems || order.orderItems.length === 0) return null;
     if (!order.orderItems[0].ticket || !order.orderItems[0].ticket.event) return null;
     return order.orderItems[0].ticket.event;
   };
 
-  // Count total tickets in an order
   const countTickets = (orderItems: OrderItem[]) => {
     return orderItems.reduce((total, item) => total + (item.quantity || 1), 0);
   };
@@ -284,20 +273,16 @@ const MyTicketsSection: React.FC<MyTicketsSectionProps> = ({ user }) => {
 
         <div className="divide-y divide-gray-200 dark:divide-gray-800">
           {orders.map((order) => {
-            // Ensure orderItems is an array
             const orderItems = order.orderItems || [];
-            // Get event info from the first item (assuming all items belong to the same event)
             const event = getEventFromOrder(order);
-            // Count total tickets
             const ticketCount = countTickets(orderItems);
-            // Check if payment is completed
             const isPaid = order.paymentStatus === 'PAID' || order.paymentStatus === 'COMPLETED';
             
             return (
               <div key={order.id} className="p-0">
-                {/* Redesigned Order Card */}
+                
                 <div className="rounded-lg overflow-hidden">
-                  {/* Order Header */}
+                  
                   <div className="px-6 py-4 bg-gray-50 dark:bg-gray-900/40 border-b border-gray-200 dark:border-gray-800">
                     <div className="flex flex-col md:flex-row md:items-center md:justify-between">
                       <div className="flex items-center mb-2 md:mb-0">
@@ -332,9 +317,9 @@ const MyTicketsSection: React.FC<MyTicketsSectionProps> = ({ user }) => {
                     </div>
                   </div>
 
-                  {/* Event and Tickets Info */}
+                  
                   <div className="p-6 bg-white dark:bg-black">
-                    {/* Event Information */}
+                    
                     {event && (
                       <div className="flex flex-col md:flex-row md:items-center gap-4 p-4 mb-4 bg-gradient-to-r from-emerald-50 to-emerald-100 dark:from-emerald-900/20 dark:to-emerald-900/10 rounded-lg border border-emerald-200 dark:border-emerald-900/30">
                         <div className="flex-shrink-0 w-12 h-12 bg-emerald-100 dark:bg-emerald-800/40 rounded-full flex items-center justify-center text-emerald-600 dark:text-emerald-400">
@@ -377,7 +362,7 @@ const MyTicketsSection: React.FC<MyTicketsSectionProps> = ({ user }) => {
                       </div>
                     )}
 
-                    {/* Tickets Section - Always visible information */}
+                    
                     <div className="flex flex-col md:flex-row md:items-center justify-between mb-2">
                       <div 
                         className="flex items-center text-gray-700 dark:text-gray-300 cursor-pointer hover:text-emerald-600 dark:hover:text-emerald-500 transition-colors"
@@ -404,7 +389,7 @@ const MyTicketsSection: React.FC<MyTicketsSectionProps> = ({ user }) => {
 )}
                     </div>
 
-                    {/* Expanded Tickets List */}
+                    
                     {expandedOrders[order.id as number] && (
                       <div className="mt-4 space-y-3 bg-gray-50 dark:bg-gray-900/20 p-4 rounded-lg border border-gray-200 dark:border-gray-800">
                         <h5 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">Ticket Details</h5>
@@ -437,7 +422,6 @@ const MyTicketsSection: React.FC<MyTicketsSectionProps> = ({ user }) => {
                                   </td>
                                   <td className="px-3 py-3 whitespace-nowrap text-sm text-center">
                                     {isPaid ? (
-                                      // Show view ticket button if payment is completed
                                       <Link 
                                         href={`/orders/${order.id}/items/${item.id}/ticket`}
                                         target="_blank"
@@ -447,7 +431,6 @@ const MyTicketsSection: React.FC<MyTicketsSectionProps> = ({ user }) => {
                                         <Eye className="h-4 w-4" />
                                       </Link>
                                     ) : (
-                                      // Show a disabled button with a different style if payment is not completed
                                       <div 
                                         className="inline-flex items-center justify-center p-2 bg-gray-100 dark:bg-gray-800 text-gray-400 dark:text-gray-500 rounded-lg cursor-not-allowed"
                                         title="Payment required to view ticket"
@@ -475,3 +458,4 @@ const MyTicketsSection: React.FC<MyTicketsSectionProps> = ({ user }) => {
 };
 
 export default MyTicketsSection;
+

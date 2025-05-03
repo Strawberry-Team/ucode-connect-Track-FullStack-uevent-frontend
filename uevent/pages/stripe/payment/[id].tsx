@@ -10,7 +10,6 @@ import {
   CreditCard, ArrowLeft, CheckCircle, Shield 
 } from 'lucide-react';
 import { useRef } from 'react';
-// Global variable for Stripe Promise
 let stripePromise: ReturnType<typeof loadStripe> | null = null;
 
 const PaymentPage: React.FC = () => {
@@ -24,11 +23,9 @@ const PaymentPage: React.FC = () => {
   const [orderDetails, setOrderDetails] = useState<any>(null);
   const initializedRef = useRef(false);
   useLayoutEffect(() => {
-    // Предотвращаем выполнение в режиме SSR
     if (typeof window === 'undefined') return;
     
     const initializePayment = async () => {
-      // Проверяем, был ли уже инициализирован платеж
       if (initializedRef.current) {
         console.log('Payment already initialized, skipping duplicate initialization');
         return;
@@ -47,7 +44,6 @@ const PaymentPage: React.FC = () => {
       setClientSecret(null);
 
       try {
-        // Устанавливаем флаг перед запросом
         initializedRef.current = true;
         
         const response = await paymentService.createPaymentIntent(id);
@@ -71,7 +67,6 @@ const PaymentPage: React.FC = () => {
       } catch (err: any) {
         console.error('Error initializing payment:', err);
         setError(err.response?.data?.message || 'Failed to load payment details. Please try again later.');
-        // Сбрасываем флаг только в случае ошибки, чтобы можно было повторить попытку
         initializedRef.current = false;
       } finally {
         setLoading(false);
@@ -82,13 +77,11 @@ const PaymentPage: React.FC = () => {
       initializePayment();
     }
     
-    // Функция очистки, которая выполнится при размонтировании компонента
     return () => {
       console.log('Payment page unmounted');
     };
   }, [id, router.isReady]);
 
-  // Options for Stripe Elements
   const options: StripeElementsOptions = {
     clientSecret: clientSecret ?? undefined,
     locale: 'en',
@@ -274,12 +267,7 @@ const PaymentPage: React.FC = () => {
                 </Elements>
                 
                 <div className="mt-6">
-                  {/* <div className="flex items-center justify-center my-4 space-x-4">
-                    <img src="/images/visa.svg" alt="Visa" className="h-6 opacity-80" />
-                    <img src="/images/mastercard.svg" alt="Mastercard" className="h-6 opacity-80" />
-                    <img src="/images/amex.svg" alt="American Express" className="h-6 opacity-80" />
-                    <img src="/images/discover.svg" alt="Discover" className="h-6 opacity-80" />
-                  </div> */}
+                  
                   
                   <div className="flex items-center mt-4 pt-4 border-t border-gray-100 dark:border-gray-700 text-xs text-gray-500 dark:text-gray-400">
                     <Shield size={14} className="text-emerald-500 mr-2" />
@@ -296,3 +284,4 @@ const PaymentPage: React.FC = () => {
 };
 
 export default PaymentPage;
+

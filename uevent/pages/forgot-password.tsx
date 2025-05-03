@@ -10,19 +10,16 @@ export default function ForgotPassword() {
   const { sendPasswordResetLink, loading, error, clearError } = useAuth();
 
   useEffect(() => {
-    // Clear errors when component mounts
     clearError();
   }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Clear previous messages
     setMessage('');
     clearError();
     
     try {
-      // Send password reset request
       await sendPasswordResetLink(email);
       setIsSuccess(true);
       setMessage('Password reset link has been sent to your email');
@@ -122,3 +119,4 @@ export default function ForgotPassword() {
     </>
   );
 }
+

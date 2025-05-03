@@ -12,7 +12,6 @@ import Footer from '../../../components/Footer';
 import { usePromoCodes, PromoCode } from '../../../contexts/PromoCodeContext';
 import LocationPicker from '../../../components/LocationPicker';
 
-// Format and Theme types
 interface Format {
   id: number;
   title: string;
@@ -27,9 +26,7 @@ const EditEventPage: React.FC = () => {
   const router = useRouter();
   const { id } = router.query;
   const { currentEvent, getEventById, updateEvent, isLoading, syncThemes } = useEvents();
-  // Import promo code context methods
 const { getPromoCodesByEventId, createPromoCode, updatePromoCode } = usePromoCodes();
-  // Local state
   const [eventData, setEventData] = useState<any>(null);
   const [formats, setFormats] = useState<Format[]>([]);
   const [availableThemes, setAvailableThemes] = useState<Theme[]>([]);
@@ -37,14 +34,11 @@ const { getPromoCodesByEventId, createPromoCode, updatePromoCode } = usePromoCod
   const [isSaving, setIsSaving] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
-  
-  // Refs for file input
+
   const posterInputRef = useRef<HTMLInputElement>(null);
   
-  // State for poster preview
   const [posterPreview, setPosterPreview] = useState<string | null>(null);
   const [posterFile, setPosterFile] = useState<File | null>(null);
-  // Promo code state
 const [promoCodesList, setPromoCodesList] = useState<PromoCode[]>([]);
 const [isAddingPromoCode, setIsAddingPromoCode] = useState(false);
 const [isEditingPromoCode, setIsEditingPromoCode] = useState<number | null>(null);
@@ -55,7 +49,6 @@ const [newPromoCode, setNewPromoCode] = useState<Partial<PromoCode>>({
   isActive: true,
   eventId: 0
 });
-// Add these state variables at the top of your component with the other state declarations:
 const [eventTickets, setEventTickets] = useState<Array<any>>([]);
 const [newTicket, setNewTicket] = useState({
   title: '',
@@ -63,9 +56,8 @@ const [newTicket, setNewTicket] = useState({
   status: 'AVAILABLE',
   quantity: 1
 });
-const { createTickets, getEventTickets } = useEvents(); // Get methods from context
+const { createTickets, getEventTickets } = useEvents();
 
-// Add this useEffect to fetch tickets along with the other data fetching effects
 useEffect(() => {
   const fetchTickets = async () => {
     if (id && typeof id === 'string') {
@@ -82,7 +74,6 @@ useEffect(() => {
   fetchTickets();
 }, [id, getEventTickets]);
 
-// Add these handler functions for ticket operations
 const handleTicketChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
   const { name, value } = e.target;
   setNewTicket(prev => ({
@@ -90,13 +81,13 @@ const handleTicketChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectEl
     [name]: name === 'price' || name === 'quantity' ? parseFloat(value) : value
   }));
 };
-// Добавить эту функцию для правильного форматирования дат для input полей
+
 const formatDateForInput = (dateString) => {
   const date = new Date(dateString);
   const localISOTime = new Date(date.getTime() - (date.getTimezoneOffset() * 60000)).toISOString().slice(0, 16);
   return localISOTime;
 };
-// Modified handleAddTicket function to work with grouped tickets
+
 const handleAddTicket = async () => {
   if (!newTicket.title) {
     toast.warning('Please enter a ticket title', {
@@ -107,24 +98,20 @@ const handleAddTicket = async () => {
   }
 
   try {
-    // Check if a ticket with the same title and status already exists
     const existingTicket = eventTickets.find(ticket => 
       ticket.title === newTicket.title && 
       ticket.status === newTicket.status
     );
 
     if (existingTicket) {
-      // If it exists, update its quantity
       const updatedTicket = {
         ...existingTicket,
         quantity: existingTicket.quantity + newTicket.quantity
       };
       
-      // Update the existing ticket
       const result = await eventService.updateTicket(existingTicket.id, updatedTicket);
       
       if (result.success) {
-        // Refresh the tickets list
         const updatedTickets = await getEventTickets(Number(id));
         setEventTickets(updatedTickets);
         
@@ -137,11 +124,9 @@ const handleAddTicket = async () => {
         toast.error(result.message || 'Failed to update ticket');
       }
     } else {
-      // Create a new ticket
       const result = await createTickets(Number(id), [newTicket]);
 
       if (result.success) {
-        // Refresh the tickets list
         const updatedTickets = await getEventTickets(Number(id));
         setEventTickets(updatedTickets);
         
@@ -155,7 +140,6 @@ const handleAddTicket = async () => {
       }
     }
     
-    // Reset the new ticket form in either case
     setNewTicket({
       title: '',
       price: 0,
@@ -171,14 +155,9 @@ const handleAddTicket = async () => {
 
 const handleRemoveTicket = async (ticketId: number) => {
   try {
-    // Since we don't have a direct deleteTicket method in the context,
-    // we'll need to use the eventService directly or handle it differently
-    
-    // Option 1: Using direct service call if available
     const result = await eventService.deleteTicket(ticketId);
     
     if (result.success) {
-      // Update the local state to remove the ticket
       setEventTickets(prev => prev.filter(ticket => ticket.id !== ticketId));
       
       toast.info('Ticket removed', {
@@ -189,15 +168,11 @@ const handleRemoveTicket = async (ticketId: number) => {
       toast.error(result.message || 'Failed to remove ticket');
     }
     
-    // Option 2: If deleteTicket doesn't exist, refresh the tickets list
-    // const updatedTickets = await getEventTickets(Number(id));
-    // setEventTickets(updatedTickets);
   } catch (error) {
     console.error('Error removing ticket:', error);
     toast.error('Failed to remove ticket');
   }
 };
-  // Fetch event data when ID is available
   useEffect(() => {
     const fetchEventData = async () => {
       if (id && typeof id === 'string') {
@@ -206,7 +181,6 @@ const handleRemoveTicket = async (ticketId: number) => {
           console.log("red",eventData);
           setEventData(eventData);
           
-          // If we have theme data for this event, set the selected themes
           if (eventData?.themes?.length > 0) {
             setSelectedThemes(eventData.themes.map((theme: any) => theme.id));
           }
@@ -220,7 +194,6 @@ const handleRemoveTicket = async (ticketId: number) => {
     fetchEventData();
   }, [id, getEventById]);
 
-  // Fetch promo codes for the event
 useEffect(() => {
   const fetchPromoCodes = async () => {
     if (id && typeof id === 'string') {
@@ -237,8 +210,6 @@ useEffect(() => {
   fetchPromoCodes();
 }, [id, getPromoCodesByEventId]);
 
-
-  // Fetch formats and themes on component mount
   useEffect(() => {
     const fetchOptions = async () => {
       try {
@@ -258,14 +229,11 @@ useEffect(() => {
     fetchOptions();
   }, []);
   
-  // Изменить handleInputChange для работы с датами
 const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
   const { name, value } = e.target;
   
-  // Преобразуем datetime-local значения обратно в UTC перед сохранением в состоянии
   if (name === 'startedAt' || name === 'endedAt' || name === 'publishedAt' || name === 'ticketsAvailableFrom') {
     if (value) {
-      // Преобразуем локальное время в UTC
       const localDate = new Date(value);
       const utcDate = new Date(
         Date.UTC(
@@ -288,13 +256,11 @@ const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaE
       }));
     }
   } else if (name === 'formatId') {
-    // Специальная обработка для formatId - конвертация строки в число
     setEventData(prev => ({
       ...prev,
       [name]: value ? parseInt(value, 10) : 0
     }));
   } else {
-    // Обычные поля
     setEventData(prev => ({
       ...prev,
       [name]: value
@@ -302,7 +268,6 @@ const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaE
   }
 };
   
-  // Handle theme selection
   const handleThemeChange = (themeId: number) => {
     setSelectedThemes(prev => {
       if (prev.includes(themeId)) {
@@ -313,15 +278,12 @@ const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaE
     });
   };
   
-  // File validation helper function
   const validatePosterFile = (file: File): boolean => {
-    // Size validation (max 5MB)
     if (file.size > 5 * 1024 * 1024) {
       toast.error('Image size should not exceed 5MB');
       return false;
     }
-    
-    // Type validation
+
     const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/svg+xml'];
     if (!allowedTypes.includes(file.type)) {
       toast.error('Only JPG, PNG, GIF, and SVG files are allowed');
@@ -331,23 +293,20 @@ const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaE
     return true;
   };
   
-  // Handle poster file change
   const handlePosterChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
       if (!validatePosterFile(file)) {
-        e.target.value = ''; // Reset the input
+        e.target.value = '';
         return;
       }
       
-      // Show preview
       const reader = new FileReader();
       reader.onloadend = () => {
         setPosterPreview(reader.result as string);
       };
       reader.readAsDataURL(file);
-      
-      // Store file for upload on save
+
       setPosterFile(file);
       
       toast.success('Poster uploaded successfully!', {
@@ -358,23 +317,19 @@ const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaE
     }
   };
   
-  // Handle poster button click
   const handlePosterButtonClick = () => {
     posterInputRef.current?.click();
   };
-  
-  // Handle poster upload
+
   const handlePosterUpload = async () => {
     if (!posterFile || !eventData?.id) return false;
     
     setIsUploading(true);
     try {
       console.log('Uploading poster for event:', eventData.id);
-      // Using the dedicated endpoint for poster uploads
       const result = await eventService.uploadEventPoster(posterFile, eventData.id);
       
       if (result.success) {
-        // Update local state with the new poster name
         if (result.posterName) {
           setEventData(prev => ({
             ...prev,
@@ -396,10 +351,8 @@ const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaE
     }
   };
   
-  // Validate form
   const validateForm = () => {
     try {
-      // We're reusing the basic info schema from event creation
       EventBasicInfoSchema.parse(eventData);
       setErrors({});
       return true;
@@ -413,25 +366,21 @@ const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaE
     }
   };
 
-  // Handle promo code input change
 const handlePromoCodeInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
   const { name, value, type } = e.target as HTMLInputElement;
   
-  // Special handling for discount percent
   if (name === 'discountPercent') {
     setNewPromoCode(prev => ({
       ...prev,
       [name]: parseFloat(value) || 0
     }));
   } 
-  // Special handling for boolean isActive
   else if (type === 'checkbox') {
     setNewPromoCode(prev => ({
       ...prev,
       [name]: (e.target as HTMLInputElement).checked
     }));
   } 
-  // Regular text inputs
   else {
     setNewPromoCode(prev => ({
       ...prev,
@@ -440,8 +389,6 @@ const handlePromoCodeInputChange = (e: React.ChangeEvent<HTMLInputElement | HTML
   }
 };
 
-// Create new promo code
-// Create new promo code
 const handleCreatePromoCode = async (e: React.MouseEvent | React.FormEvent) => {
   e.preventDefault();
   e.stopPropagation();
@@ -452,10 +399,8 @@ const handleCreatePromoCode = async (e: React.MouseEvent | React.FormEvent) => {
   }
   
   try {
-    // Ensure the promo code is associated with the current event
     const promoCodeData = {
       ...newPromoCode,
-      // Convert percentage to decimal (5% → 0.05)
       discountPercent: newPromoCode.discountPercent / 100,
       eventId: eventData.id
     };
@@ -463,9 +408,8 @@ const handleCreatePromoCode = async (e: React.MouseEvent | React.FormEvent) => {
     const result = await createPromoCode(eventData.id, promoCodeData);
     
     if (result.success && result.promoCode) {
-      // Add the new promo code to the list
       setPromoCodesList(prev => [...prev, result.promoCode!]);
-      // Reset the form
+
       setNewPromoCode({
         title: '',
         code: '',
@@ -473,7 +417,7 @@ const handleCreatePromoCode = async (e: React.MouseEvent | React.FormEvent) => {
         isActive: true,
         eventId: eventData.id
       });
-      // Close the form
+
       setIsAddingPromoCode(false);
       
       toast.success('Promo code created successfully');
@@ -486,7 +430,7 @@ const handleCreatePromoCode = async (e: React.MouseEvent | React.FormEvent) => {
   }
 };
 
-// Edit promo code setup
+
 const handleEditPromoCode = (promoCode: PromoCode) => {
   setIsEditingPromoCode(promoCode.id || null);
   setNewPromoCode({
@@ -498,7 +442,6 @@ const handleEditPromoCode = (promoCode: PromoCode) => {
   });
 };
 
-// Update promo code
 const handleUpdatePromoCode = async (id: number) => {
   if (!id) {
     toast.error('Promo code ID is required');
@@ -506,7 +449,6 @@ const handleUpdatePromoCode = async (id: number) => {
   }
   
   try {
-    // Include only title and isActive in the update payload
     const updatePayload = {
       title: newPromoCode.title,
       isActive: newPromoCode.isActive
@@ -515,11 +457,9 @@ const handleUpdatePromoCode = async (id: number) => {
     const result = await updatePromoCode(id, updatePayload);
     
     if (result.success && result.promoCode) {
-      // Update the promo code in the list
       setPromoCodesList(prev => 
         prev.map(promoCode => promoCode.id === id ? { ...promoCode, ...result.promoCode } : promoCode)
       );
-      // Reset the form
       setNewPromoCode({
         title: '',
         code: '',
@@ -527,7 +467,6 @@ const handleUpdatePromoCode = async (id: number) => {
         isActive: true,
         eventId: eventData.id
       });
-      // Close the edit form
       setIsEditingPromoCode(null);
       
       toast.success('Promo code updated successfully');
@@ -540,7 +479,6 @@ const handleUpdatePromoCode = async (id: number) => {
   }
 };
 
-// Toggle promo code status
 const handleTogglePromoCodeStatus = async (promoCode: PromoCode) => {
   if (!promoCode.id) {
     toast.error('Promo code ID is required');
@@ -555,7 +493,6 @@ const handleTogglePromoCodeStatus = async (promoCode: PromoCode) => {
     const result = await updatePromoCode(promoCode.id, updatedData);
     
     if (result.success && result.promoCode) {
-      // Update the promo code in the list
       setPromoCodesList(prev => 
         prev.map(pc => pc.id === promoCode.id ? { ...pc, isActive: !pc.isActive } : pc)
       );
@@ -570,7 +507,6 @@ const handleTogglePromoCodeStatus = async (promoCode: PromoCode) => {
   }
 };
 
-// Cancel promo code form
 const handleCancelPromoCodeForm = () => {
   setNewPromoCode({
     title: '',
@@ -583,11 +519,6 @@ const handleCancelPromoCodeForm = () => {
   setIsEditingPromoCode(null);
 };
   
-
-
-
-  // Handle form submission
-  // Handle form submission
 const handleSubmit = async (e: React.FormEvent) => {
   e.preventDefault();
   
@@ -599,7 +530,6 @@ const handleSubmit = async (e: React.FormEvent) => {
   setIsSaving(true);
   
   try {
-    // Prepare the update payload with all required fields
     const updatePayload = {
       id: eventData.id,
       title: eventData.title,
@@ -619,14 +549,12 @@ const handleSubmit = async (e: React.FormEvent) => {
     
     console.log('Updating event with payload:', updatePayload);
     
-    // First update event data
     const updateResult = await updateEvent(updatePayload);
     
     if (!updateResult.success) {
       throw new Error(updateResult.message || 'Failed to update event');
     }
-    
-    // If we have a new poster, upload it
+  
     if (posterFile) {
       const posterResult = await handlePosterUpload();
       if (!posterResult) {
@@ -634,7 +562,6 @@ const handleSubmit = async (e: React.FormEvent) => {
       }
     }
     
-    // Sync the selected themes with the server
     const themesResult = await syncThemes(eventData.id, selectedThemes);
     
     if (!themesResult.success) {
@@ -651,21 +578,17 @@ const handleSubmit = async (e: React.FormEvent) => {
   }
 };
   
-  // Get image URL with correct domain if needed
   const getImageUrl = (path: string | undefined) => {
     if (!path) return null;
     
-    // Check if path is already a full URL
     if (path.startsWith('http://') || path.startsWith('https://')) {
       return path;
     }
     
-    // If it's a relative path, prepend the backend URL with correct path structure
     const baseUrl = 'http://localhost:8080';
     return `${baseUrl}/uploads/event-posters/${path.startsWith('/') ? path.substring(1) : path}`;
   };
   
-  // Get field error
   const getFieldError = (field: string) => {
     return errors[field] || '';
   };
@@ -1317,7 +1240,6 @@ const handleSubmit = async (e: React.FormEvent) => {
         </thead>
         <tbody className="bg-white dark:bg-gray-900 divide-y divide-gray-200 dark:divide-gray-700">
           {(() => {
-            // Group tickets by title and status
             const ticketGroups = {};
             
             eventTickets.forEach(ticket => {
@@ -1338,17 +1260,13 @@ const handleSubmit = async (e: React.FormEvent) => {
                 };
               }
               
-              // Ensure quantity is a valid number
               const quantity = typeof ticket.quantity === 'number' ? ticket.quantity : 1;
               
-              // Add to count
               ticketGroups[key].statusGroups[ticket.status].count += quantity;
               
-              // Keep track of all tickets in this group
               ticketGroups[key].statusGroups[ticket.status].tickets.push(ticket);
             });
-            
-            // Convert to array for rendering
+
             return Object.values(ticketGroups).flatMap(group => {
               return Object.values(group.statusGroups).map(statusGroup => (
                 <tr key={`${group.title}-${statusGroup.status}`} className="hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
@@ -1567,7 +1485,7 @@ const handleSubmit = async (e: React.FormEvent) => {
       {isEditingPromoCode !== null ? 'Edit Promo Code' : 'Add New Promo Code'}
     </h4>
     
-    <div> {/* Заменено form на div */}
+    <div>
       <div className="space-y-6">
         {/* Promo Code Title - Always visible */}
         <div>
@@ -1834,3 +1752,4 @@ const handleSubmit = async (e: React.FormEvent) => {
 };
 
 export default EditEventPage;
+

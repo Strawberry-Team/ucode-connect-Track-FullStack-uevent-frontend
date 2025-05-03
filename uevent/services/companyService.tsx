@@ -2,10 +2,9 @@ import axios from 'axios';
 import { Company } from '../contexts/CompanyContext';
 import userService from './userService';
 
-// Base API URL
 const API_URL = 'http://localhost:8080/api';
 
-// News type definition
+
 export type CompanyNews = {
   id?: string;
   authorId?: string; 
@@ -46,7 +45,7 @@ export type CompanyEvent = {
   };
 };
 
-// Helper function to get auth headers
+
 const getAuthHeaders = () => {
   const token = localStorage.getItem('token');
   return {
@@ -56,10 +55,10 @@ const getAuthHeaders = () => {
   };
 };
 
-// Company service methods
+
 export const companyService = {
   
-  // Get current user's primary company
+
   async getCompany(): Promise<Company | null> {
     try {
       const user = await userService.getCurrentUser('me');
@@ -73,17 +72,17 @@ export const companyService = {
     }
   },
   
-  // Get all companies owned by the current user
+
   async getUserCompanies(): Promise<Company[]> {
     try {
       const user = await userService.getCurrentUser('me');
       if (user && user.id) {
         const company = await userService.getUserCompany(user.id);
-        // If the response is already an array, return it
+
         if (Array.isArray(company)) {
           return company;
         }
-        // Otherwise, wrap it in an array (if it exists)
+
         return company ? [company] : [];
       }
       return [];
@@ -93,11 +92,11 @@ export const companyService = {
     }
   },
   
-  // Get any company by ID (public or private)
+
   async getCompanyById(id: string): Promise<Company> {
     try {
       console.log(`Fetching company with ID: ${id}`);
-      // Прямой запрос к API компании без использования userService
+
       const response = await axios.get(`${API_URL}/companies/${id}`, getAuthHeaders());
       console.log('Response from getCompanyById:', response.data);
       return response.data;
@@ -107,7 +106,7 @@ export const companyService = {
     }
   },
   
-  // Create new company
+
   async createCompany(companyData: Omit<Company, 'id'>): Promise<Company> {
     try {
       const response = await axios.post(`${API_URL}/companies`, companyData, getAuthHeaders());
@@ -118,7 +117,7 @@ export const companyService = {
     }
   },
   
-  // Update company
+
   async updateCompany(id: string, companyData: Partial<Company>): Promise<Company> {
     try {
       const response = await axios.patch(`${API_URL}/companies/${id}`, companyData, getAuthHeaders());
@@ -129,7 +128,7 @@ export const companyService = {
     }
   },
   
-  // Upload company logo
+
   async uploadLogo(id: string, formData: FormData): Promise<{logoName: string}> {
     try {
       const config = {
@@ -148,7 +147,7 @@ export const companyService = {
     }
   },
   
-  // Get all companies (for admin or public listings)
+
   async getAllCompanies(): Promise<Company[]> {
     try {
       const response = await axios.get(`${API_URL}/companies`, getAuthHeaders());
@@ -159,9 +158,9 @@ export const companyService = {
     }
   },
   
-  // NEWS RELATED METHODS
+
   
-  // Get company news
+
   async getCompanyNews(companyId: string): Promise<CompanyNews[]> {
     try {
       const response = await axios.get(`${API_URL}/companies/${companyId}/news`, getAuthHeaders());
@@ -172,7 +171,7 @@ export const companyService = {
     }
   },
   
-  // Create company news
+
   async createCompanyNews(companyId: string, newsData: Omit<CompanyNews, 'id' | 'authorId' | 'companyId' | 'createdAt'>): Promise<CompanyNews> {
     try {
       const response = await axios.post(`${API_URL}/companies/${companyId}/news`, newsData, getAuthHeaders());
@@ -183,10 +182,10 @@ export const companyService = {
     }
   },
   
-  // Delete company news
+
   async deleteCompanyNews(companyId: string, newsId: string): Promise<void> {
     try {
-      // Using the correct endpoint format for consistency
+
       await axios.delete(`${API_URL}/news/${newsId}`, getAuthHeaders());
     } catch (error) {
       console.error(`Error deleting news with ID ${newsId}:`, error);
@@ -194,10 +193,10 @@ export const companyService = {
     }
   },
   
-  // Update company news
+
   async updateCompanyNews(companyId: string, newsId: string, newsData: Partial<CompanyNews>): Promise<CompanyNews> {
     try {
-      // Using the correct endpoint format for consistency
+
       const response = await axios.patch(`${API_URL}/news/${newsId}`, newsData, getAuthHeaders());
       return response.data;
     } catch (error) {
@@ -206,7 +205,7 @@ export const companyService = {
     }
   },
   
-  // Get company events
+
   async getCompanyEvents(companyId: string): Promise<CompanyEvent[]> {
     try {
       const response = await axios.get(`${API_URL}/companies/${companyId}/events`, getAuthHeaders());
@@ -217,7 +216,7 @@ export const companyService = {
     }
   },
   
-  // Check if a company exists
+
   async checkCompanyExists(id: string): Promise<boolean> {
     try {
       await axios.get(`${API_URL}/companies/${id}`, getAuthHeaders());
@@ -231,3 +230,4 @@ export const companyService = {
     }
   }
 };
+

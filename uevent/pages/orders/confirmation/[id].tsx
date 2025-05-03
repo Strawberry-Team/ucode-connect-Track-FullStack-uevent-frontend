@@ -1,4 +1,3 @@
-// src/pages/orders/confirmation/[orderId].tsx
 import React, { useEffect, useState, useRef } from 'react';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
@@ -16,12 +15,11 @@ import {
   ShoppingBag
 } from 'lucide-react';
 
-const POLLING_INTERVAL = 3000; // 3 seconds
-const POLLING_TIMEOUT = 120000; // 2 minutes
+const POLLING_INTERVAL = 3000;
+const POLLING_TIMEOUT = 120000;
 
 const OrderConfirmationPage: React.FC = () => {
   const router = useRouter();
-  // Extract orderId and parameters from URL
   const { id, payment_intent, payment_intent_client_secret, redirect_status } = router.query;
   const orderId = Array.isArray(id) ? id[0] : id;
   const [loading, setLoading] = useState(true);
@@ -41,17 +39,15 @@ const OrderConfirmationPage: React.FC = () => {
     const isStripeRedirect = router.query.payment_intent && router.query.redirect_status;
   
     
-    // Function to request order status from backend
-    const checkOrderStatus = async (): Promise<boolean> => { // Returns true if status is final
+    const checkOrderStatus = async (): Promise<boolean> => {
       if (!orderId || typeof orderId !== 'string') {
         setError('Invalid Order ID in URL.');
         setLoading(false);
-        return true; // Consider as final to stop polling
+        return true;
       }
 
       try {
         console.log(`Checking order status for ${orderId}...`);
-        // Step 6: Request current status
         const response = await orderService.getOrderById(orderId);
 
         const currentStatus = response.paymentStatus;
@@ -59,7 +55,6 @@ const OrderConfirmationPage: React.FC = () => {
         setOrderStatus(currentStatus);
         setOrderDetails(response);
 
-        // Check if status is final
         const isFinalStatus = ['PAID', 'FAILED', 'CANCELLED', 'REFUNDED'].includes(currentStatus);
         if (isFinalStatus) {
           setLoading(false);
@@ -69,27 +64,22 @@ const OrderConfirmationPage: React.FC = () => {
 
       } catch (err: any) {
         console.error('Error checking order status:', err);
-        // Show error only on first load, otherwise polling will just stop
+
         if (loading) setError(err.response?.data?.message || 'Could not verify payment status.');
         setLoading(false);
         clearTimers();
-        return true; // Consider as final on error
+        return true;
       }
     };
     if (isStripeRedirect) {
       console.log('Processing redirect from Stripe with status:', router.query.redirect_status);
-      // Prioritize immediate status check for Stripe redirects
       checkOrderStatus();
     }
-    // --- Logic for starting checks and polling ---
-    if (router.isReady) { // Make sure query parameters are available
+    if (router.isReady) {
       setLoading(true);
       setError(null);
       console.log('Confirmation page loaded. Initial check...');
       checkOrderStatus().then(isFinal => {
-        // Start polling only if:
-        // 1. Status is not final yet (e.g., PENDING)
-        // 2. There was a redirect from Stripe (redirect_status exists)
         if (!isFinal) {
           console.log(`Status is not final (${orderStatus}), starting polling...`);
           intervalRef.current = setInterval(async () => {
@@ -102,32 +92,26 @@ const OrderConfirmationPage: React.FC = () => {
           }, POLLING_INTERVAL);
 
 
-          // Set a timeout for polling
           timeoutRef.current = setTimeout(() => {
             console.warn('Polling timeout reached for order', orderId);
             clearTimers();
-            // If status is still not final after timeout
             if (!['PAID', 'FAILED', 'CANCELLED', 'REFUNDED'].includes(orderStatus ?? '')) {
               setError('Payment status verification timed out. Please check "My Orders" or contact support.');
             }
-            setLoading(false); // Show current status or timeout error
+            setLoading(false);
           }, POLLING_TIMEOUT);
         } else {
-          // If status is immediately final or there was no redirect - polling is not needed
           console.log(`Polling not needed. Initial status: ${orderStatus}, Is final: ${isFinal}, Redirect status: ${redirect_status}`);
           setLoading(false);
         }
       });
     }
 
-    // Clear timers when unmounting
     return () => {
       clearTimers();
     };
-    // Restart effect when orderId changes or if router becomes ready
   }, [orderId, router.isReady, redirect_status]);
 
-  // Helper function to format date
   const formatDate = (dateString?: string) => {
     if (!dateString) return '';
     const date = new Date(dateString);
@@ -140,7 +124,6 @@ const OrderConfirmationPage: React.FC = () => {
     });
   };
 
-  // Determine which status icon to show
   const getStatusIcon = () => {
     switch (orderStatus) {
       case 'PAID':
@@ -158,7 +141,6 @@ const OrderConfirmationPage: React.FC = () => {
     }
   };
 
-  // Determine status color
   const getStatusColor = () => {
     switch (orderStatus) {
       case 'PAID':
@@ -176,7 +158,6 @@ const OrderConfirmationPage: React.FC = () => {
     }
   };
 
-  // Determine status background
   const getStatusBg = () => {
     switch (orderStatus) {
       case 'PAID':
@@ -194,7 +175,6 @@ const OrderConfirmationPage: React.FC = () => {
     }
   };
 
-  // Get status heading text
   const getStatusHeading = () => {
     switch (orderStatus) {
       case 'PAID':
@@ -212,7 +192,6 @@ const OrderConfirmationPage: React.FC = () => {
     }
   };
 
-  // Get status message text
   const getStatusMessage = () => {
     switch (orderStatus) {
       case 'PAID':
@@ -230,7 +209,6 @@ const OrderConfirmationPage: React.FC = () => {
     }
   };
 
-  // --- Content Rendering ---
   const renderContent = () => {
     if (loading) {
       return (
@@ -419,3 +397,4 @@ const OrderConfirmationPage: React.FC = () => {
 };
 
 export default OrderConfirmationPage;
+

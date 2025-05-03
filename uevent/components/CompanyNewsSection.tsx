@@ -5,7 +5,6 @@ import { toast } from 'react-toastify';
 import { z } from 'zod';
 import { DeleteConfirmationModal } from './DeleteConfirmationModal';
 
-// Define Zod validation schema for news
 const NewsSchema = z.object({
   title: z
     .string()
@@ -20,7 +19,6 @@ const NewsSchema = z.object({
   eventId: z.string().nullable().optional()
 });
 
-// Type inference for typescript
 type NewsInput = z.infer<typeof NewsSchema>;
 
 export const CompanyNewsSection: React.FC = () => {
@@ -30,7 +28,7 @@ export const CompanyNewsSection: React.FC = () => {
     isLoadingNews, 
     createCompanyNews, 
     deleteCompanyNews,
-    updateCompanyNews, // Предполагается, что эта функция уже существует
+    updateCompanyNews,
     fetchCompanyNews
   } = useCompany();
   
@@ -39,18 +37,15 @@ export const CompanyNewsSection: React.FC = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [newsBeingEdited, setNewsBeingEdited] = useState<string | null>(null);
   
-  // Delete confirmation modal state
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [newsToDelete, setNewsToDelete] = useState<string | null>(null);
   
-  // Form state for new/edited news item
   const [newsForm, setNewsForm] = useState<NewsInput>({
     title: '',
     description: '',
     eventId: null
   });
   
-  // Initialize the news creation form
   const handleStartCreateNews = () => {
     setNewsForm({
       title: '',
@@ -62,7 +57,6 @@ export const CompanyNewsSection: React.FC = () => {
     setNewsBeingEdited(null);
   };
 
-  // Initialize the news editing form
   const handleStartEditNews = (news: CompanyNews) => {
     setNewsForm({
       title: news.title || '',
@@ -74,7 +68,6 @@ export const CompanyNewsSection: React.FC = () => {
     setIsCreatingNews(false);
   };
   
-  // Handle form input changes
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setNewsForm(prev => ({
@@ -83,14 +76,11 @@ export const CompanyNewsSection: React.FC = () => {
     }));
   };
   
-  // Create news item
   const handleCreateNews = async () => {
     try {
-      // Validate form data using Zod
       const validationResult = NewsSchema.safeParse(newsForm);
       
       if (!validationResult.success) {
-        // Display all validation errors as toasts
         validationResult.error.errors.forEach(error => {
           toast.error(error.message);
         });
@@ -108,7 +98,6 @@ export const CompanyNewsSection: React.FC = () => {
           description: '',
           eventId: null
         });
-        //toast.success('News item created successfully');
       } else {
         toast.error(result.message || 'Failed to create news item');
       }
@@ -120,16 +109,13 @@ export const CompanyNewsSection: React.FC = () => {
     }
   };
 
-  // Update news item
   const handleUpdateNews = async () => {
     if (!newsBeingEdited) return;
     
     try {
-      // Validate form data using Zod
       const validationResult = NewsSchema.safeParse(newsForm);
       
       if (!validationResult.success) {
-        // Display all validation errors as toasts
         validationResult.error.errors.forEach(error => {
           toast.error(error.message);
         });
@@ -160,7 +146,6 @@ export const CompanyNewsSection: React.FC = () => {
     }
   };
   
-  // Cancel editing or creating
   const handleCancelForm = () => {
     setIsCreatingNews(false);
     setIsEditingNews(false);
@@ -172,19 +157,16 @@ export const CompanyNewsSection: React.FC = () => {
     });
   };
 
-  // Open delete confirmation modal
   const openDeleteConfirmation = (newsId: string) => {
     setNewsToDelete(newsId);
     setIsDeleteModalOpen(true);
   };
   
-  // Close delete confirmation modal
   const closeDeleteConfirmation = () => {
     setIsDeleteModalOpen(false);
     setNewsToDelete(null);
   };
   
-  // Execute delete action after confirmation
   const confirmDeleteNews = async () => {
     if (!newsToDelete) return;
     
@@ -204,7 +186,6 @@ export const CompanyNewsSection: React.FC = () => {
     }
   };
   
-  // Format date for display
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString(undefined, {
       year: 'numeric',
@@ -215,7 +196,6 @@ export const CompanyNewsSection: React.FC = () => {
     });
   };
   
-  // Refresh news list
   const handleRefreshNews = () => {
     if (company?.id) {
       fetchCompanyNews(company.id);
@@ -513,3 +493,4 @@ export const CompanyNewsSection: React.FC = () => {
     </>
   );
 };
+

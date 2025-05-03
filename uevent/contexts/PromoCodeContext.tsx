@@ -2,7 +2,7 @@ import React, { createContext, useContext, useState, useCallback, ReactNode } fr
 import { toast } from 'react-toastify';
 import { promoCodeService } from '../services/promoCodeService';
 
-// Types
+
 export interface PromoCode {
   id?: number;
   eventId: number;
@@ -36,16 +36,16 @@ export interface PromoCodeContextType {
   }>;
 }
 
-// Create the PromoCode context
+
 const PromoCodeContext = createContext<PromoCodeContextType | undefined>(undefined);
 
-// Provider component
+
 export const PromoCodeProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [promoCodes, setPromoCodes] = useState<PromoCode[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Fetch promo codes by event ID
+  
   const fetchPromoCodesByEventId = useCallback(async (eventId: number) => {
     setIsLoading(true);
     setError(null);
@@ -63,7 +63,7 @@ export const PromoCodeProvider: React.FC<{ children: ReactNode }> = ({ children 
     }
   }, []);
 
-  // Fetch a specific promo code by ID
+  
   const fetchPromoCodeById = useCallback(async (id: number) => {
     setIsLoading(true);
     setError(null);
@@ -80,7 +80,7 @@ export const PromoCodeProvider: React.FC<{ children: ReactNode }> = ({ children 
     }
   }, []);
 
-  // Create a new promo code
+  
   const handleCreatePromoCode = useCallback(async (eventId: number, promoCodeData: Partial<PromoCode>) => {
     setIsLoading(true);
     setError(null);
@@ -105,14 +105,14 @@ export const PromoCodeProvider: React.FC<{ children: ReactNode }> = ({ children 
     }
   }, []);
 
-  // Update a promo code
+  
   const handleUpdatePromoCode = useCallback(async (id: number, promoCodeData: Partial<PromoCode>) => {
     setIsLoading(true);
     setError(null);
     try {
       const updatedPromoCode = await promoCodeService.updatePromoCode(id, promoCodeData);
       
-      // Update the promo codes list
+      
       setPromoCodes(prev => 
         prev.map(promoCode => promoCode.id === id ? { ...promoCode, ...updatedPromoCode } : promoCode)
       );
@@ -136,15 +136,15 @@ export const PromoCodeProvider: React.FC<{ children: ReactNode }> = ({ children 
   }, []);
 
 
-// Validate a promo code
-// Validate a promo code
+
+
 const handleValidatePromoCode = useCallback(async (eventId: number, code: string) => {
   setIsLoading(true);
   setError(null);
   try {
     const result = await promoCodeService.validatePromoCode(eventId, code);
     
-    // If service returns success: false, handle it here
+    
     if (!result.success) {
       const errorMessage = result.message || 'Invalid promo code';
       setError(errorMessage);
@@ -177,7 +177,7 @@ const handleValidatePromoCode = useCallback(async (eventId: number, code: string
   }
 }, []);
 
-  // Context value
+  
   const value: PromoCodeContextType = {
     promoCodes,
     isLoading,
@@ -196,7 +196,7 @@ const handleValidatePromoCode = useCallback(async (eventId: number, code: string
   );
 };
 
-// Custom hook to use the PromoCode context
+
 export const usePromoCodes = (): PromoCodeContextType => {
   const context = useContext(PromoCodeContext);
   if (context === undefined) {
@@ -204,3 +204,4 @@ export const usePromoCodes = (): PromoCodeContextType => {
   }
   return context;
 };
+

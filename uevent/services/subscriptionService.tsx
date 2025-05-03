@@ -1,9 +1,7 @@
 import axios from 'axios';
 
-// Base API URL
 const API_URL = 'http://localhost:8080/api';
 
-// Helper function to get auth headers
 const getAuthHeaders = () => {
   const token = localStorage.getItem('token');
   return {
@@ -13,18 +11,18 @@ const getAuthHeaders = () => {
   };
 };
 
-// Subscription types
+
 export type SubscriptionEntityType = 'event' | 'company';
 
-// Basic subscription structure
+
 export interface Subscription {
   id: string;
   userId?: string;
   entityId: string;
   entityType: SubscriptionEntityType;
   createdAt: string;
-  event?: any; // For event subscriptions
-  company?: any; // For company subscriptions
+
+
 }
 
 export interface SubscriptionCreateParams {
@@ -32,22 +30,22 @@ export interface SubscriptionCreateParams {
   entityType: SubscriptionEntityType;
 }
 
-// Subscription service methods
+
 export const subscriptionService = {
-  // Get all user subscriptions
+
   async getUserSubscriptions(): Promise<Subscription[]> {
     try {
-      // Get the current user ID
+
       const userId = this.getCurrentUserId();
       if (!userId) throw new Error('User not authenticated');
       
-      // Get both event and company subscriptions
+
       const [eventSubs, companySubs] = await Promise.all([
         this.getUserEventSubscriptions(userId),
         this.getUserCompanySubscriptions(userId)
       ]);
       
-      // Combine both types of subscriptions
+
       return [...eventSubs, ...companySubs];
     } catch (error) {
       console.error('Error fetching user subscriptions:', error);
@@ -55,14 +53,14 @@ export const subscriptionService = {
     }
   },
 
-  // Get user event subscriptions
+
   async getUserEventSubscriptions(userId: string): Promise<Subscription[]> {
     const response = await axios.get(
       `${API_URL}/users/${userId}/subscriptions/events`, 
       getAuthHeaders()
     );
     
-    // Normalize the data structure to match our Subscription interface
+
     return response.data.map((sub: any) => ({
       ...sub,
       entityType: 'event',
@@ -70,14 +68,14 @@ export const subscriptionService = {
     }));
   },
 
-  // Get user company subscriptions
+
   async getUserCompanySubscriptions(userId: string): Promise<Subscription[]> {
     const response = await axios.get(
       `${API_URL}/users/${userId}/subscriptions/companies`, 
       getAuthHeaders()
     );
     
-    // Normalize the data structure to match our Subscription interface
+
     return response.data.map((sub: any) => ({
       ...sub,
       entityType: 'company',
@@ -85,7 +83,7 @@ export const subscriptionService = {
     }));
   },
 
-  // Create new subscription
+
   async createSubscription(params: SubscriptionCreateParams): Promise<Subscription> {
     const response = await axios.post(
       `${API_URL}/subscriptions`, 
@@ -95,7 +93,7 @@ export const subscriptionService = {
     return response.data;
   },
 
-  // Delete subscription
+
   async deleteSubscription(id: string): Promise<void> {
     await axios.delete(
       `${API_URL}/subscriptions/${id}`, 
@@ -103,10 +101,10 @@ export const subscriptionService = {
     );
   },
 
-  // Helper method to get current user ID
+
   getCurrentUserId(): string | null {
-    // You can implement this based on how you store the user ID
-    // For example, from localStorage or your auth context
+
+
     const userData = localStorage.getItem('user');
     if (userData) {
       try {
@@ -119,7 +117,7 @@ export const subscriptionService = {
     return null;
   },
 
-  // Check if user is subscribed to an entity
+
   async isSubscribed(entityId: string, entityType: SubscriptionEntityType): Promise<boolean> {
     try {
       const subscriptions = await this.getUserSubscriptions();
@@ -132,7 +130,7 @@ export const subscriptionService = {
     }
   },
 
-  // Find subscription by entity
+
   async findSubscriptionByEntity(entityId: string, entityType: SubscriptionEntityType): Promise<Subscription | null> {
     try {
       const subscriptions = await this.getUserSubscriptions();
@@ -145,3 +143,4 @@ export const subscriptionService = {
     }
   }
 };
+

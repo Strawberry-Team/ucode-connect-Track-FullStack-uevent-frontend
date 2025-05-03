@@ -18,10 +18,9 @@ import {
 import { usePromoCodes } from '../contexts/PromoCodeContext';
 import LocationPicker from '../components/LocationPicker';
 import  {useCallback } from 'react';
-// Step type definition
+
 type Step = 'basicInfo' | 'themes' | 'tickets' | 'promoCodes' | 'review';
 
-// Format and Theme types
 interface Format {
   id: number;
   title: string;
@@ -39,12 +38,10 @@ const EventCreationForm: React.FC<{}> = () => {
   
   const { createPromoCode } = usePromoCodes();
   
-  // State for step management
   const [currentStep, setCurrentStep] = useState<Step>('basicInfo');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [animationDirection, setAnimationDirection] = useState<'forward' | 'backward'>('forward');
 
-  // State for form data
   const [formData, setFormData] = useState<EventFormData>(() => ({
   basicInfo: {
     title: '',
@@ -57,7 +54,7 @@ const EventCreationForm: React.FC<{}> = () => {
     ticketsAvailableFrom: '',
     attendeeVisibility: 'EVERYONE',
     status: 'DRAFT',
-    companyId: company?.id || 0, // ID устанавливается только один раз при инициализации
+    companyId: company?.id || 0,
     formatId: 0
   },
   themes: {
@@ -71,7 +68,6 @@ const EventCreationForm: React.FC<{}> = () => {
   }
 }));
   
-  // State for validation errors
   const [errors, setErrors] = useState<{
     basicInfo: Record<string, string> | null;
     themes: Record<string, string> | null;
@@ -83,53 +79,44 @@ const EventCreationForm: React.FC<{}> = () => {
     tickets: null,
     promoCodes: null
   });
-  
-  // State for options in dropdowns
+
   const [formats, setFormats] = useState<Format[]>([]);
   const [availableThemes, setAvailableThemes] = useState<Theme[]>([]);
   
-  // Refs for file inputs
   const posterInputRef = useRef<HTMLInputElement>(null);
   
-  // State for file preview
   const [posterPreview, setPosterPreview] = useState<string | null>(null);
   const [posterFile, setPosterFile] = useState<File | null>(null);
   
-  // State for tickets management
   const [newTicket, setNewTicket] = useState<EventTicket>({
     title: '',
     price: 0,
     status: 'AVAILABLE',
     quantity: 1
   });
-// Добавить эту функцию для правильного форматирования дат для input полей
 const formatDateForInput = (dateString) => {
   if (!dateString) return '';
   
   try {
-    // Преобразуем строку UTC даты в объект Date
+
     const date = new Date(dateString);
     
-    // Получаем компоненты даты в локальном часовом поясе
     const year = date.getFullYear();
     const month = String(date.getMonth() + 1).padStart(2, '0');
     const day = String(date.getDate()).padStart(2, '0');
     const hours = String(date.getHours()).padStart(2, '0');
     const minutes = String(date.getMinutes()).padStart(2, '0');
     
-    // Форматируем в строку YYYY-MM-DDThh:mm для input type="datetime-local"
     return `${year}-${month}-${day}T${hours}:${minutes}`;
   } catch (error) {
     console.error('Error formatting date for input:', error);
     return '';
   }
 };
-  // Scroll to top when changing steps
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }, [currentStep]);
   
-  // Fetch formats and themes on component mount
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -163,31 +150,12 @@ const formatDateForInput = (dateString) => {
     fetchData();
   }, []);
   
-  // Set company ID when company data changes
-   // Effect to sync company ID, but only run when company.id changes
-  //  useEffect(() => {
-  //   // Выполняется только при первичной загрузке или изменении ID компании
-  //   if (company?.id && !formData.basicInfo.companyId) {
-  //     console.log('Установка ID компании:', company.id);
-  //     setFormData((prev) => ({
-  //       ...prev,
-  //       basicInfo: {
-  //         ...prev.basicInfo,
-  //         companyId: company.id,
-  //       },
-  //     }));
-  //   }
-  // }, [company?.id]);
-  
-  // File validation helper function
   const validatePosterFile = (file: File): boolean => {
-    // Size validation (max 5MB)
     if (file.size > 5 * 1024 * 1024) {
       toast.error('Image size should not exceed 5MB');
       return false;
     }
     
-    // Type validation
     const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/svg+xml'];
     if (!allowedTypes.includes(file.type)) {
       toast.error('Only JPG, PNG, GIF, and SVG files are allowed');
@@ -197,23 +165,21 @@ const formatDateForInput = (dateString) => {
     return true;
   };
   
-  // Handle poster file selection
+
   const handlePosterChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
       if (!validatePosterFile(file)) {
-        e.target.value = ''; // Reset the input
+        e.target.value = '';
         return;
       }
       
-      // Show preview
       const reader = new FileReader();
       reader.onloadend = () => {
         setPosterPreview(reader.result as string);
       };
       reader.readAsDataURL(file);
       
-      // Store the file
       setPosterFile(file);
       toast.success('Poster uploaded successfully!', {
         icon: '🖼️',
@@ -223,7 +189,6 @@ const formatDateForInput = (dateString) => {
     }
   };
   
-  // Handle poster button click
   const handlePosterButtonClick = () => {
     posterInputRef.current?.click();
   };
@@ -231,10 +196,8 @@ const formatDateForInput = (dateString) => {
     if (!dateString) return '';
     
     try {
-      // Преобразуем UTC дату в объект Date
       const date = new Date(dateString);
       
-      // Форматируем в локализованную строку с нужными параметрами
       return date.toLocaleString(undefined, {
         year: 'numeric',
         month: 'long',
@@ -250,11 +213,9 @@ const formatDateForInput = (dateString) => {
   const handleBasicInfoChange = (e) => {
     const { name, value } = e.target;
     
-    // Обработка полей даты и времени
     if (name === 'startedAt' || name === 'endedAt' || name === 'publishedAt' || name === 'ticketsAvailableFrom') {
       if (value) {
-        // Значение из поля input типа datetime-local браузер интерпретирует 
-        // как локальное время. Нам нужно преобразовать его в UTC для сервера
+
         const localDate = new Date(value);
         const utcString = localDate.toISOString();
         
@@ -262,7 +223,7 @@ const formatDateForInput = (dateString) => {
           ...prev,
           basicInfo: {
             ...prev.basicInfo,
-            [name]: utcString // Сохраняем в UTC формате
+            [name]: utcString
           }
         }));
       } else {
@@ -275,7 +236,6 @@ const formatDateForInput = (dateString) => {
         }));
       }
     }
-    // Специальная обработка для formatId
     else if (name === 'formatId') {
       setFormData(prev => ({
         ...prev,
@@ -285,7 +245,6 @@ const formatDateForInput = (dateString) => {
         }
       }));
     } 
-    // Обычные поля
     else {
       setFormData(prev => ({
         ...prev,
@@ -298,12 +257,10 @@ const formatDateForInput = (dateString) => {
   };
   const onLocationSelect = useCallback((newCoordinates) => {
     setFormData(prevFormData => {
-      // Проверяем, действительно ли изменились координаты
       if (prevFormData.basicInfo.locationCoordinates === newCoordinates) {
-        return prevFormData; // Возвращаем прежнее состояние без изменений
+        return prevFormData;
       }
       
-      // Только если координаты изменились, обновляем состояние
       return {
         ...prevFormData,
         basicInfo: {
@@ -312,13 +269,10 @@ const formatDateForInput = (dateString) => {
         }
       };
     });
-  }, []); // Пустой массив зависимостей для стабильности
+  }, []);
   const onAddressFound = useCallback((address) => {
-    // Update the venue field with the found address
     setFormData(prevFormData => {
-      // Check if the venue field is already filled
       if (prevFormData.basicInfo.venue && prevFormData.basicInfo.venue !== address) {
-        // If venue is already set with a different value, we'll update it
         return {
           ...prevFormData,
           basicInfo: {
@@ -327,10 +281,9 @@ const formatDateForInput = (dateString) => {
           }
         };
       }
-      return prevFormData; // Return unchanged if venue already equals address
+      return prevFormData;
     });
   }, []);
-  // Handle theme selection
   const handleThemeChange = (themeId: number) => {
     setFormData(prev => {
       const themes = prev.themes.themes.includes(themeId)
@@ -344,7 +297,6 @@ const formatDateForInput = (dateString) => {
     });
   };
   
-  // Handle ticket input change
   const handleTicketChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setNewTicket(prev => ({
@@ -353,7 +305,6 @@ const formatDateForInput = (dateString) => {
     }));
   };
   
-  // Add a new ticket
   const handleAddTicket = () => {
     if (!newTicket.title) {
       toast.warning('Please enter a ticket title', {
@@ -370,7 +321,6 @@ const formatDateForInput = (dateString) => {
       }
     }));
     
-    // Reset the new ticket form
     setNewTicket({
       title: '',
       price: 0,
@@ -384,8 +334,7 @@ const formatDateForInput = (dateString) => {
       autoClose: 2000,
     });
   };
-  
-  // Remove a ticket
+
   const handleRemoveTicket = (index: number) => {
     setFormData(prev => ({
       ...prev,
@@ -409,7 +358,6 @@ const formatDateForInput = (dateString) => {
     }));
   };
 
-  // Add a new promo code
 const handleAddPromoCode = () => {
   if (!newPromoCode.title || !newPromoCode.code) {
     toast.warning('Please enter a title and code for the promo code', {
@@ -425,8 +373,7 @@ const handleAddPromoCode = () => {
       promoCodes: [...prev.promoCodes.promoCodes, newPromoCode]
     }
   }));
-  
-  // Reset the new promo code form
+
   setNewPromoCode({
     title: '',
     code: '',
@@ -441,7 +388,6 @@ const handleAddPromoCode = () => {
   });
 };
 
-// Remove a promo code
 const handleRemovePromoCode = (index: number) => {
   setFormData(prev => ({
     ...prev,
@@ -456,7 +402,6 @@ const handleRemovePromoCode = (index: number) => {
   });
 };
 
-  // Validate current step
   const validateStep = (step: Step): boolean => {
     let isValid = true;
     
@@ -501,7 +446,6 @@ const handleRemovePromoCode = (index: number) => {
     return isValid;
   };
   
-  // Move to the next step
   const handleNextStep = () => {
     if (currentStep === 'basicInfo' && validateStep('basicInfo')) {
       setAnimationDirection('forward');
@@ -518,7 +462,6 @@ const handleRemovePromoCode = (index: number) => {
     }
   };
   
-  // Move to the previous step
   const handlePrevStep = () => {
     setAnimationDirection('backward');
     if (currentStep === 'themes') {
@@ -532,9 +475,7 @@ const handleRemovePromoCode = (index: number) => {
     }
   };
 
-  // Submit the form
   const handleSubmit = async () => {
-    // Validate all steps before submission
     const basicInfoValid = validateStep('basicInfo');
     const themesValid = validateStep('themes');
     const ticketsValid = validateStep('tickets');
@@ -554,7 +495,6 @@ const handleRemovePromoCode = (index: number) => {
         position: 'top-center',
       });
       
-      // Step 1: Create event
       const eventResult = await createEvent(formData.basicInfo);
       
       if (!eventResult.success || !eventResult.eventId) {
@@ -563,25 +503,20 @@ const handleRemovePromoCode = (index: number) => {
       
       const eventId = eventResult.eventId;
       
-      // Step 2: Sync themes
       const themesResult = await syncThemes(eventId, formData.themes.themes);
       
       if (!themesResult.success) {
         throw new Error(themesResult.message || 'Failed to sync event themes');
       }
-      
-      // Step 3: Create tickets
       const ticketsResult = await createTickets(eventId, formData.tickets.tickets);
       
       if (!ticketsResult.success) {
         throw new Error(ticketsResult.message || 'Failed to create event tickets');
       }
       
-      // Step 4: Create promo codes if any
-      // Step 4: Create promo codes if any
 if (formData.promoCodes.promoCodes.length > 0) {
   try {
-    // Process promo codes sequentially instead of in parallel
+
     const failedPromoCodes = [];
     for (const promoCode of formData.promoCodes.promoCodes) {
       try {
@@ -589,7 +524,7 @@ if (formData.promoCodes.promoCodes.length > 0) {
           eventId,
           title: promoCode.title,
           code: promoCode.code.toUpperCase(),
-          discountPercent: promoCode.discountPercent / 100, // Convert from percentage to decimal
+          discountPercent: promoCode.discountPercent / 100, 
           isActive: promoCode.isActive
         });
         
@@ -602,7 +537,6 @@ if (formData.promoCodes.promoCodes.length > 0) {
         console.error(`Error creating promo code ${promoCode.code}:`, error);
       }
       
-      // Add a small delay between requests to prevent overwhelming the API
       await new Promise(resolve => setTimeout(resolve, 200));
     }
     
@@ -619,11 +553,9 @@ if (formData.promoCodes.promoCodes.length > 0) {
       position: 'top-right',
       autoClose: 4000,
     });
-    // We continue the event creation process despite promo code errors
   }
 }
       
-      // Upload poster if available
       if (posterFile) {
         const posterResult = await uploadPoster(posterFile, eventId);
         
@@ -642,7 +574,6 @@ if (formData.promoCodes.promoCodes.length > 0) {
         closeButton: true
       });
       
-      // Redirect to the event detail page after a short delay
       setTimeout(() => {
         console.log('Redirecting to event page:', eventId);
         router.push(`/events/${eventId}`);
@@ -658,11 +589,8 @@ if (formData.promoCodes.promoCodes.length > 0) {
       setIsSubmitting(false);
     }
   };
- // Keyboard navigation - fixed implementation
 useEffect(() => {
-  // More robust handler that directly handles the navigation
   const handleKeyDown = (e) => {
-    // Don't trigger navigation if user is typing in an input, textarea, or select
     if (
       e.target.tagName === 'INPUT' || 
       e.target.tagName === 'TEXTAREA' || 
@@ -674,12 +602,10 @@ useEffect(() => {
       return;
     }
 
-    // Prevent default behavior for arrow keys to avoid page scrolling
     if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
       e.preventDefault();
     }
 
-    // Left arrow key - go to previous step
     if (e.key === 'ArrowLeft') {
       if (currentStep === 'themes') {
         setAnimationDirection('backward');
@@ -692,7 +618,6 @@ useEffect(() => {
         setCurrentStep('tickets');
       }
     }
-    // Right arrow key - go to next step (with validation)
     else if (e.key === 'ArrowRight') {
   if (currentStep === 'basicInfo' && validateStep('basicInfo')) {
     setAnimationDirection('forward');
@@ -716,15 +641,13 @@ useEffect(() => {
   return () => {
     window.removeEventListener('keydown', handleKeyDown);
   };
-}, [currentStep, isSubmitting]); // Minimal dependency array
+}, [currentStep, isSubmitting]);
 
-// Add visual feedback for active keyboard shortcuts
 const [keyFeedback, setKeyFeedback] = useState({
   left: false,
   right: false
 });
 
-// Add this useEffect for visual feedback when keys are pressed
 useEffect(() => {
   const handleKeyDown = (e) => {
     if (e.key === 'ArrowLeft') {
@@ -750,12 +673,10 @@ useEffect(() => {
     window.removeEventListener('keyup', handleKeyUp);
   };
 }, []);
-  // Get error message for a field
   const getFieldError = (step: Step, field: string) => {
     return errors[step]?.[field] || '';
   };
   
- // Format date for display
 const formatDate = (dateString) => {
   if (!dateString) return '';
   
@@ -767,19 +688,16 @@ const formatDate = (dateString) => {
   }
 };
   
-  // Find theme name by ID
   const getThemeName = (themeId: number) => {
     const theme = availableThemes.find(t => t.id === themeId);
     return theme?.title || `Theme ${themeId}`;
   };
   
-  // Find format name by ID
   const getFormatName = (formatId: number) => {
     const format = formats.find(f => f.id === formatId);
     return format?.title || `Format ${formatId}`;
   };
 
-  // Step sequence array for progress indicator
   const steps: { key: Step; label: string }[] = [
     { key: 'basicInfo', label: 'Basic Info' },
     { key: 'themes', label: 'Themes' },
@@ -800,13 +718,11 @@ const formatDate = (dateString) => {
     isActive: true
   });
 
-  // Calculate progress percentage
   const progressPercentage = (() => {
     const stepIndex = steps.findIndex(s => s.key === currentStep);
     return ((stepIndex + 1) / steps.length) * 100;
   })();
 
-  // Animation variants
   const pageVariants = {
     initial: (direction: string) => ({
       x: direction === 'forward' ? 20 : -20,
@@ -830,7 +746,6 @@ const formatDate = (dateString) => {
     })
   };
 
-  // Label variants for step indicator
   const labelVariants = {
     inactive: { color: 'var(--color-gray-400)' },
     active: { 
@@ -839,7 +754,6 @@ const formatDate = (dateString) => {
     }
   };
 
-  // Circle variants for step indicator
   const circleVariants = {
     inactive: { 
       backgroundColor: 'var(--color-gray-100)',
@@ -860,21 +774,17 @@ const formatDate = (dateString) => {
 
   return (
     <div className="bg-white dark:bg-gray-900 shadow-xl dark:shadow-emerald-900/10 rounded-3xl overflow-hidden border border-gray-100 dark:border-gray-800">
-      {/* Form Header with animated gradient */}
       <div className="relative overflow-hidden bg-emerald-600 py-8 px-8">
         <div className="absolute top-0 left-0 right-0 bottom-0 bg-grid-white/[0.2] bg-[length:16px_16px]"></div>
         <div className="relative z-10">
           <h2 className="text-2xl font-bold text-white mb-1">Create New Event</h2>
           <p className="text-emerald-50">Create an unforgettable experience for your audience</p>
         </div>
-        {/* Animated blobs in the background */}
         <div className="absolute -right-20 -top-20 w-64 h-64 bg-emerald-400/20 rounded-full filter blur-3xl animate-blob"></div>
         <div className="absolute -bottom-24 -right-24 w-72 h-72 bg-blue-400/20 rounded-full filter blur-3xl animate-blob animation-delay-2000"></div>
       </div>
       
-      {/* Step Indicator with Animation */}
       <div className="relative px-8 py-6 border-b border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900">
-        {/* Progress Bar */}
         <div className="absolute top-0 left-0 h-1 bg-emerald-100 dark:bg-gray-800 w-full">
           <motion.div 
             className="h-full bg-emerald-500" 
@@ -891,7 +801,7 @@ const formatDate = (dateString) => {
             
             return (
               <div key={step.key} className="flex flex-col items-center relative">
-                {/* Connector Line */}
+                
                 {index > 0 && (
                   <div className="absolute top-5 -left-1/2 w-full h-0.5 bg-gray-200 dark:bg-gray-700 -z-10">
                     {isCompleted || (index === steps.findIndex(s => s.key === currentStep) && index > 0) ? (
@@ -905,7 +815,6 @@ const formatDate = (dateString) => {
                   </div>
                 )}
                 
-                {/* Step Circle */}
                 <motion.div
                   className={`flex items-center justify-center w-10 h-10 rounded-full border-2 ${
                     isCompleted 
@@ -926,7 +835,7 @@ const formatDate = (dateString) => {
                   )}
                 </motion.div>
                 
-                {/* Step Label */}
+ 
                 <motion.span 
                   className={`text-sm font-medium transition-colors duration-300 ${
                     isActive ? 'text-emerald-600 dark:text-emerald-400' : 'text-gray-500 dark:text-gray-400'
@@ -942,10 +851,10 @@ const formatDate = (dateString) => {
         </div>
       </div>
       
-      {/* Form Content with Page Transitions */}
+      
       <div className="p-8">
         <AnimatePresence mode="wait" custom={animationDirection}>
-          {/* Step 1: Basic Info */}
+          
           {currentStep === 'basicInfo' && (
             <motion.div
               key="basicInfo"
@@ -966,7 +875,7 @@ const formatDate = (dateString) => {
               </div>
               
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {/* Event Title */}
+                
                 <div className="md:col-span-2">
                   <label htmlFor="title" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
                     Event Title <span className="text-red-500">*</span>
@@ -1009,7 +918,7 @@ const formatDate = (dateString) => {
                   )}
                 </div>
                 
-                {/* Event Description */}
+                
                 <div className="md:col-span-2">
                   <label htmlFor="description" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
                     Event Description <span className="text-red-500">*</span>
@@ -1044,7 +953,7 @@ const formatDate = (dateString) => {
                   )}
                 </div>
 
-                {/* Location and Timing Section */}
+                
                 <div className="md:col-span-2 pt-4 pb-2">
                   <h4 className="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4 flex items-center">
                     <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2 text-emerald-500" viewBox="0 0 20 20" fill="currentColor">
@@ -1054,7 +963,7 @@ const formatDate = (dateString) => {
                   </h4>
                 </div>
                 
-                {/* Venue */}
+                
                 <div>
                   <label htmlFor="venue" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
                     Venue <span className="text-red-500">*</span>
@@ -1089,7 +998,7 @@ const formatDate = (dateString) => {
                   )}
                 </div>
                 
-                {/* Location Coordinates */}
+                
                 <div className="md:col-span-2">
   <label htmlFor="locationCoordinates" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
     Location Map <span className="text-red-500">*</span>
@@ -1100,7 +1009,7 @@ const formatDate = (dateString) => {
   />
 </div>
                 
-                {/* Start Date */}
+                
                 <div>
                   <label htmlFor="startedAt" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
                     Start Date and Time <span className="text-red-500">*</span>
@@ -1134,7 +1043,7 @@ const formatDate = (dateString) => {
                   )}
                 </div>
                 
-                {/* End Date */}
+                
                 <div>
                   <label htmlFor="endedAt" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
                     End Date and Time <span className="text-red-500">*</span>
@@ -1169,7 +1078,7 @@ const formatDate = (dateString) => {
                   )}
                 </div>
                 
-                {/* Event Settings Section */}
+                
                 <div className="md:col-span-2 pt-4 pb-2">
                   <h4 className="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4 flex items-center">
                     <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2 text-emerald-500" viewBox="0 0 20 20" fill="currentColor">
@@ -1179,7 +1088,7 @@ const formatDate = (dateString) => {
                   </h4>
                 </div>
                 
-                {/* Published Date */}
+                
                 <div>
                   <label htmlFor="publishedAt" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
                     Publication Date <span className="text-gray-400 dark:text-gray-500 font-normal">(optional)</span>
@@ -1205,7 +1114,7 @@ const formatDate = (dateString) => {
                   </p>
                 </div>
                 
-                {/* Tickets Available From */}
+                
                 <div>
                   <label htmlFor="ticketsAvailableFrom" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
                     Tickets Available From <span className="text-gray-400 dark:text-gray-500 font-normal">(optional)</span>
@@ -1231,7 +1140,7 @@ const formatDate = (dateString) => {
                   </p>
                 </div>
                 
-                {/* Event Visibility */}
+                
                 <div>
                   <label htmlFor="attendeeVisibility" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
                     Event Visibility <span className="text-red-500">*</span>
@@ -1274,7 +1183,7 @@ const formatDate = (dateString) => {
                   )}
                 </div>
                 
-                {/* Event Status */}
+                
                 <div>
                   <label htmlFor="status" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
                     Event Status <span className="text-red-500">*</span>
@@ -1319,7 +1228,7 @@ const formatDate = (dateString) => {
                   )}
                 </div>
                 
-                {/* Format Selection */}
+                
                 <div>
                   <label htmlFor="formatId" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
                     Event Format <span className="text-red-500">*</span>
@@ -1362,7 +1271,7 @@ const formatDate = (dateString) => {
                   )}
                 </div>
                 
-                {/* Event Poster */}
+                
                 <div className="md:col-span-2">
                   <label htmlFor="posterFile" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
                     Event Poster <span className="text-gray-400 dark:text-gray-500 font-normal">(optional)</span>
@@ -1428,7 +1337,7 @@ const formatDate = (dateString) => {
             </motion.div>
           )}
           
-          {/* Step 2: Themes */}
+          
           {currentStep === 'themes' && (
             <motion.div
               key="themes"
@@ -1526,7 +1435,7 @@ const formatDate = (dateString) => {
             </motion.div>
           )}
           
-          {/* Step 3: Tickets */}
+          
           {currentStep === 'tickets' && (
             <motion.div
               key="tickets"
@@ -1571,7 +1480,7 @@ const formatDate = (dateString) => {
                 </motion.div>
               )}
               
-              {/* Current Tickets List */}
+              
               {formData.tickets.tickets.length > 0 && (
                 <motion.div 
                   initial={{ opacity: 0, y: 20 }}
@@ -1656,7 +1565,7 @@ const formatDate = (dateString) => {
                 </motion.div>
               )}
               
-              {/* Add New Ticket Form */}
+              
               <motion.div 
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -1790,7 +1699,7 @@ const formatDate = (dateString) => {
               </motion.div>
             </motion.div>
           )}
-          {/* Step 4: Promo Codes */}
+          
 {currentStep === 'promoCodes' && (
   <motion.div
     key="promoCodes"
@@ -1816,7 +1725,7 @@ const formatDate = (dateString) => {
       </p>
     </div>
     
-    {/* Current Promo Codes List */}
+    
     {formData.promoCodes.promoCodes.length > 0 && (
       <motion.div 
         initial={{ opacity: 0, y: 20 }}
@@ -1897,7 +1806,7 @@ const formatDate = (dateString) => {
       </motion.div>
     )}
     
-    {/* Add New Promo Code Form */}
+    
     <motion.div 
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
@@ -2030,7 +1939,7 @@ const formatDate = (dateString) => {
       </div>
     </motion.div>
     
-    {/* Helper Tips for Promo Codes */}
+    
     <div className="bg-blue-50 dark:bg-blue-900/20 p-5 rounded-xl border border-blue-100 dark:border-blue-800">
       <h5 className="font-medium text-blue-800 dark:text-blue-300 mb-2 flex items-center">
         <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
@@ -2061,7 +1970,7 @@ const formatDate = (dateString) => {
     </div>
   </motion.div>
 )}
-          {/* Step 4: Review */}
+          
           {currentStep === 'review' && (
             <motion.div
               key="review"
@@ -2088,7 +1997,7 @@ const formatDate = (dateString) => {
               </div>
               
               <div className="space-y-8">
-                {/* Basic Info Summary */}
+                
                 <motion.div 
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
@@ -2211,7 +2120,7 @@ const formatDate = (dateString) => {
                   </div>
                 </motion.div>
                 
-                {/* Themes Summary */}
+                
                 <motion.div 
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
@@ -2254,7 +2163,7 @@ const formatDate = (dateString) => {
                   </div>
                 </motion.div>
                 
-                {/* Promo Codes Summary */}
+                
 <motion.div 
   initial={{ opacity: 0, y: 20 }}
   animate={{ opacity: 1, y: 0 }}
@@ -2329,7 +2238,7 @@ const formatDate = (dateString) => {
   </div>
 </motion.div>
 
-                {/* Tickets Summary */}
+                
                 <motion.div 
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
@@ -2425,7 +2334,7 @@ const formatDate = (dateString) => {
           )}
         </AnimatePresence>
         
-        {/* Form Navigation Buttons */}
+        
         <div className="flex justify-between items-center mt-10 pt-6 border-t border-gray-100 dark:border-gray-800">
           {currentStep !== 'basicInfo' ? (
             <motion.button
@@ -2442,7 +2351,7 @@ const formatDate = (dateString) => {
               Back
             </motion.button>
           ) : (
-            <div></div> // Empty div to maintain flex spacing
+            <div></div>
           )}
           
           {currentStep !== 'review' ? (
@@ -2489,7 +2398,7 @@ const formatDate = (dateString) => {
           )}
         </div>
 
-        {/* Keyboard shortcuts hints (advanced UX feature) */}
+        
         <div className="mt-8 text-center">
   <p className="text-xs text-gray-500 dark:text-gray-400">
     Keyboard shortcuts: 
@@ -2510,3 +2419,4 @@ const formatDate = (dateString) => {
 
 
 export default EventCreationForm;
+

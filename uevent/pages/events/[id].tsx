@@ -35,10 +35,9 @@ const EventDetailsPage = () => {
     deleteEventNews,
     getEventAttendees,
     updateAttendeeVisibility,
-    getTicketTypes // Add this
+    getTicketTypes 
   } = useEvents();
   
-  // Add these context hooks
   const { validatePromoCode } = usePromoCodes();
   const { createOrder } = useOrders();
   const [event, setEvent] = useState(null);
@@ -47,7 +46,6 @@ const EventDetailsPage = () => {
   const [isCheckingAuthor, setIsCheckingAuthor] = useState(true);
 
 
-  // Add these state variables with your other state variables (at the top)
 const [ticketTypes, setTicketTypes] = useState([]);
 const [selectedTickets, setSelectedTickets] = useState({});
 const [promoCode, setPromoCode] = useState('');
@@ -59,10 +57,8 @@ const [subtotal, setSubtotal] = useState(0);
 const [discount, setDiscount] = useState(0);
 const [total, setTotal] = useState(0);
 const ticketsLoadedRef = useRef(false);
-    // News editing states
     const [editingNews, setEditingNews] = useState(null);
     const [newNewsForm, setNewNewsForm] = useState({ title: '', description: '' });
-  // Placeholder for actual countdown logic
   const [countdown, setCountdown] = useState({ days: 0, hours: 0, minutes: 0 });
   const [news, setNews] = useState([]);
   const [isNewsLoading, setIsNewsLoading] = useState(false);
@@ -70,7 +66,6 @@ const ticketsLoadedRef = useRef(false);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [newsToDelete, setNewsToDelete] = useState(null);
   const [purchaseModalOpen, setPurchaseModalOpen] = useState(false);
-// 1. Add these new state variables at the top of the component with the other state variables:
 const [attendees, setAttendees] = useState([]);
 const [attendeesLoading, setAttendeesLoading] = useState(false);
 const [currentUserAttendee, setCurrentUserAttendee] = useState(null);
@@ -80,7 +75,6 @@ const attendeesLoadedRef = useRef(false);
     setNewsToDelete(newsId);
     setDeleteModalOpen(true);
   };
-    // Execute the actual deletion after confirmation
   const executeDeleteNews = async () => {
     if (!id || !newsToDelete) return;
     
@@ -99,7 +93,6 @@ const attendeesLoadedRef = useRef(false);
     }
   };
 
-  // Check if the current user is the event author by checking their company
   useEffect(() => {
     const checkIfEventAuthor = async () => {
       if (!user || !event) {
@@ -110,7 +103,6 @@ const attendeesLoadedRef = useRef(false);
       
       try {
         setIsCheckingAuthor(true);
-        // Fetch the user's company information
         const token = localStorage.getItem('token');
         const response = await axios.get(
           `http://localhost:8080/api/users/${user.id}/companies`,
@@ -119,7 +111,6 @@ const attendeesLoadedRef = useRef(false);
         
         const userCompanies = response.data;
         
-        // Check if any of the user's companies match the event's company
         const isAuthor = userCompanies.some(company => company.id === event.companyId);
         setIsEventAuthor(isAuthor);
       } catch (error) {
@@ -138,31 +129,26 @@ const attendeesLoadedRef = useRef(false);
     }
   }, [user, event]);
 
-// Fetch ticket types when modal opens
 useEffect(() => {
   if (purchaseModalOpen && event?.id && !ticketsLoadedRef.current) {
     fetchTicketTypes();
     ticketsLoadedRef.current = true;
   }
   
-  // Reset the ref when modal closes
   if (!purchaseModalOpen) {
     ticketsLoadedRef.current = false;
   }
 }, [purchaseModalOpen, event?.id]);
 
-// Calculate prices whenever selected tickets or promo code changes
 useEffect(() => {
   calculatePrices();
 }, [selectedTickets, validPromoCode]);
 
-// Fetch available ticket types
 const fetchTicketTypes = async () => {
   try {
     const types = await getTicketTypes(event.id);
     setTicketTypes(types);
     
-    // Initialize selected tickets
     const initialSelected = {};
     types.forEach(type => {
       initialSelected[type.title] = 0;
@@ -174,13 +160,11 @@ const fetchTicketTypes = async () => {
   }
 };
 
-// Handle quantity changes
 const handleQuantityChange = (ticketTitle, change) => {
   setSelectedTickets(prev => {
     const currentQty = prev[ticketTitle] || 0;
     const newQty = Math.max(0, currentQty + change);
     
-    // Find this ticket type to check available count
     const ticketType = ticketTypes.find(t => t.title === ticketTitle);
     if (ticketType && newQty > ticketType.count) {
       toast.warning(`Only ${ticketType.count} ${ticketTitle} tickets available`);
@@ -194,8 +178,6 @@ const handleQuantityChange = (ticketTitle, change) => {
   });
 };
 
-// Validate promo code
-// Validate promo code
 const handleValidatePromoCode = async (e) => {
   e.preventDefault();
   if (!promoCode.trim()) {
@@ -213,11 +195,9 @@ const handleValidatePromoCode = async (e) => {
         discountPercent: result.discountPercent
       });
       
-      // Format the percentage for display (0.5 becomes 50%)
       const displayPercent = (result.discountPercent * 100).toFixed(0);
       toast.success(`Promo code applied: ${displayPercent}% discount`);
     } else {
-      // Explicitly show error toast with the message from the result
       toast.error(result.message || 'Invalid promo code');
       setValidPromoCode(null);
     }
@@ -228,7 +208,6 @@ const handleValidatePromoCode = async (e) => {
       ? error.message
       : 'Failed to validate promo code';
       
-    // Make sure this toast is displayed
     toast.error(errorMessage);
     setValidPromoCode(null);
   } finally {
@@ -236,17 +215,14 @@ const handleValidatePromoCode = async (e) => {
   }
 };
 
-// Clear promo code
 const handleClearPromoCode = () => {
   setPromoCode('');
   setValidPromoCode(null);
 };
 
-// Calculate prices based on selected tickets and promo code
 const calculatePrices = () => {
   let subtotalAmount = 0;
 
-  // Calculate subtotal
   Object.keys(selectedTickets).forEach(title => {
     const quantity = selectedTickets[title];
     const ticketType = ticketTypes.find(t => t.title === title);
@@ -255,26 +231,21 @@ const calculatePrices = () => {
     }
   });
 
-  // Calculate discount
   let discountAmount = 0;
   if (validPromoCode) {
-    // Apply the discount percentage directly as a decimal
-    // If discountPercent is 0.5, that means 50%
     discountAmount = subtotalAmount * validPromoCode.discountPercent;
   }
 
-  // Calculate total
   const totalAmount = subtotalAmount - discountAmount;
 
   setSubtotal(subtotalAmount);
   setDiscount(discountAmount);
   setTotal(totalAmount);
 };
-// Handle form submission
+
 const handleSubmitOrder = async (e) => {
   e.preventDefault();
   
-  // Validate form
   const orderItems = Object.keys(selectedTickets)
     .filter(title => selectedTickets[title] > 0)
     .map(title => ({
@@ -287,31 +258,24 @@ const handleSubmitOrder = async (e) => {
     return;
   }
 
-  // Prepare order data
   const orderData = {
     eventId: event.id,
     paymentMethod,
     items: orderItems
   };
 
-  // Add promo code if valid
   if (validPromoCode) {
     orderData.promoCode = validPromoCode.code;
   }
 
-  // Submit order
   setIsSubmitting(true);
   try {
     const result = await createOrder(orderData);
-    console.log('result', result);
     if (result.success) {
       toast.success('Order created successfully!');
       setPurchaseModalOpen(false);
-      console.log('order id',result.order.id);
-      // Redirect to payment or order confirmation page
       router.push(`/stripe/payment/${result.order.id}`);
-      // Redirect to order confirmation or payment page
-      // You might want to redirect to the order details page here
+
     }
   } catch (error) {
     console.error('Error creating order:', error);
@@ -321,7 +285,6 @@ const handleSubmitOrder = async (e) => {
   }
 };
 
-// Format price to display with currency
 const formatPrice = (price) => {
   return new Intl.NumberFormat('en-US', {
     style: 'currency',
@@ -332,15 +295,11 @@ const formatPrice = (price) => {
     const fetchEventAndNews = async () => {
       if (id && typeof id === 'string') {
         try {
-          // Fetch event details
           const eventData = await getEventById(Number(id));
           setEvent(eventData);
-          console.log('event', event);
-          // Fetch event news
           const eventNews = await getEventNews(Number(id));
           setNews(eventNews);
-          console.log(news);
-          // Calculate countdown
+
           if (eventData?.startedAt) {
             const eventDate = new Date(eventData.startedAt);
             const now = new Date();
@@ -364,22 +323,16 @@ const formatPrice = (price) => {
 
   useEffect(() => {
     const fetchAttendees = async () => {
-      // Skip if no event id, no event data, or we've already loaded attendees
       if (!id || !event || attendeesLoadedRef.current) return;
-      
-      // Early return if attendee visibility is set to NOBODY
-      //if (event.attendeeVisibility === 'NOBODY') return;
       
       try {
         setAttendeesLoading(true);
         attendeesLoadedRef.current = true;
         
         const attendeesList = await getEventAttendees(Number(id));
-        console.log('attendeesList', attendeesList);
-        // Check if current user is an attendee
+
         const isUserAttendee = user && attendeesList.some(attendee => attendee.userId === user.id);
-        
-        // Set visibility based on event settings and user's attendee status
+
         let canView = false;
         if (event.attendeeVisibility === 'EVERYONE') {
           canView = true;
@@ -390,7 +343,6 @@ const formatPrice = (price) => {
         setCanViewAttendees(canView);
         setAttendees(attendeesList);
         
-        // Find and store the current user's attendee record
         if (user) {
           const userAttendee = attendeesList.find(attendee => attendee.userId === user.id);
           setCurrentUserAttendee(userAttendee || null);
@@ -406,7 +358,6 @@ const formatPrice = (price) => {
     fetchAttendees();
   }, [id, event, user, getEventAttendees]);
   
-  // 3. Add this function to handle toggling visibility
   const toggleAttendeeVisibility = async () => {
     if (!currentUserAttendee) return;
     
@@ -416,7 +367,6 @@ const formatPrice = (price) => {
       const result = await updateAttendeeVisibility(currentUserAttendee.id, newVisibility);
       
       if (result.success) {
-        // Update local state
         setCurrentUserAttendee(prev => ({ ...prev, isVisible: newVisibility }));
         setAttendees(prev => 
           prev.map(attendee => 
@@ -436,9 +386,8 @@ const formatPrice = (price) => {
     }
   };
   
-  // 4. Add helper functions for attendees display
+
   const getUserDisplayName = (attendee) => {
-    console.log('attendeeS',attendee);
     if (!attendee.user) return 'Unknown User';
     return `${attendee.user.firstName} ${attendee.user.lastName}`;
   };
@@ -452,14 +401,9 @@ const formatPrice = (price) => {
     return `${baseUrl}/uploads/user-avatars/${path}`;
   };
   
-  // 5. Create a renderAttendees function
-  // First, add this new state at the component level with your other state variables
-// Add this state at the component level with your other state variables
 const [attendeesModalOpen, setAttendeesModalOpen] = useState(false);
 
-// Then modify your renderAttendees function to ensure proper visibility control
 const renderAttendees = () => {
-  // Early return for cases when attendees can't be viewed
   if (!canViewAttendees) {
     return (
       <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm overflow-hidden border border-gray-100 dark:border-gray-700 p-6">
@@ -493,41 +437,14 @@ const renderAttendees = () => {
     );
   }
 
-  // if (attendeesLoading) {
-  //   return (
-  //     <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm overflow-hidden border border-gray-100 dark:border-gray-700 p-6">
-  //       <div className="flex items-center justify-between mb-4">
-  //         <h2 className="text-xl font-semibold text-gray-900 dark:text-white flex items-center">
-  //           <Users className="w-5 h-5 mr-2 text-emerald-500" />
-  //           Attendees
-  //         </h2>
-  //       </div>
-        
-  //       <div className="flex items-center space-x-2 mb-2">
-  //         {[...Array(3)].map((_, i) => (
-  //           <div key={i} className="animate-pulse w-16 h-16 rounded-full bg-gray-200 dark:bg-gray-700"></div>
-  //         ))}
-  //         <div className="animate-pulse w-16 h-16 flex items-center justify-center rounded-full bg-gray-200 dark:bg-gray-700">
-  //           <div className="h-5 w-10 bg-gray-300 dark:bg-gray-600 rounded"></div>
-  //         </div>
-  //       </div>
-        
-  //       <div className="animate-pulse h-6 w-32 bg-gray-200 dark:bg-gray-700 rounded mt-2"></div>
-  //     </div>
-  //   );
-  // }
-
-  // Filter attendees for display:
-  // - Current user is always visible to themselves
-  // - Other users are only visible if they have set isVisible to true
+  
   const filteredAttendees = attendees.filter(attendee => 
     (user && attendee.userId === user.id) || attendee.isVisible
   );
   
-  // For count display, we want to show the actual public count
   const publicAttendeeCount = attendees.filter(a => a.isVisible).length;
   
-  const displayCount = 3; // Number of attendees to display directly
+  const displayCount = 3;
   const displayedAttendees = filteredAttendees.slice(0, displayCount);
   const remainingCount = Math.max(0, filteredAttendees.length - displayCount);
   
@@ -548,7 +465,7 @@ const renderAttendees = () => {
           </a>
         </div>
         
-        {/* Current user visibility toggle - always show at the top if user is an attendee */}
+        
         {currentUserAttendee && (
           <div className="mb-4 p-3 bg-emerald-50 dark:bg-emerald-900/20 rounded-lg">
             <div className="flex justify-between items-center">
@@ -605,7 +522,7 @@ const renderAttendees = () => {
         ) : (
           <div className="flex flex-wrap -ml-2 -mr-2">
             {displayedAttendees.map((attendee, index) => {
-              const isHost = index === 0; // Example: first person is host
+              const isHost = index === 0;
               const isCurrentUser = user && attendee.userId === user.id;
               const name = getUserDisplayName(attendee);
               
@@ -613,7 +530,7 @@ const renderAttendees = () => {
                 <div key={attendee.id} className="w-1/3 px-2 mb-4">
                   <div className="flex flex-col items-center text-center">
                     <div className="relative mb-2">
-                      {/* Avatar */}
+                      
                       <div className={`w-16 h-16 rounded-full overflow-hidden bg-gray-200 dark:bg-gray-700 mx-auto ${
                          
                         isCurrentUser ? 'ring-2 ring-blue-500 dark:ring-blue-400' : ''
@@ -635,13 +552,9 @@ const renderAttendees = () => {
                         )}
                       </div>
                       
-                      {/* Badges */}
+                      
                       <div className="absolute -top-1 -right-1 flex flex-col gap-1">
-                        {/* {isHost && (
-                          <span className="bg-emerald-100 text-emerald-800 text-xs font-medium px-2 py-0.5 rounded-full">
-                            Host
-                          </span>
-                        )} */}
+                       
                         
                         {isCurrentUser && (
                           <span className="bg-blue-100 text-blue-800 text-xs font-medium px-2 py-0.5 rounded-full dark:bg-blue-900 dark:text-blue-300">
@@ -662,16 +575,14 @@ const renderAttendees = () => {
                       <h3 className="font-medium text-gray-900 dark:text-white text-sm truncate">
                         {name}
                       </h3>
-                      {/* <p className="text-xs text-gray-500 dark:text-gray-400 truncate">
-                        {attendee.user?.company || "Member"}
-                      </p> */}
+                    
                     </div>
                   </div>
                 </div>
               );
             })}
             
-            {/* "More" button if there are additional attendees */}
+            
             {remainingCount > 0 && (
               <div className="w-1/3 px-2 mb-4">
                 <div className="flex flex-col items-center text-center" onClick={() => setAttendeesModalOpen(true)}>
@@ -693,11 +604,9 @@ const renderAttendees = () => {
   );
 };
 
-// Separate function for the modal
 const renderAttendeesModal = () => {
   if (!attendeesModalOpen) return null;
   
-  // Apply the same filtering logic from renderAttendees
   const filteredAttendees = attendees.filter(attendee => 
     (user && attendee.userId === user.id) || attendee.isVisible
   );
@@ -727,7 +636,7 @@ const renderAttendeesModal = () => {
             </button>
           </div>
           
-          {/* Current user visibility toggle in modal */}
+          
           {currentUserAttendee && (
             <div className="px-6 pt-4">
               <div className="p-4 bg-emerald-50 dark:bg-emerald-900/20 rounded-lg">
@@ -779,27 +688,10 @@ const renderAttendeesModal = () => {
           )}
           
           <div className="px-6 py-4 max-h-[70vh] overflow-y-auto">
-            {/* Search input */}
-            {/* <div className="mb-6">
-              <div className="relative">
-                <input 
-                  type="text" 
-                  placeholder="Search attendees..." 
-                  className="w-full pl-10 pr-4 py-2 border border-gray-200 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-700 focus:ring-2 focus:ring-emerald-500 focus:border-transparent dark:text-white"
-                />
-                <svg 
-                  className="w-5 h-5 text-gray-400 absolute left-3 top-1/2 transform -translate-y-1/2" 
-                  fill="none" 
-                  stroke="currentColor" 
-                  viewBox="0 0 24 24" 
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                </svg>
-              </div>
-            </div> */}
             
-            {/* Attendees grid */}
+           
+            
+            
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {filteredAttendees.map((attendee, index) => {
                 const isHost = index === 0; // Example: first person is host
@@ -809,7 +701,7 @@ const renderAttendeesModal = () => {
                 return (
                   <div key={attendee.id} className="flex flex-col items-center bg-white dark:bg-gray-700 rounded-lg p-4 border border-gray-100 dark:border-gray-600 transition-shadow hover:shadow-md">
                     <div className="relative mb-3">
-                      {/* Avatar */}
+                      
                       <div className={`w-20 h-20 rounded-full overflow-hidden bg-gray-200 dark:bg-gray-600 ${
                          
                         isCurrentUser ? 'ring-3 ring-blue-500 dark:ring-blue-400' : ''
@@ -831,13 +723,9 @@ const renderAttendeesModal = () => {
                         )}
                       </div>
                       
-                      {/* Badges */}
+                      
                       <div className="absolute -top-1 -right-1 flex flex-col gap-1">
-                        {/* {isHost && (
-                          <span className="bg-emerald-100 text-emerald-800 text-xs font-medium px-2 py-0.5 rounded-full">
-                            Host
-                          </span>
-                        )} */}
+                        
                         
                         {isCurrentUser && (
                           <span className="bg-blue-100 text-blue-800 text-xs font-medium px-2 py-0.5 rounded-full dark:bg-blue-900 dark:text-blue-300">
@@ -870,13 +758,8 @@ const renderAttendeesModal = () => {
                       )}
                     </div>
                     
-                    {/* Connect button for other users */}
-                    {/* {!isHost && !isCurrentUser && (
-                      <button className="mt-3 text-xs px-3 py-1 bg-emerald-50 text-emerald-700 hover:bg-emerald-100 dark:bg-emerald-900/20 dark:text-emerald-400 dark:hover:bg-emerald-900/30 rounded-full flex items-center">
-                        <UserPlus className="w-3 h-3 mr-1" />
-                        Connect
-                      </button>
-                    )} */}
+                    
+                    
                   </div>
                 );
               })}
@@ -896,15 +779,7 @@ const renderAttendeesModal = () => {
     </div>
   );
 };
-
-// Don't forget to add this line in your component's return statement
-// {renderAttendeesModal()}
-
-// Then in your JSX return statement, add this line to render the modal conditionally
-// Somewhere near the end of your return statement, but before the closing tags:
-// {renderAttendeesModal()}
   
-  // Format date helper
   const formatDate = (dateString) => {
     const date = new Date(dateString);
     return date.toLocaleDateString('en-US', {
@@ -914,7 +789,6 @@ const renderAttendeesModal = () => {
       day: 'numeric'
     });
   };
-   // Handle creating new news
    const handleCreateNews = async (e) => {
     e.preventDefault();
     if (!id) return;
@@ -938,7 +812,6 @@ const renderAttendeesModal = () => {
     }
   };
   
-  // Handle editing news
   const handleEditNews = async (e) => {
     e.preventDefault();
     if (!id || !editingNews) return;
@@ -964,7 +837,6 @@ const renderAttendeesModal = () => {
     }
   };
   
-  // Handle deleting news
   const handleDeleteNews = async (newsId) => {
     if (!id) return;
     
@@ -981,7 +853,6 @@ const renderAttendeesModal = () => {
     }
   };
   
-  // Format time helper
   const formatTime = (dateString) => {
     const date = new Date(dateString);
     return date.toLocaleTimeString('en-US', {
@@ -990,7 +861,6 @@ const renderAttendeesModal = () => {
     });
   };
   
-  // Calculate event duration
   const getEventDuration = () => {
     if (!event?.startedAt || !event?.endedAt) return '';
     
@@ -1003,30 +873,23 @@ const renderAttendeesModal = () => {
     return `${diffHrs > 0 ? `${diffHrs}h` : ''} ${diffMins > 0 ? `${diffMins}m` : ''}`;
   };
   
-  // Get image URL with correct domain
   const getImageUrl = (path) => {
     if (!path) return null;
     
-    // Check if path is already a full URL
     if (path.startsWith('http://') || path.startsWith('https://')) {
       return path;
     }
     
-    // If it's a relative path, prepend the backend URL
     const baseUrl = 'http://localhost:8080';
     return `${baseUrl}/uploads/event-posters/${path}`;
   };
   
-  // Get logo URL with correct domain
   const getLogoUrl = (path) => {
     if (!path) return null;
     
-    // Check if path is already a full URL
     if (path.startsWith('http://') || path.startsWith('https://')) {
       return path;
     }
-    
-    // If it's a relative path, prepend the backend URL
     const baseUrl = 'http://localhost:8080';
     return `${baseUrl}/uploads/company-logos/${path}`;
   };
@@ -1060,7 +923,7 @@ const renderAttendeesModal = () => {
 
       
       <main className="min-h-screen bg-gray-50 dark:bg-gray-900 pt-8 pb-20">
-        {/* Back Button */}
+        
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-4">
           <button
             onClick={() => router.back()}
@@ -1071,11 +934,11 @@ const renderAttendeesModal = () => {
           </button>
         </div>
         
-        {/* Event Hero Section */}
+        
         <div className="bg-gradient-to-r from-emerald-900 to-emerald-700 dark:from-emerald-800 dark:to-emerald-950 text-white py-12 mb-8">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex flex-col md:flex-row gap-8">
-              {/* Event Poster */}
+              
               <div className="md:w-1/3 lg:w-1/4 flex-shrink-0">
                 <div className="rounded-xl overflow-hidden shadow-xl bg-white dark:bg-gray-800 h-auto aspect-[3/4] relative">
                   {event.posterName ? (
@@ -1092,7 +955,7 @@ const renderAttendeesModal = () => {
                     </div>
                   )}
                   
-                  {/* Event status badge */}
+                  
                   <div className="absolute top-4 right-4">
   <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium
     ${event.status === 'PUBLISHED' ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' : 
@@ -1115,7 +978,7 @@ const renderAttendeesModal = () => {
                 </div>
               </div>
               
-              {/* Event Info */}
+              
               <div className="md:w-2/3 lg:w-3/4">
                 <div className="flex flex-col h-full justify-between">
                   <div>
@@ -1173,9 +1036,6 @@ const renderAttendeesModal = () => {
     />
   )}
                     
-                    {/* <button className="p-3 rounded-lg border border-white/30 bg-transparent text-white hover:bg-white/10 flex items-center transition-colors">
-                      <Share2 className="w-5 h-5" />
-                    </button> */}
                     
                     {isEventAuthor && (
     <Link
@@ -1192,7 +1052,7 @@ const renderAttendeesModal = () => {
           </div>
         </div>
         
-        {/* Event Countdown */}
+        
         {event.status !== 'CANCELLED' && new Date(event.startedAt) > new Date() && (
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-8">
             <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm overflow-hidden border border-gray-100 dark:border-gray-700">
@@ -1217,12 +1077,12 @@ const renderAttendeesModal = () => {
           </div>
         )}
         
-        {/* Main Content Grid */}
+        
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            {/* Left Column - Details */}
+            
             <div className="lg:col-span-2 space-y-8">
-              {/* About This Event */}
+              
               <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm overflow-hidden border border-gray-100 dark:border-gray-700">
                 <div className="px-6 py-5 border-b border-gray-100 dark:border-gray-700">
                   <h2 className="text-xl font-semibold text-gray-900 dark:text-white">About This Event</h2>
@@ -1234,7 +1094,7 @@ const renderAttendeesModal = () => {
                 </div>
               </div>
               
-              {/* Location */}
+              
 <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm overflow-hidden border border-gray-100 dark:border-gray-700">
   <div className="px-6 py-5 border-b border-gray-100 dark:border-gray-700">
     <h2 className="text-xl font-semibold text-gray-900 dark:text-white">Location</h2>
@@ -1248,7 +1108,7 @@ const renderAttendeesModal = () => {
       </div>
     </div>
     
-    {/* Map Component */}
+    
     <EventLocationMap 
       coordinates={event.locationCoordinates} 
       venueName={event.venue} 
@@ -1267,26 +1127,17 @@ const renderAttendeesModal = () => {
     </div>
   </div>
 </div>
-              {/* Event News Section */}
+              
               <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm overflow-hidden border border-gray-100 dark:border-gray-700">
                 <div className="px-6 py-5 border-b border-gray-100 dark:border-gray-700 flex justify-between items-center">
                   <h2 className="text-xl font-semibold text-gray-900 dark:text-white flex items-center">
                     <Newspaper className="w-5 h-5 mr-2 text-emerald-500" />
                     Event News
                   </h2>
-                  {/* Only show Add News button if user is the event author */}
-                  {/* {isEventAuthor && (
-                    <button 
-                      onClick={() => setNewNewsForm({ title: '', description: '' })}
-                      className="text-emerald-600 hover:text-emerald-700 dark:text-emerald-400 dark:hover:text-emerald-300 flex items-center"
-                    >
-                      <Plus className="w-5 h-5 mr-1" />
-                      Add News
-                    </button>
-                  )} */}
+                  
                 </div>
                 
-                {/* New News Form - Only visible if user is event author */}
+                
                 {isEventAuthor && (newNewsForm.title || newNewsForm.description) && (
                   <form onSubmit={handleCreateNews} className="p-6 border-b border-gray-100 dark:border-gray-700">
                     <div className="grid grid-cols-1 gap-4">
@@ -1326,7 +1177,7 @@ const renderAttendeesModal = () => {
                   </form>
                 )}
                 
-                {/* News List */}
+                
                 <div className="divide-y divide-gray-100 dark:divide-gray-700">
                   {news.length === 0 ? (
                     <div className="p-6 text-center text-gray-500 dark:text-gray-400">
@@ -1374,7 +1225,7 @@ const renderAttendeesModal = () => {
                               <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
                                 {newsItem.title}
                               </h3>
-                              {/* Only show edit/delete buttons if user is the event author */}
+                              
                               {isEventAuthor && (
                                 <div className="flex space-x-2">
                                   <button 
@@ -1410,7 +1261,7 @@ const renderAttendeesModal = () => {
                     ))
                   )}
                 </div>
-                {/* Confirmation Modal */}
+                
                 <DeleteConfirmationModal
                   isOpen={deleteModalOpen}
                   title="Delete News"
@@ -1424,9 +1275,9 @@ const renderAttendeesModal = () => {
               </div>
             </div>
             
-            {/* Right Column - Sidebar */}
+            
             <div className="space-y-8">
-              {/* Registration/Ticket Info - показывается только авторизованным пользователям */}
+              
 {user ? (
   <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm overflow-hidden border border-gray-100 dark:border-gray-700">
     <div className="px-6 py-5 border-b border-gray-100 dark:border-gray-700">
@@ -1456,9 +1307,7 @@ const renderAttendeesModal = () => {
           </p>
         </div>
       ) : (
-        // Проверяем доступность билетов по дате
         new Date(event.ticketsAvailableFrom) > new Date() ? (
-          // Билеты еще не доступны
           <div className="text-center py-4">
             <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-amber-100 dark:bg-amber-900/30 text-amber-600 dark:text-amber-300 mb-3">
               <Clock className="h-6 w-6" />
@@ -1474,7 +1323,6 @@ const renderAttendeesModal = () => {
             </p>
           </div>
         ) : (
-          // Билеты доступны, показываем кнопку регистрации
           <>
             <div className="mb-6">
               <div className="flex justify-between items-center mb-2">
@@ -1503,7 +1351,6 @@ const renderAttendeesModal = () => {
     </div>
   </div>
 ) : (
-  /* Альтернативное сообщение для неавторизованных пользователей */
   <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm overflow-hidden border border-gray-100 dark:border-gray-700">
     <div className="px-6 py-5 border-b border-gray-100 dark:border-gray-700">
       <h2 className="text-xl font-semibold text-gray-900 dark:text-white">Registration</h2>
@@ -1534,36 +1381,11 @@ const renderAttendeesModal = () => {
   </div>
 )}
               
-              {/* <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm overflow-hidden border border-gray-100 dark:border-gray-700">
-  <div className="px-6 py-5 border-b border-gray-100 dark:border-gray-700">
-    <h2 className="text-xl font-semibold text-gray-900 dark:text-white">Stay Updated</h2>
-  </div>
-  <div className="p-6">
-    <div className="flex items-center mb-4">
-      <div className="w-10 h-10 rounded-full flex items-center justify-center bg-pink-100 dark:bg-pink-900/30 text-pink-600 dark:text-pink-400 mr-3">
-        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
-        </svg>
-      </div>
-      <div>
-        <h3 className="font-medium text-gray-900 dark:text-white">Event Updates</h3>
-        <p className="text-sm text-gray-600 dark:text-gray-400">
-          Get notified about changes, news, and announcements for this event
-        </p>
-      </div>
-    </div>
-    
-    <EventSubscribeButton 
-  eventId={event.id.toString()} 
-  className="w-full py-2.5 px-4 rounded-lg font-medium flex items-center justify-center transition-colors"
-/>
-  </div>
-</div> */}
+             
 
-{/* <EventAttendeesSection eventId={id} event={event} /> */}
 { renderAttendees()}
 {renderAttendeesModal()}
-              {/* Organizer Info */}
+              
               <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm overflow-hidden border border-gray-100 dark:border-gray-700">
                 <div className="px-6 py-5 border-b border-gray-100 dark:border-gray-700">
                   <h2 className="text-xl font-semibold text-gray-900 dark:text-white">Organizer</h2>
@@ -1600,7 +1422,7 @@ const renderAttendeesModal = () => {
                 </div>
               </div>
               
-              {/* Share Widget */}
+              
               
             </div>
           </div>
@@ -1610,22 +1432,22 @@ const renderAttendeesModal = () => {
                 title={event.title}
                 url={`${process.env.NEXT_PUBLIC_SITE_URL}/products/${event.id}`}
             />
-        {/* Related Events Section */}
+        
 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-8">
-  {/* Company Events */}
+  
   <CompanyEventsSection event={event} />
   
-  {/* Similar Events */}
+  
   <div className="mt-8">
     <SimilarEventsSection event={event} />
   </div>
 </div>
       </main>
-      {/* Ticket Purchase Modal */}
+      
 {purchaseModalOpen && (
   <div className="fixed inset-0 z-50 overflow-y-auto bg-black bg-opacity-50 flex items-center justify-center">
     <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-hidden">
-      {/* Header */}
+      
       <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center">
         <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Purchase Tickets</h2>
         <button 
@@ -1638,7 +1460,7 @@ const renderAttendeesModal = () => {
       
       <form onSubmit={handleSubmitOrder}>
         <div className="p-6 overflow-y-auto max-h-[calc(90vh-9rem)]">
-          {/* Ticket Types */}
+          
           <div className="mb-6">
             <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">Available Tickets</h3>
             
@@ -1696,7 +1518,7 @@ const renderAttendeesModal = () => {
             )}
           </div>
           
-          {/* Promo Code */}
+          
           <div className="mb-6">
             <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">Promo Code</h3>
             
@@ -1746,7 +1568,7 @@ const renderAttendeesModal = () => {
             )}
           </div>
           
-          {/* Payment Method */}
+          
           <div className="mb-6">
             <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">Payment Method</h3>
             
@@ -1778,7 +1600,7 @@ const renderAttendeesModal = () => {
             </div>
           </div>
           
-          {/* Order Summary */}
+          
           <div className="border-t border-gray-200 dark:border-gray-700 pt-4">
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">Order Summary</h3>
             
@@ -1803,7 +1625,7 @@ const renderAttendeesModal = () => {
           </div>
         </div>
         
-        {/* Footer */}
+        
         <div className="px-6 py-4 border-t border-gray-200 dark:border-gray-700 flex justify-between">
           <button
             type="button"
@@ -1840,3 +1662,4 @@ const renderAttendeesModal = () => {
 };
 
 export default EventDetailsPage;
+

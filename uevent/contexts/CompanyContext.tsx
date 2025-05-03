@@ -3,7 +3,6 @@ import { companyService, CompanyNews } from '../services/companyService';
 import { useAuth } from './AuthContext';
 import { toast } from 'react-toastify';
 
-// Define Company type
 export type Company = {
   id?: string;
   title: string;
@@ -22,15 +21,14 @@ export type Company = {
   };
 };
 
-// Define the context type with extended return types
 type CompanyContextType = {
   company: Company | null;
   isLoading: boolean;
   error: string | null;
-  userCompanies: Company[]; // Add user companies list
+  userCompanies: Company[];
   fetchCompany: () => Promise<void>;
-  fetchCompanyById: (id: string) => Promise<void>; // New method to fetch company by ID
-  getUserCompanies: () => Promise<void>; // Fetch all companies owned by the user
+  fetchCompanyById: (id: string) => Promise<void>;
+  getUserCompanies: () => Promise<void>;
   createCompany: (companyData: Omit<Company, 'id'>) => Promise<{ 
     success: boolean; 
     message?: string; 
@@ -47,7 +45,6 @@ type CompanyContextType = {
   }>;
   resetCompanyState: () => void;
   
-  // News related functionality
   companyNews: CompanyNews[];
   isLoadingNews: boolean;
   newsError: string | null;
@@ -57,25 +54,23 @@ type CompanyContextType = {
   deleteCompanyNews: (newsId: string, companyId?: string) => Promise<{ success: boolean; message?: string }>;
   updateCompanyNews: (newsId: string, newsData: Partial<CompanyNews>, companyId?: string) => 
     Promise<{ success: boolean; message?: string; newsItem?: CompanyNews }>;
-  viewingSpecificCompany: boolean; // Add this if not already present
+  viewingSpecificCompany: boolean;
   resetViewingSpecificCompany: () => void;
 };
 
-// Create the context with default values
 const CompanyContext = createContext<CompanyContextType>({
   company: null,
   isLoading: false,
   error: null,
-  userCompanies: [], // Default empty array for user companies
+  userCompanies: [],
   fetchCompany: async () => {},
-  fetchCompanyById: async () => {}, // Add default for fetchCompanyById
-  getUserCompanies: async () => {}, // Add default for getUserCompanies
+  fetchCompanyById: async () => {},
+  getUserCompanies: async () => {},
   createCompany: async () => ({ success: false }),
   updateCompany: async () => ({ success: false }),
   uploadLogo: async () => ({ success: false }),
   resetCompanyState: () => {},
   
-  // News defaults
   companyNews: [],
   isLoadingNews: false,
   newsError: null,
@@ -87,29 +82,24 @@ const CompanyContext = createContext<CompanyContextType>({
   resetViewingSpecificCompany: () => {},
 });
 
-// Provider component
+
 export const CompanyProvider: React.FC<{children: ReactNode}> = ({ children }) => {
   const [company, setCompany] = useState<Company | null>(null);
-  const [userCompanies, setUserCompanies] = useState<Company[]>([]); // State for user's companies
+  const [userCompanies, setUserCompanies] = useState<Company[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const { user } = useAuth();
-  
-  // News related state
+
   const [companyNews, setCompanyNews] = useState<CompanyNews[]>([]);
   const [isLoadingNews, setIsLoadingNews] = useState<boolean>(false);
   const [newsError, setNewsError] = useState<string | null>(null);
   const [viewingSpecificCompany, setViewingSpecificCompany] = useState<boolean>(false);
-  // Fetch all companies owned by the current user
+
   const getUserCompanies = async () => {
-    // Simply call fetchCompany which now handles both states
     await fetchCompany();
   };
 
-  // Fetch company data of the current user's primary company
   const fetchCompany = async () => {
-    // Only reset if we're actually viewing a specific company,
-    // preventing the infinite loop
     if (viewingSpecificCompany) {
       resetViewingSpecificCompany();
     }
@@ -121,23 +111,20 @@ export const CompanyProvider: React.FC<{children: ReactNode}> = ({ children }) =
     }
   
     try {
-      //setIsLoading(true);
       setError(null);
       const companyData = await companyService.getCompany();
       
-      // Update both states from a single API call
       if (Array.isArray(companyData) && companyData.length > 0) {
         setCompany(companyData[0]);
-        setUserCompanies(companyData); // Set all companies
+        setUserCompanies(companyData);
       } else if (companyData) {
         setCompany(companyData);
-        setUserCompanies([companyData]); // Wrap in array
+        setUserCompanies([companyData]);
       } else {
         setCompany(null);
         setUserCompanies([]);
       }
     } catch (error) {
-      // Error handling
       if (error.response && error.response.status === 404) {
         setCompany(null);
         setUserCompanies([]);
@@ -151,14 +138,12 @@ export const CompanyProvider: React.FC<{children: ReactNode}> = ({ children }) =
     }
   };
 
-  // NEW: Fetch a specific company by ID (for viewing other companies)
   const fetchCompanyById = async (id: string) => {
     try {
       setIsLoading(true);
       setError(null);
-      setViewingSpecificCompany(true); // Установите флаг
+      setViewingSpecificCompany(true);
       
-      // Остальной код без изменений
       const existingCompany = userCompanies.find(c => c.id === id);
       
       if (existingCompany) {
@@ -180,7 +165,6 @@ export const CompanyProvider: React.FC<{children: ReactNode}> = ({ children }) =
     }
   };
 
-  // Create a new company
   const createCompany = async (companyData: Omit<Company, 'id'>) => {
     try {
       setIsLoading(true);
@@ -188,18 +172,16 @@ export const CompanyProvider: React.FC<{children: ReactNode}> = ({ children }) =
       const response = await companyService.createCompany(companyData);
       setCompany(response);
       
-      // Also add to userCompanies list
       setUserCompanies(prev => [...prev, response]);
       
       toast.success('Company created successfully');
       
-      // Return more data, including functions to update state
       return { 
         success: true,
         companyId: response.id,
         company: response,
-        updateCompanyState: setCompany, // Pass the function to update state
-        refreshCompanyData: fetchCompany // Pass the function to update data
+        updateCompanyState: setCompany,
+        refreshCompanyData: fetchCompany 
       };
     } catch (error) {
       setError('Failed to create company');
@@ -214,7 +196,6 @@ export const CompanyProvider: React.FC<{children: ReactNode}> = ({ children }) =
     }
   };
 
-  // Update company data
   const updateCompany = async (companyData: Partial<Company>) => {
     if (!company?.id) {
       return { success: false, message: 'No company to update' };
@@ -226,12 +207,10 @@ export const CompanyProvider: React.FC<{children: ReactNode}> = ({ children }) =
       const updatedCompany = await companyService.updateCompany(company.id, companyData);
       setCompany(updatedCompany);
       
-      // Also update in userCompanies list if it exists there
       setUserCompanies(prev => 
         prev.map(c => c.id === updatedCompany.id ? updatedCompany : c)
       );
       
-      //toast.success('Company updated successfully');
       return { success: true };
     } catch (error) {
       setError('Failed to update company');
@@ -246,9 +225,7 @@ export const CompanyProvider: React.FC<{children: ReactNode}> = ({ children }) =
     }
   };
 
-  // Upload company logo - updated version
   const uploadLogo = async (file: File, companyId?: string) => {
-    // Use provided company ID or fall back to the current company's ID
     const targetCompanyId = companyId || company?.id;
     
     if (!targetCompanyId) {
@@ -264,24 +241,17 @@ export const CompanyProvider: React.FC<{children: ReactNode}> = ({ children }) =
       const response = await companyService.uploadLogo(targetCompanyId, formData);
       console.log('Logo upload response:', response);
       
-      // Always update company state regardless of whether it's new or not
       if (response && response.logoName) {
-        // Update current company with new logo
         setCompany(prev => {
-          // If it's the same company, update it
           if (prev && (!companyId || prev.id === targetCompanyId)) {
             return { ...prev, logoName: response.logoName };
           }
-          // If it's a new company and we don't have a company yet, 
-          // or if it's the same company by ID, update it
           else if (!prev || (prev.id === targetCompanyId)) {
-            // Get latest company data from server
             fetchCompany();
           }
           return prev;
         });
         
-        // Also update in userCompanies list if it exists there
         setUserCompanies(prev => 
           prev.map(c => c.id === targetCompanyId ? {...c, logoName: response.logoName} : c)
         );
@@ -289,7 +259,7 @@ export const CompanyProvider: React.FC<{children: ReactNode}> = ({ children }) =
       
       return { 
         success: true,
-        logoName: response.logoName, // Return logoName for use in component
+        logoName: response.logoName,
         message: 'Logo uploaded successfully'
       };
     } catch (error) {
@@ -305,14 +275,12 @@ export const CompanyProvider: React.FC<{children: ReactNode}> = ({ children }) =
     }
   };
 
-  // Reset company state
   const resetCompanyState = () => {
     resetViewingSpecificCompany();
     setCompany(null);
     setError(null);
   };
 
-  // Fetch company news
   const fetchCompanyNews = async (companyId?: string) => {
     const targetCompanyId = companyId || company?.id;
     
@@ -335,7 +303,6 @@ export const CompanyProvider: React.FC<{children: ReactNode}> = ({ children }) =
     }
   };
 
-  // Create company news
   const createCompanyNews = async (
     newsData: Omit<CompanyNews, 'id' | 'authorId' | 'companyId' | 'createdAt'>,
     companyId?: string
@@ -351,8 +318,7 @@ export const CompanyProvider: React.FC<{children: ReactNode}> = ({ children }) =
       setIsLoadingNews(true);
       setNewsError(null);
       const response = await companyService.createCompanyNews(targetCompanyId, newsData);
-      
-      // Update news list with new item
+
       setCompanyNews(prev => [...prev, response]);
       
       toast.success('News created successfully');
@@ -373,7 +339,6 @@ export const CompanyProvider: React.FC<{children: ReactNode}> = ({ children }) =
     }
   };
 
-  // Delete company news
   const deleteCompanyNews = async (newsId: string, companyId?: string) => {
     const targetCompanyId = companyId || company?.id;
     
@@ -386,7 +351,6 @@ export const CompanyProvider: React.FC<{children: ReactNode}> = ({ children }) =
       setNewsError(null);
       await companyService.deleteCompanyNews(targetCompanyId, newsId);
       
-      // Remove deleted item from state
       setCompanyNews(prev => prev.filter(news => news.id !== newsId));
       
       toast.success('News deleted successfully');
@@ -404,7 +368,6 @@ export const CompanyProvider: React.FC<{children: ReactNode}> = ({ children }) =
     }
   };
 
-  // Update company news
   const updateCompanyNews = async (
     newsId: string, 
     newsData: Partial<CompanyNews>,
@@ -421,7 +384,6 @@ export const CompanyProvider: React.FC<{children: ReactNode}> = ({ children }) =
       setNewsError(null);
       const response = await companyService.updateCompanyNews(targetCompanyId, newsId, newsData);
       
-      // Update the specific news item in state
       setCompanyNews(prev => 
         prev.map(news => news.id === newsId ? response : news)
       );
@@ -446,17 +408,15 @@ export const CompanyProvider: React.FC<{children: ReactNode}> = ({ children }) =
   const resetViewingSpecificCompany = () => {
     setViewingSpecificCompany(false);
   };
-  // Load user data when user changes
-  // В существующем useEffect
+
   useEffect(() => {
     if (user && !viewingSpecificCompany) { 
-      fetchCompany(); // Just call this single function
+      fetchCompany();
     } else if (!user) {
       resetCompanyState();
       setUserCompanies([]);
     }
   }, [user, viewingSpecificCompany]);
-  // Load company news when company changes
   useEffect(() => {
     if (company?.id) {
       fetchCompanyNews(company.id);
@@ -467,18 +427,16 @@ export const CompanyProvider: React.FC<{children: ReactNode}> = ({ children }) =
 
   const value = {
     company,
-    userCompanies, // Add userCompanies to the context value
+    userCompanies,
     isLoading,
     error,
     fetchCompany,
-    fetchCompanyById, // Add new method to context value
-    getUserCompanies, // Add new method to context value
+    fetchCompanyById,
+    getUserCompanies,
     createCompany,
     updateCompany,
     uploadLogo,
     resetCompanyState,
-    
-    // News related values
     companyNews,
     isLoadingNews,
     newsError,
@@ -497,5 +455,5 @@ export const CompanyProvider: React.FC<{children: ReactNode}> = ({ children }) =
   );
 };
 
-// Custom hook to use the company context
 export const useCompany = () => useContext(CompanyContext);
+

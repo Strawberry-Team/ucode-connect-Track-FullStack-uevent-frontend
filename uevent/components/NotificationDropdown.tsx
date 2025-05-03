@@ -1,4 +1,3 @@
-// components/NotificationDropdown.tsx
 import React, { useState, useRef, useEffect } from 'react';
 import { useNotifications } from '../contexts/NotificationContext';
 import Link from 'next/link';
@@ -6,14 +5,10 @@ import { motion, AnimatePresence } from 'framer-motion';
 
 export default function NotificationDropdown() {
   const [isOpen, setIsOpen] = useState(false);
-  // At the top of your component, after getting values from context
 const { notifications: notificationsData, unreadCount, markAsRead, markAllAsRead } = useNotifications();
 
-// Make sure notifications is always an array
 const notifications = Array.isArray(notificationsData) ? notificationsData : [];
   const dropdownRef = useRef<HTMLDivElement>(null);
-
-  // Close dropdown when clicking outside
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
@@ -27,7 +22,6 @@ const notifications = Array.isArray(notificationsData) ? notificationsData : [];
     };
   }, []);
 
-  // Format date to relative time
   const formatRelativeTime = (dateString: string) => {
     const date = new Date(dateString);
     const now = new Date();
@@ -58,14 +52,12 @@ const notifications = Array.isArray(notificationsData) ? notificationsData : [];
     await markAllAsRead();
   };
 
-  // Animation variants for the bell icon
   const bellAnimation = unreadCount > 0 ? {
     initial: { rotate: 0 },
     animate: { rotate: [0, 15, -15, 10, -10, 0] },
     transition: { duration: 0.7, ease: "easeInOut", repeat: 0 }
   } : {};
 
-  // Animation variants for the dropdown
   const dropdownVariants = {
     hidden: { opacity: 0, y: -10, scale: 0.95 },
     visible: { opacity: 1, y: 0, scale: 1 }
@@ -112,14 +104,7 @@ const notifications = Array.isArray(notificationsData) ? notificationsData : [];
           >
             <div className="flex justify-between items-center px-4 py-3 border-b border-gray-200 dark:border-gray-700 bg-gradient-to-r from-emerald-500 to-teal-500 text-white">
               <h3 className="text-sm font-bold">Notifications</h3>
-              {/* {unreadCount > 0 && (
-                <button
-                  onClick={handleMarkAllAsRead}
-                  className="text-xs bg-white bg-opacity-20 hover:bg-opacity-30 px-2 py-1 rounded-full transition-all duration-200"
-                >
-                  Mark all as read
-                </button>
-              )} */}
+              
             </div>
             
             <div className="max-h-96 overflow-y-auto">
@@ -135,11 +120,9 @@ const notifications = Array.isArray(notificationsData) ? notificationsData : [];
                 </div>
               ) : (
                 notifications.map((notification, index) => {
-                  // Determine if notification is related to an event or company
                   const isEventNotification = !!notification.event;
                   const isUnread = !notification.readAt;
                   
-                  // Determine destination URL based on notification type
                   let destinationUrl = isEventNotification && notification.event
                     ? `/events/${notification.event.id}`
                     : notification.company
@@ -223,3 +206,4 @@ const notifications = Array.isArray(notificationsData) ? notificationsData : [];
     </div>
   );
 }
+

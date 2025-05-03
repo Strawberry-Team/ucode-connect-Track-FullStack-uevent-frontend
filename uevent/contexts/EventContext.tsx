@@ -2,7 +2,6 @@ import React, { createContext, useContext, useState, useCallback, ReactNode, use
 import { toast } from 'react-toastify';
 import { eventService } from '../services/eventService';
 import { useAuth } from '../contexts/AuthContext';
-// Types
 export interface Event {
   id?: number;
   title: string;
@@ -105,7 +104,6 @@ export interface EventContextType {
     tickets?: Ticket[];
     
   }>;
-  // Новые методы для работы с новостями
   getEventNews: (eventId: number) => Promise<EventNews[]>;
   createEventNews: (eventId: number, newsData: { title: string; description: string }) => Promise<{
     success: boolean;
@@ -127,51 +125,47 @@ updateAttendeeVisibility: (attendeeId: number, isVisible: boolean) => Promise<{
   message?: string;
 }>;
 canViewAttendees: (event: Event) => boolean;
- // Ticket-related methods
  getTicketTypes: (eventId: number) => Promise<TicketType[]>;
  getEventTickets: (eventId: number, filters?: { title?: string, status?: string }) => Promise<EventTicket[]>;
  getTicketById: (eventId: number, ticketId: number) => Promise<EventTicket>;
 
 }
-
-// Create the Event context
 const EventContext = createContext<EventContextType | undefined>(undefined);
 
-// Provider component
 export const EventProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [events, setEvents] = useState<Event[]>([]);
   const [currentEvent, setCurrentEvent] = useState<Event | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
-  const { user } = useAuth(); // Get user from AuthContext
-  // Fetch all events
+  const { user } = useAuth();
+
   const fetchEvents = useCallback(async () => {
     setIsLoading(true);
     setError(null);
     try {
       const data = await eventService.getEvents();
       
-      // Make sure we always set an array for events
+      
       if (Array.isArray(data)) {
         setEvents(data);
       } else if (data && Array.isArray(data.items)) {
-        // Handle case where API returns { items: [...] }
+        
         setEvents(data.items);
       } else {
         console.error('Unexpected data format from getEvents():', data);
-        setEvents([]); // Set empty array as fallback
+        setEvents([]); 
       }
     } catch (error) {
       console.error('Error fetching events:', error);
       setError('Failed to fetch events');
       toast.error('Failed to fetch events');
-      setEvents([]); // Set empty array on error
+      setEvents([]); 
     } finally {
       setIsLoading(false);
     }
   }, []);
 
-  // Fetch event attendees
+  
 const fetchEventAttendees = useCallback(async (eventId: number) => {
   setIsLoading(true);
   setError(null);
@@ -188,7 +182,7 @@ const fetchEventAttendees = useCallback(async (eventId: number) => {
   }
 }, []);
 
-// Update attendee visibility
+
 const handleUpdateAttendeeVisibility = useCallback(async (attendeeId: number, isVisible: boolean) => {
   setIsLoading(true);
   setError(null);
@@ -209,37 +203,37 @@ const handleUpdateAttendeeVisibility = useCallback(async (attendeeId: number, is
   }
 }, []);
 
-// Check if current user can view attendees for an event
-// In EventContext.tsx, make sure the checkCanViewAttendees function is properly memoized
+
+
 const checkCanViewAttendees = useCallback((event: Event) => {
-  // If no event or visibility is NOBODY, no one can see attendees
+  
   if (!event || event.attendeeVisibility === 'NOBODY') {
     return false;
   }
   
-  // If visibility is EVERYONE, anyone can see attendees
+  
   if (event.attendeeVisibility === 'EVERYONE') {
     return true;
   }
   
-  // If visibility is ATTENDEES_ONLY, check if current user is an attendee
+  
   if (event.attendeeVisibility === 'ATTENDEES_ONLY') {
-    // First check if user is logged in
+    
     if (!user) {
       return false;
     }
     
-    // Here you would check if the user is an attendee of this event
-    // This is a simplified check - in a real implementation,
-    // you would check against your attendees list
-    // For now, we'll just return true if the user is logged in
+    
+    
+    
+    
     return true;
   }
   
   return false;
-}, [user]);  // Only depend on user, not on any other changing values
+}, [user]);  
 
-  // Fetch a specific event by ID
+  
   const fetchEventById = useCallback(async (id: number) => {
     setIsLoading(true);
     setError(null);
@@ -257,7 +251,7 @@ const checkCanViewAttendees = useCallback((event: Event) => {
     }
   }, []);
 
-  // Create a new event
+  
   const handleCreateEvent = useCallback(async (eventData: Partial<Event>) => {
     setIsLoading(true);
     setError(null);
@@ -283,7 +277,7 @@ const checkCanViewAttendees = useCallback((event: Event) => {
     }
   }, []);
 
- // Update the handleUpdateEvent function to safely handle non-array values
+ 
 const handleUpdateEvent = useCallback(async (eventData: Partial<Event>) => {
   if (!eventData.id) {
     return { success: false, message: 'Event ID is required for update' };
@@ -296,17 +290,17 @@ const handleUpdateEvent = useCallback(async (eventData: Partial<Event>) => {
     
     const updatedEvent = await eventService.updateEvent(id, dataWithoutId);
     
-    // Update the events list with safety check
+    
     setEvents(prev => {
-      // Make sure prev is an array before using map
+      
       if (!Array.isArray(prev)) {
         console.error('Expected events state to be an array but got:', typeof prev);
-        return [updatedEvent]; // Start a new array with just the updated event
+        return [updatedEvent]; 
       }
       return prev.map(event => event.id === id ? { ...event, ...updatedEvent } : event);
     });
     
-    // Update current event if it's the one being edited
+    
     if (currentEvent && currentEvent.id === id) {
       setCurrentEvent(prev => prev ? { ...prev, ...updatedEvent } : prev);
     }
@@ -326,17 +320,17 @@ const handleUpdateEvent = useCallback(async (eventData: Partial<Event>) => {
   }
 }, [currentEvent]);
 
-  // Delete an event
+  
   const handleDeleteEvent = useCallback(async (id: number) => {
     setIsLoading(true);
     setError(null);
     try {
       await eventService.deleteEvent(id);
       
-      // Remove the event from the list
+      
       setEvents(prev => prev.filter(event => event.id !== id));
       
-      // Clear current event if it's the one being deleted
+      
       if (currentEvent && currentEvent.id === id) {
         setCurrentEvent(null);
       }
@@ -356,14 +350,14 @@ const handleUpdateEvent = useCallback(async (eventData: Partial<Event>) => {
     }
   }, [currentEvent]);
 
-  // Upload an event poster
+  
   const handleUploadPoster = useCallback(async (file: File, eventId: number) => {
     setIsLoading(true);
     setError(null);
     try {
       const result = await eventService.uploadEventPoster(file, eventId);
       
-      // Update the event with the poster name
+      
       setEvents(prev => 
         prev.map(event => 
           event.id === eventId 
@@ -372,7 +366,7 @@ const handleUpdateEvent = useCallback(async (eventData: Partial<Event>) => {
         )
       );
       
-      // Update current event if it's the one being modified
+      
       if (currentEvent && currentEvent.id === eventId) {
         setCurrentEvent(prev => 
           prev ? { ...prev, posterName: result.posterName } : prev
@@ -397,7 +391,7 @@ const handleUpdateEvent = useCallback(async (eventData: Partial<Event>) => {
     }
   }, [currentEvent]);
 
-  // Sync event themes
+  
   const handleSyncThemes = useCallback(async (eventId: number, themeIds: number[]) => {
     setIsLoading(true);
     setError(null);
@@ -418,7 +412,7 @@ const handleUpdateEvent = useCallback(async (eventData: Partial<Event>) => {
     }
   }, []);
 
-  // Create event tickets
+  
   const handleCreateTickets = useCallback(async (eventId: number, tickets: Ticket[]) => {
     setIsLoading(true);
     setError(null);
@@ -442,9 +436,9 @@ const handleUpdateEvent = useCallback(async (eventData: Partial<Event>) => {
     }
   }, []);
 
-  // НОВЫЕ МЕТОДЫ ДЛЯ РАБОТЫ С НОВОСТЯМИ СОБЫТИЙ
   
-  // Получить новости события
+  
+  
   const fetchEventNews = useCallback(async (eventId: number) => {
     setIsLoading(true);
     setError(null);
@@ -461,7 +455,7 @@ const handleUpdateEvent = useCallback(async (eventData: Partial<Event>) => {
     }
   }, []);
 
-  // Создать новость события
+  
   const handleCreateEventNews = useCallback(async (eventId: number, newsData: { title: string; description: string }) => {
     setIsLoading(true);
     setError(null);
@@ -485,7 +479,7 @@ const handleUpdateEvent = useCallback(async (eventData: Partial<Event>) => {
     }
   }, []);
 
-  // Обновить новость события
+  
   const handleUpdateEventNews = useCallback(async (eventId: number, newsId: string, newsData: { title: string; description: string }) => {
     setIsLoading(true);
     setError(null);
@@ -509,7 +503,7 @@ const handleUpdateEvent = useCallback(async (eventData: Partial<Event>) => {
     }
   }, []);
 
-  // Удалить новость события
+  
   const handleDeleteEventNews = useCallback(async (eventId: number, newsId: string) => {
     setIsLoading(true);
     setError(null);
@@ -529,7 +523,7 @@ const handleUpdateEvent = useCallback(async (eventData: Partial<Event>) => {
       setIsLoading(false);
     }
   }, []);
-// Fetch ticket types
+
 const fetchTicketTypes = useCallback(async (eventId: number) => {
   setIsLoading(true);
   setError(null);
@@ -546,7 +540,7 @@ const fetchTicketTypes = useCallback(async (eventId: number) => {
   }
 }, []);
 
-// Fetch event tickets
+
 const fetchEventTickets = useCallback(async (eventId: number, filters?: { title?: string, status?: string }) => {
   setIsLoading(true);
   setError(null);
@@ -563,7 +557,7 @@ const fetchEventTickets = useCallback(async (eventId: number, filters?: { title?
   }
 }, []);
 
-// Fetch a specific ticket
+
 const fetchTicketById = useCallback(async (eventId: number, ticketId: number) => {
   setIsLoading(true);
   setError(null);
@@ -581,12 +575,12 @@ const fetchTicketById = useCallback(async (eventId: number, ticketId: number) =>
 }, []);
 
 
-  // Load events on component mount
+  
   useEffect(() => {
     fetchEvents();
   }, [fetchEvents]);
 
-  // Context value
+  
   const value: EventContextType = {
     events,
     currentEvent,
@@ -600,7 +594,7 @@ const fetchTicketById = useCallback(async (eventId: number, ticketId: number) =>
     uploadPoster: handleUploadPoster,
     syncThemes: handleSyncThemes,
     createTickets: handleCreateTickets,
-    // Новые методы для новостей событий
+    
     getEventNews: fetchEventNews,
     createEventNews: handleCreateEventNews,
     updateEventNews: handleUpdateEventNews,
@@ -608,7 +602,7 @@ const fetchTicketById = useCallback(async (eventId: number, ticketId: number) =>
     getEventAttendees: fetchEventAttendees,
 updateAttendeeVisibility: handleUpdateAttendeeVisibility,
 canViewAttendees: checkCanViewAttendees,
-// Ticket-related methods
+
 getTicketTypes: fetchTicketTypes,
 getEventTickets: fetchEventTickets,
 getTicketById: fetchTicketById,
@@ -622,7 +616,7 @@ getTicketById: fetchTicketById,
   );
 };
 
-// Custom hook to use the Event context
+
 export const useEvents = (): EventContextType => {
   const context = useContext(EventContext);
   if (context === undefined) {

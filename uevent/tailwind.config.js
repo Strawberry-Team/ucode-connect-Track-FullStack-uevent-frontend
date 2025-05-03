@@ -4,7 +4,7 @@ module.exports = {
     "./pages/**/*.{js,ts,jsx,tsx}",
     "./components/**/*.{js,ts,jsx,tsx}",
   ],
-  darkMode: 'class', // Добавляем поддержку dark mode через класс
+  darkMode: 'class', 
   theme: {
     extend: {
       fontFamily: {
@@ -23,7 +23,7 @@ module.exports = {
           800: '#104c84',
           900: '#12406e',
         },
-        // Переопределяем цвета для тёмной темы
+        
         dark: {
           bg: '#121212',
           card: '#1E1E1E',
@@ -35,7 +35,7 @@ module.exports = {
         },
       },
       backgroundColor: {
-        // Добавляем цвета, которые будут переключаться между темами
+        
         'theme-bg': 'var(--bg-primary)',
         'theme-card': 'var(--bg-card)',
         'theme-input': 'var(--bg-input)',

@@ -3,7 +3,6 @@ import { useEvents } from '../contexts/EventContext';
 import { toast } from 'react-toastify';
 import { z } from 'zod';
 
-// Определяем схему валидации для новости
 const NewsSchema = z.object({
   title: z
     .string()
@@ -32,13 +31,11 @@ export const EventNewsModal: React.FC<EventNewsModalProps> = ({
   const { createEventNews } = useEvents();
   const [isSubmitting, setIsSubmitting] = useState(false);
   
-  // Форма новости
   const [newsForm, setNewsForm] = useState({
     title: '',
     description: ''
   });
-  
-  // Обработка изменений в форме
+
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setNewsForm(prev => ({
@@ -47,10 +44,8 @@ export const EventNewsModal: React.FC<EventNewsModalProps> = ({
     }));
   };
   
-  // Создание новости
   const handleCreateNews = async () => {
     try {
-      // Валидация с помощью Zod
       const validationResult = NewsSchema.safeParse(newsForm);
       
       if (!validationResult.success) {
@@ -65,13 +60,11 @@ export const EventNewsModal: React.FC<EventNewsModalProps> = ({
       const result = await createEventNews(eventId, newsForm);
       
       if (result.success) {
-        //toast.success('News item created successfully');
-        // Сброс формы
+
         setNewsForm({
           title: '',
           description: ''
         });
-        // Закрытие модального окна
         onClose();
       } else {
         toast.error(result.message || 'Failed to create news item');
@@ -84,7 +77,6 @@ export const EventNewsModal: React.FC<EventNewsModalProps> = ({
     }
   };
   
-  // Отмена создания и закрытие модального окна
   const handleCancel = () => {
     setNewsForm({
       title: '',
@@ -98,26 +90,26 @@ export const EventNewsModal: React.FC<EventNewsModalProps> = ({
   return (
     <div className="fixed inset-0 z-50 overflow-y-auto">
       <div className="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-        {/* Фон overlay */}
+        
         <div 
           className="fixed inset-0 transition-opacity bg-gray-500 bg-opacity-75"
           onClick={handleCancel}
         ></div>
         
-        {/* Центрирование модального окна */}
+        
         <span className="hidden sm:inline-block sm:align-middle sm:h-screen">&#8203;</span>
         
-        {/* Модальное окно */}
+        
         <div className="inline-block align-bottom bg-white dark:bg-gray-900 rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
           <div className="bg-white dark:bg-gray-900">
-            {/* Заголовок */}
+            
             <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-800">
               <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
                 Create News for Event: {eventTitle}
               </h3>
             </div>
             
-            {/* Форма */}
+            
             <div className="p-6 space-y-4">
               <div>
                 <label htmlFor="title" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
@@ -150,7 +142,7 @@ export const EventNewsModal: React.FC<EventNewsModalProps> = ({
               </div>
             </div>
             
-            {/* Кнопки действий */}
+            
             <div className="px-6 py-4 border-t border-gray-200 dark:border-gray-800 flex justify-end space-x-3">
               <button
                 type="button"

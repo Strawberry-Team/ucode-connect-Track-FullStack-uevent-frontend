@@ -20,7 +20,6 @@ export const EventSubscribeButton: React.FC<EventSubscribeButtonProps> = ({
   const [isToggling, setIsToggling] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
-  // Function to directly check event subscription status
   const checkEventSubscriptionStatus = useCallback(async () => {
     if (!user || !eventId) {
       setIsLoading(false);
@@ -28,14 +27,12 @@ export const EventSubscribeButton: React.FC<EventSubscribeButtonProps> = ({
     }
     
     try {
-      // Get the current user ID
       const userId = getCurrentUserId();
       if (!userId) {
         setIsLoading(false);
         return false;
       }
       
-      // Direct API check for event subscription
       const response = await axios.get(
         `http://localhost:8080/api/users/${userId}/subscriptions/events?eventId=${eventId}`,
         { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } }
@@ -52,7 +49,6 @@ export const EventSubscribeButton: React.FC<EventSubscribeButtonProps> = ({
     }
   }, [user, eventId]);
 
-  // Helper to get current user ID
   const getCurrentUserId = (): string | null => {
     const userData = localStorage.getItem('user');
     if (userData) {
@@ -66,10 +62,8 @@ export const EventSubscribeButton: React.FC<EventSubscribeButtonProps> = ({
     return null;
   };
 
-  // Toggle event subscription
   const handleToggleSubscription = async () => {
     if (!user) {
-      // User needs to be logged in
       return;
     }
 
@@ -83,7 +77,6 @@ export const EventSubscribeButton: React.FC<EventSubscribeButtonProps> = ({
       }
 
       if (isSubscribed) {
-        // Find the subscription ID first
         const response = await axios.get(
           `http://localhost:8080/api/users/${userId}/subscriptions/events?eventId=${eventId}`,
           { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } }
@@ -92,7 +85,6 @@ export const EventSubscribeButton: React.FC<EventSubscribeButtonProps> = ({
         if (response.data && response.data.length > 0) {
           const subscriptionId = response.data[0].id;
           
-          // Delete the subscription
           await axios.delete(
             `http://localhost:8080/api/subscriptions/${subscriptionId}`,
             { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } }
@@ -101,7 +93,6 @@ export const EventSubscribeButton: React.FC<EventSubscribeButtonProps> = ({
           setIsSubscribed(false);
         }
       } else {
-        // Create new subscription
         await axios.post(
           `http://localhost:8080/api/subscriptions`,
           { entityId: eventId, entityType: 'event' },
@@ -111,12 +102,10 @@ export const EventSubscribeButton: React.FC<EventSubscribeButtonProps> = ({
         setIsSubscribed(true);
       }
       
-      // After toggling, refresh the subscription data
       await fetchSubscriptions();
     } catch (error: any) {
       console.error('Error toggling event subscription:', error);
       
-      // If we get a 409 Conflict error, it means the user is already subscribed
       if (error.response && error.response.status === 409) {
         setIsSubscribed(true);
       }
@@ -125,7 +114,6 @@ export const EventSubscribeButton: React.FC<EventSubscribeButtonProps> = ({
     }
   };
 
-  // Fetch subscription status on mount and when dependencies change
   useEffect(() => {
     checkEventSubscriptionStatus();
   }, [checkEventSubscriptionStatus]);
@@ -185,3 +173,4 @@ export const EventSubscribeButton: React.FC<EventSubscribeButtonProps> = ({
 };
 
 export default EventSubscribeButton;
+

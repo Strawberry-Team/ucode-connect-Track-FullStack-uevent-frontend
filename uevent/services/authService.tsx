@@ -37,35 +37,27 @@ interface AuthResponse {
 const authService = {
   register: async (userData: RegisterData) => {
     try {
-      // Попытка регистрации
       const response = await axios.post(`${API_URL}/register`, userData);
       return response.data.user;
     } catch (error: any) {
-      // Тихо логируем ошибку для отладки
       console.error('Registration API error:', error.response?.status, error.response?.data);
       
-      // Создаем понятное сообщение об ошибке
       const errorMessage = error.response?.data?.message || 
                         (error.response?.status === 409 ? 'Email already exists' : 
                          'Registration failed. Please try again.');
       
-      // Создаем новый объект ошибки с понятным сообщением
       const customError = new Error(errorMessage);
       (customError as any).response = error.response;
       (customError as any).status = error.response?.status;
       
-      // Возвращаем Promise.reject с нашей кастомной ошибкой
       return Promise.reject(customError);
     }
   },
 
-  // authService.ts - обновленный метод login
 
 login: async (loginData: LoginData) => {
   try {
-    // For testing purposes - handle test user
     if (loginData.email === 'test@example.com' && loginData.password === 'Test@1234') {
-      // Mock successful authentication
       const testUser = {
         id: '1',
         firstName: 'Test',
@@ -77,15 +69,12 @@ login: async (loginData: LoginData) => {
         created_at: new Date().toISOString()
       };
       
-      // Mock tokens
       const accessToken = 'fake-access-token-for-testing';
       const refreshToken = 'fake-refresh-token-for-testing';
       
-      // Save tokens
       sessionStorage.setItem('accessToken', accessToken);
       localStorage.setItem('refreshToken', refreshToken);
       
-      // Return an object similar to API response
       return {
         user: testUser,
         accessToken,
@@ -94,11 +83,9 @@ login: async (loginData: LoginData) => {
       };
     }
     
-    // For real requests
     try {
       const response = await axios.post<AuthResponse>(`${API_URL}/login`, loginData);
       
-      // Save tokens
       if (response.data.accessToken) {
         sessionStorage.setItem('accessToken', response.data.accessToken);
       }
@@ -106,7 +93,6 @@ login: async (loginData: LoginData) => {
         localStorage.setItem('refreshToken', response.data.refreshToken);
       }
       
-      // Add profile URL if needed
       if (response.data.user && response.data.user.profilePictureName) {
         const userWithProfileUrl = {
           ...response.data.user,
@@ -119,24 +105,18 @@ login: async (loginData: LoginData) => {
       
       return response.data;
     } catch (apiError: any) {
-      // Тихо логируем ошибку для отладки
       console.error('Login API error:', apiError.response?.status, apiError.response?.data);
       
-      // Создаем понятное сообщение об ошибке
       const errorMessage = apiError.response?.data?.message || 
                          (apiError.response?.status === 401 ? 'Invalid email or password' : 
                           'Login failed. Please try again.');
       
-      // Создаем новый объект ошибки с понятным сообщением
       const error = new Error(errorMessage);
       (error as any).response = apiError.response;
       
-      // Важно! - не использовать throw, а возвращать Promise.reject
       return Promise.reject(error);
     }
   } catch (error) {
-    // Этот блок будет выполнен только если произошла какая-то неожиданная ошибка 
-    // в первом try-блоке (например, при работе с localStorage)
     console.error('Unexpected login error:', error);
     return Promise.reject(new Error('An unexpected error occurred. Please try again.'));
   }
@@ -144,7 +124,6 @@ login: async (loginData: LoginData) => {
 
   logout: async () => {
     const refreshToken = localStorage.getItem('refreshToken');
-    // FIX: Only proceed with API call if refresh token exists
     if (!refreshToken) {
       console.log('No refresh token found, skipping API logout');
       return;
@@ -196,7 +175,6 @@ login: async (loginData: LoginData) => {
     return response.data;
   },
 
-  // FIX: Updated the setupInterceptors function to better handle auth endpoints
   setupInterceptors: () => {
     axios.interceptors.request.use(
       (config) => {
@@ -211,13 +189,11 @@ login: async (loginData: LoginData) => {
       }
     );
 
-    // Response interceptor for handling token refresh
     axios.interceptors.response.use(
       (response) => response,
       async (error) => {
         const originalRequest = error.config;
         
-        // Check if the request is for auth endpoints
         const isAuthEndpoint = originalRequest.url && (
           originalRequest.url.includes('/auth/login') ||
           originalRequest.url.includes('/auth/register') ||
@@ -225,27 +201,21 @@ login: async (loginData: LoginData) => {
           originalRequest.url.includes('/register')
         );
         
-        // Also check if we have a refresh token before attempting refresh
         const hasRefreshToken = localStorage.getItem('refreshToken') !== null;
         
-        // If error is 401 (Unauthorized) and we haven't tried to refresh the token yet
-        // and it's not an auth endpoint
         if (error.response?.status === 401 && 
             !originalRequest._retry && 
             !isAuthEndpoint && 
             hasRefreshToken) {
           originalRequest._retry = true;
           try {
-            // Try to refresh the token
             const refreshResponse = await authService.refreshToken();
             
-            // If token refresh was successful, retry the original request
             if (refreshResponse.accessToken) {
               originalRequest.headers['Authorization'] = `Bearer ${refreshResponse.accessToken}`;
               return axios(originalRequest);
             }
           } catch (refreshError) {
-            // If refresh token is invalid, quietly logout without throwing an error
             try {
               await authService.logout();
             } catch (logoutError) {
@@ -262,3 +232,4 @@ login: async (loginData: LoginData) => {
 };
 
 export default authService;
+

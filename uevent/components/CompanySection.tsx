@@ -4,10 +4,9 @@ import { useEvents } from '../contexts/EventContext';
 import Link from 'next/link';
 import { toast } from 'react-toastify';
 import { z } from 'zod';
-import { CompanyNewsSection } from './CompanyNewsSection'; // Import the news component
+import { CompanyNewsSection } from './CompanyNewsSection';
 import { CompactEventCard } from './CompactEventCard';
 import { companyService } from '../services/companyService'; 
-// Define Zod validation schema
 const CompanySchema = z.object({
   title: z
     .string()
@@ -25,46 +24,38 @@ const CompanySchema = z.object({
     .max(1000, { message: "Description is too long (max 1000 characters)" }),
 });
 
-// Type inference for typescript
 type CompanyInput = z.infer<typeof CompanySchema>;
 
-// Company Section Component
 export const CompanySection = () => {
   const { company, isLoading, createCompany, updateCompany, uploadLogo } = useCompany();
   const { resetViewingSpecificCompany } = useCompany();
-  const { events, isLoading: eventsLoading, getEvents } = useEvents(); // Get events functionality
+  const { events, isLoading: eventsLoading, getEvents } = useEvents();
   const [companyEvents, setCompanyEvents] = useState<any[]>([]);
   const [isCreatingCompany, setIsCreatingCompany] = useState(false);
   const [isEditingCompany, setIsEditingCompany] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
-  const [isLoadingEvents, setIsLoadingEvents] = useState(false); // Add loading state for events
-  // Form state for new company
+  const [isLoadingEvents, setIsLoadingEvents] = useState(false);
   const [newCompany, setNewCompany] = useState({
     title: '',
     email: '',
     description: ''
   });
   
-  // Form state for editing company
   const [editCompany, setEditCompany] = useState({
     title: '',
     email: '',
     description: ''
   });
   
-  // Refs for file inputs
   const logoInputRef = useRef<HTMLInputElement>(null);
   const newLogoInputRef = useRef<HTMLInputElement>(null);
   
-  // State for image previews
   const [logoPreview, setLogoPreview] = useState<string | null>(null);
   const [newLogoPreview, setNewLogoPreview] = useState<string | null>(null);
   
-  // State to store the selected logo file for new company
   const [newLogoFile, setNewLogoFile] = useState<File | null>(null);
 
-  // Initialize edit form when editing starts
   const handleStartEdit = () => {
     if (company) {
       setEditCompany({
@@ -78,7 +69,6 @@ export const CompanySection = () => {
   useEffect(() => {
     resetViewingSpecificCompany();
   }, []);
-  // Reset form state when company data changes
   useEffect(() => {
     if (company) {
       setEditCompany({
@@ -89,13 +79,12 @@ export const CompanySection = () => {
     }
   }, [company]);
 
-  // For debugging - log company data when it changes
   useEffect(() => {
     if (company) {
       console.log("Current company data:", company);
     }
   }, [company]);
- // Fetch events for this company
+
  useEffect(() => {
   const fetchCompanyEvents = async () => {
     if (company?.id) {
@@ -118,7 +107,6 @@ export const CompanySection = () => {
   fetchCompanyEvents();
 }, [company?.id]);
 
-// Filter events for the current company
 useEffect(() => {
   if (company?.id && events.length > 0) {
     const filteredEvents = events.filter(event => event.companyId === company.id);
@@ -129,16 +117,15 @@ useEffect(() => {
   }
 }, [company?.id, events]);
 
-// For debugging - log company data when it changes
-  // File validation helper function
+
   const validateLogoFile = (file: File): boolean => {
-    // Size validation (max 2MB)
+
     if (file.size > 2 * 1024 * 1024) {
       toast.error('Image size should not exceed 2MB');
       return false;
     }
     
-    // Type validation
+
     const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/svg+xml'];
     if (!allowedTypes.includes(file.type)) {
       toast.error('Only JPG, PNG, GIF, and SVG files are allowed');
@@ -148,14 +135,11 @@ useEffect(() => {
     return true;
   };
 
-  // Handle company creation with logo upload - UPDATED with Zod validation
   const handleCreateCompany = async () => {
     try {
-      // Validate form data using Zod
       const validationResult = CompanySchema.safeParse(newCompany);
       
       if (!validationResult.success) {
-        // Display all validation errors as toasts with cleaner messages
         validationResult.error.errors.forEach(error => {
           toast.error(error.message);
         });
@@ -164,32 +148,25 @@ useEffect(() => {
       
       setIsSaving(true);
       
-      // Create company first
       const result = await createCompany(newCompany);
       
       if (result.success && result.companyId) {
-        // If company was created successfully and we have a logo file, upload it
         if (newLogoFile) {
           try {
-            // Show uploading state during logo upload
             setIsUploading(true);
             const logoResult = await uploadLogo(newLogoFile, result.companyId);
             
             if (logoResult.success) {
               toast.success('Company created with logo successfully');
               
-              // If logo was uploaded successfully and we have its name,
-              // update company state immediately
               if (logoResult.logoName && result.updateCompanyState) {
                 result.updateCompanyState(prevCompany => {
-                  // If we already have company data
                   if (prevCompany) {
                     return {
                       ...prevCompany,
                       logoName: logoResult.logoName
                     };
                   }
-                  // If we don't have company data
                   return result.company ? {
                     ...result.company,
                     logoName: logoResult.logoName
@@ -210,7 +187,6 @@ useEffect(() => {
           toast.success('Company created successfully');
         }
         
-        // Reset form and state
         setIsCreatingCompany(false);
         setNewCompany({
           title: '',
@@ -220,8 +196,6 @@ useEffect(() => {
         setNewLogoFile(null);
         setNewLogoPreview(null);
         
-        // In any case, after creating the company, update data from the server
-        // to make sure we have the most up-to-date information
         if (result.refreshCompanyData) {
           await result.refreshCompanyData();
         }
@@ -236,14 +210,11 @@ useEffect(() => {
     }
   };
 
-  // Handle company update - UPDATED with Zod validation
   const handleUpdateCompany = async () => {
     try {
-      // Validate form data using Zod
       const validationResult = CompanySchema.safeParse(editCompany);
       
       if (!validationResult.success) {
-        // Display all validation errors as toasts with cleaner messages
         validationResult.error.errors.forEach(error => {
           toast.error(error.message);
         });
@@ -267,59 +238,50 @@ useEffect(() => {
     }
   };
 
-  // Handle logo button click for existing company
   const handleLogoButtonClick = () => {
     logoInputRef.current?.click();
   };
 
-  // Handle new logo button click for company creation
   const handleNewLogoButtonClick = () => {
     newLogoInputRef.current?.click();
   };
 
-  // Handle logo file change for existing company - UPDATED with validation
   const handleLogoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
       if (!validateLogoFile(file)) {
-        e.target.value = ''; // Reset the input
+        e.target.value = '';
         return;
       }
       
-      // Show preview
       const reader = new FileReader();
       reader.onloadend = () => {
         setLogoPreview(reader.result as string);
       };
       reader.readAsDataURL(file);
-      
-      // Upload file immediately for existing company
+
       handleLogoUpload(file);
     }
   };
 
-  // Handle logo file change for new company - UPDATED with validation
   const handleNewLogoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
       if (!validateLogoFile(file)) {
-        e.target.value = ''; // Reset the input
+        e.target.value = ''; 
         return;
       }
       
-      // Show preview
       const reader = new FileReader();
       reader.onloadend = () => {
         setNewLogoPreview(reader.result as string);
       };
       reader.readAsDataURL(file);
       
-      // Store the file to upload it after company creation
       setNewLogoFile(file);
     }
   };
 
-  // Handle logo upload for existing company
   const handleLogoUpload = async (file: File) => {
     if (!company?.id) {
       console.error('Cannot upload logo: company ID not found');
@@ -335,7 +297,6 @@ useEffect(() => {
       if (result.success) {
         toast.success('Logo uploaded successfully');
       } else {
-        // Reset preview if upload failed
         setLogoPreview(null);
         toast.error(result.message || 'Failed to upload logo');
       }
@@ -348,7 +309,6 @@ useEffect(() => {
     }
   };
 
-  // Handle cancel of company edit
   const handleCancelEdit = () => {
     setIsEditingCompany(false);
     if (company) {
@@ -361,36 +321,29 @@ useEffect(() => {
     setLogoPreview(null);
   };
 
-  // Get image URL with correct domain if needed
   const getImageUrl = (path: string | undefined) => {
     if (!path) return null;
     
-    // Check if path is already a full URL
     if (path.startsWith('http://') || path.startsWith('https://')) {
       return path;
     }
     
-    // If it's a relative path, prepend the backend URL with correct path structure
     const baseUrl = 'http://localhost:8080';
     return `${baseUrl}/uploads/company-logos/${path.startsWith('/') ? path.substring(1) : path}`;
   };
 
-  // Get image URL with correct domain if needed
   const getImageUrlEventPosters = (path: string | undefined) => {
     if (!path) return null;
     
-    // Check if path is already a full URL
     if (path.startsWith('http://') || path.startsWith('https://')) {
       return path;
     }
     
-    // If it's a relative path, prepend the backend URL with correct path structure
     const baseUrl = 'http://localhost:8080';
     return `${baseUrl}/uploads/event-posters/${path.startsWith('/') ? path.substring(1) : path}`;
   };
 
   
-  // Show loading state
   if (isLoading) {
     return (
       <div className="bg-white dark:bg-black rounded-2xl shadow-sm dark:shadow-none overflow-hidden border border-gray-100 dark:border-gray-800">
@@ -404,7 +357,7 @@ useEffect(() => {
   const hasValidCompany = () => {
     console.log("Checking company validity:", company);
     
-    // Basic checks
+
     if (!company) {
       console.log("Company is falsy");
       return false;
@@ -418,9 +371,7 @@ useEffect(() => {
     console.log("Company is valid");
     return true;
   };
-  // Company exists - show company info and management options
   if (hasValidCompany()) {
-    // For debugging
     console.log("Rendering company:", company);
     const logoUrl = getImageUrl(company?.logoName);
     
@@ -705,7 +656,6 @@ useEffect(() => {
     );
   }
 
-  // Company creation form
   if (isCreatingCompany) {
     return (
       <div className="bg-white dark:bg-black rounded-2xl shadow-sm dark:shadow-none overflow-hidden border border-gray-100 dark:border-gray-800">
@@ -770,7 +720,6 @@ useEffect(() => {
               </div>
             </div>
             
-            {/* Company Logo Upload */}
             <div>
               <label htmlFor="newCompanyLogo" className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1.5">
                 Company Logo
@@ -879,7 +828,6 @@ useEffect(() => {
     );
   }
 
-  // No company yet - show empty state
   return (
     <div className="bg-white dark:bg-black rounded-2xl shadow-sm dark:shadow-none overflow-hidden border border-gray-100 dark:border-gray-800">
       <div className="p-8 flex flex-col items-center justify-center text-center">
@@ -937,3 +885,4 @@ useEffect(() => {
     </div>
   );
 };
+

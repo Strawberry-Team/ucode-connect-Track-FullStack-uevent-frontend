@@ -23,14 +23,12 @@ const PayButton: React.FC<PayButtonProps> = ({
   icon = 'card'
 }) => {
   
-  // Determine size classes
   const sizeClasses = {
     sm: 'py-2 px-4 text-sm',
     md: 'py-3 px-5 text-base',
     lg: 'py-3 px-6 text-lg'
   };
   
-  // Determine variant classes
   const variantClasses = {
     default: `
       bg-gradient-to-r from-emerald-600 to-green-600 
@@ -49,7 +47,6 @@ const PayButton: React.FC<PayButtonProps> = ({
     `
   };
   
-  // Process indicator animation
   const ProcessingIndicator = () => (
     <>
       <div className="mr-2">
@@ -59,7 +56,6 @@ const PayButton: React.FC<PayButtonProps> = ({
     </>
   );
   
-  // Icon selection
   const ButtonIcon = () => {
     if (icon === 'none') return null;
     
@@ -99,3 +95,4 @@ const PayButton: React.FC<PayButtonProps> = ({
 };
 
 export default PayButton;
+

@@ -13,7 +13,6 @@ export default function ConfirmEmail() {
   const { verifyEmail } = useAuth();
 
   useEffect(() => {
-    // Only run verification once we have the token from the URL
     if (token && typeof token === 'string') {
       verifyEmailToken(token);
     }
@@ -97,3 +96,4 @@ export default function ConfirmEmail() {
     </>
   );
 }
+

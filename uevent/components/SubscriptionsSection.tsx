@@ -3,7 +3,6 @@ import Link from 'next/link';
 import { useSubscription } from '../contexts/SubscriptionContext';
 import { toast } from 'react-toastify';
 
-// Company Subscription Card Component
 const CompanySubscriptionCard = ({ subscription, onUnsubscribe }) => {
   const company = subscription.company;
   
@@ -17,7 +16,6 @@ const CompanySubscriptionCard = ({ subscription, onUnsubscribe }) => {
     return `http://localhost:8080/uploads/company-logos/${logoName}`;
   };
   
-  // Generate random pastel background for companies without logo
   const generatePastelColor = () => {
     const hue = Math.floor(Math.random() * 360);
     return `hsla(${hue}, 70%, 80%, 0.2)`;
@@ -57,18 +55,12 @@ const CompanySubscriptionCard = ({ subscription, onUnsubscribe }) => {
         >
           View Profile
         </Link>
-        {/* <button 
-          onClick={() => onUnsubscribe(subscription.id, 'company')}
-          className="px-4 py-2 text-sm bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors border border-gray-200 dark:border-gray-700 font-medium"
-        >
-          Unsubscribe
-        </button> */}
+      
       </div>
     </div>
   );
 };
 
-// Event Subscription Card Component
 const EventSubscriptionCard = ({ subscription, onUnsubscribe }) => {
   const event = subscription.event;
   
@@ -151,7 +143,6 @@ const EventSubscriptionCard = ({ subscription, onUnsubscribe }) => {
   );
 };
 
-// Main Subscriptions Section Component
 const SubscriptionsSection = () => {
   const { 
     subscriptions, 
@@ -165,12 +156,10 @@ const SubscriptionsSection = () => {
   const [companySubscriptions, setCompanySubscriptions] = useState([]);
   const [activeTab, setActiveTab] = useState('all'); 
 
-  // Load subscriptions on component mount
   useEffect(() => {
     fetchSubscriptions();
   }, []);
 
-  // Separate subscriptions into events and companies when data updates
   useEffect(() => {
     if (subscriptions) {
       setEventSubscriptions(subscriptions.filter(sub => sub.entityType === 'event'));
@@ -178,7 +167,6 @@ const SubscriptionsSection = () => {
     }
   }, [subscriptions]);
 
-  // Handle unsubscribe action
   const handleUnsubscribe = async (subscriptionId, entityType) => {
     try {
       const result = await unsubscribe(subscriptionId, entityType);
@@ -200,14 +188,12 @@ const SubscriptionsSection = () => {
     }
   };
 
-  // Calculate visible subscriptions based on active tab
   const visibleSubscriptions = activeTab === 'all' 
     ? subscriptions 
     : activeTab === 'events' 
       ? eventSubscriptions 
       : companySubscriptions;
 
-  // Empty state component
   const EmptyState = () => (
     <div className="p-10 flex flex-col items-center justify-center">
       <div className="w-28 h-28 bg-gradient-to-br from-emerald-50 to-teal-50 dark:from-emerald-900/20 dark:to-teal-900/20 text-emerald-500 dark:text-emerald-400 rounded-full flex items-center justify-center mb-8 shadow-inner">
@@ -236,29 +222,22 @@ const SubscriptionsSection = () => {
           Explore Events
         </Link>
         
-        {/* <Link href="/companies" className="inline-flex items-center justify-center px-6 py-3 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 font-medium rounded-xl transition-all shadow-sm dark:shadow-none hover:shadow-md">
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
-            <polyline points="9 22 9 12 15 12 15 22"></polyline>
-          </svg>
-          Browse Companies
-        </Link> */}
+      
       </div>
     </div>
   );
 
-  // Loading state
   if (isLoading) {
     return (
       <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-sm dark:shadow-none overflow-hidden border border-gray-100 dark:border-gray-800">
-        {/* Header */}
+        
         <div className="border-b border-gray-100 dark:border-gray-800 px-6 pt-4">
           <div className="flex flex-wrap items-center justify-between mb-4">
             <div className="h-8 bg-gray-200 dark:bg-gray-700 rounded w-1/3 animate-pulse"></div>
             <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded w-1/4 animate-pulse"></div>
           </div>
           
-          {/* Tabs */}
+          
           <div className="flex space-x-2">
             {['All', 'Events', 'Companies'].map((tab, index) => (
               <div 
@@ -271,23 +250,23 @@ const SubscriptionsSection = () => {
           </div>
         </div>
         
-        {/* Subscription Cards */}
+        
         <div className="p-6 space-y-4">
           {[1, 2, 3].map((_, index) => (
             <div 
               key={index} 
               className="bg-gray-50 dark:bg-gray-800 rounded-xl p-5 flex items-center space-x-4 animate-pulse"
             >
-              {/* Image Placeholder */}
+              
               <div className="w-14 h-14 bg-gray-200 dark:bg-gray-700 rounded-xl"></div>
               
-              {/* Text Placeholders */}
+              
               <div className="flex-1 space-y-3">
                 <div className="h-5 bg-gray-200 dark:bg-gray-700 rounded w-3/4"></div>
                 <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-1/2"></div>
               </div>
               
-              {/* Action Buttons */}
+              
               <div className="flex space-x-3">
                 <div className="h-10 w-24 bg-gray-200 dark:bg-gray-700 rounded"></div>
                 <div className="h-10 w-24 bg-gray-200 dark:bg-gray-700 rounded"></div>
@@ -299,7 +278,6 @@ const SubscriptionsSection = () => {
     );
   }
 
-  // Error state
   if (error) {
     return (
       <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-sm dark:shadow-none overflow-hidden border border-gray-100 dark:border-gray-800">
@@ -330,7 +308,7 @@ const SubscriptionsSection = () => {
 
   return (
     <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-sm dark:shadow-none overflow-hidden border border-gray-100 dark:border-gray-800">
-      {/* Modern Tab Navigation */}
+      
       <div className="border-b border-gray-100 dark:border-gray-800 px-6 pt-4">
         <div className="flex flex-wrap items-center justify-between mb-4">
           <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Your Subscriptions</h2>
@@ -399,7 +377,7 @@ const SubscriptionsSection = () => {
         </div>
       </div>
       
-      {/* Subscription Cards or Empty State */}
+      
       {visibleSubscriptions && visibleSubscriptions.length > 0 ? (
         <div className="p-6 space-y-4">
           {visibleSubscriptions.map(subscription => (
@@ -426,3 +404,5 @@ const SubscriptionsSection = () => {
 };
 
 export default SubscriptionsSection;
+
+

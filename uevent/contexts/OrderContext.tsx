@@ -2,7 +2,7 @@ import React, { createContext, useContext, useState, useCallback, ReactNode } fr
 import { toast } from 'react-toastify';
 import { orderService } from '../services/orderService';
 
-// Types
+
 export interface OrderItem {
   id?: number;
   orderId?: number;
@@ -60,17 +60,17 @@ export interface OrderContextType {
   }>;
 }
 
-// Create the Order context
+
 const OrderContext = createContext<OrderContextType | undefined>(undefined);
 
-// Provider component
+
 export const OrderProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [orders, setOrders] = useState<Order[]>([]);
   const [currentOrder, setCurrentOrder] = useState<Order | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Create a new order
+  
   const handleCreateOrder = useCallback(async (orderData: {
     eventId: number;
     promoCode?: string;
@@ -101,7 +101,7 @@ export const OrderProvider: React.FC<{ children: ReactNode }> = ({ children }) =
     }
   }, []);
 
-  // Get order by ID
+  
   const fetchOrderById = useCallback(async (id: number) => {
     setIsLoading(true);
     setError(null);
@@ -119,7 +119,7 @@ export const OrderProvider: React.FC<{ children: ReactNode }> = ({ children }) =
     }
   }, []);
 
-  // Get user orders
+  
   const fetchUserOrders = useCallback(async (userId: number) => {
     setIsLoading(true);
     setError(null);
@@ -137,7 +137,7 @@ export const OrderProvider: React.FC<{ children: ReactNode }> = ({ children }) =
     }
   }, []);
 
-  // Get event orders (admin/organizer only)
+  
   const fetchEventOrders = useCallback(async (eventId: number) => {
     setIsLoading(true);
     setError(null);
@@ -154,21 +154,21 @@ export const OrderProvider: React.FC<{ children: ReactNode }> = ({ children }) =
     }
   }, []);
 
-  // Update order status
+  
   const handleUpdateOrderStatus = useCallback(async (orderId: number, status: string) => {
     setIsLoading(true);
     setError(null);
     try {
       await orderService.updateOrderStatus(orderId, status);
       
-      // Update orders list
+      
       setOrders(prev => 
         prev.map(order => 
           order.id === orderId ? { ...order, paymentStatus: status as any } : order
         )
       );
       
-      // Update current order if it's the one being modified
+      
       if (currentOrder && currentOrder.id === orderId) {
         setCurrentOrder(prev => 
           prev ? { ...prev, paymentStatus: status as any } : prev
@@ -190,21 +190,21 @@ export const OrderProvider: React.FC<{ children: ReactNode }> = ({ children }) =
     }
   }, [currentOrder]);
 
-  // Process payment
+  
   const handleProcessPayment = useCallback(async (orderId: number, paymentData: any) => {
     setIsLoading(true);
     setError(null);
     try {
       const result = await orderService.processPayment(orderId, paymentData);
       
-      // Update orders list
+      
       setOrders(prev => 
         prev.map(order => 
           order.id === orderId ? { ...order, paymentStatus: 'COMPLETED' } : order
         )
       );
       
-      // Update current order if it's the one being modified
+      
       if (currentOrder && currentOrder.id === orderId) {
         setCurrentOrder(prev => 
           prev ? { ...prev, paymentStatus: 'COMPLETED' } : prev
@@ -226,21 +226,21 @@ export const OrderProvider: React.FC<{ children: ReactNode }> = ({ children }) =
     }
   }, [currentOrder]);
 
-  // Cancel order
+  
   const handleCancelOrder = useCallback(async (orderId: number) => {
     setIsLoading(true);
     setError(null);
     try {
       await orderService.cancelOrder(orderId);
       
-      // Update orders list
+      
       setOrders(prev => 
         prev.map(order => 
           order.id === orderId ? { ...order, paymentStatus: 'CANCELED' } : order
         )
       );
       
-      // Update current order if it's the one being modified
+      
       if (currentOrder && currentOrder.id === orderId) {
         setCurrentOrder(prev => 
           prev ? { ...prev, paymentStatus: 'CANCELED' } : prev
@@ -262,7 +262,7 @@ export const OrderProvider: React.FC<{ children: ReactNode }> = ({ children }) =
     }
   }, [currentOrder]);
 
-  // Context value
+  
   const value: OrderContextType = {
     orders,
     currentOrder,
@@ -284,7 +284,7 @@ export const OrderProvider: React.FC<{ children: ReactNode }> = ({ children }) =
   );
 };
 
-// Custom hook to use the Order context
+
 export const useOrders = (): OrderContextType => {
   const context = useContext(OrderContext);
   if (context === undefined) {
@@ -292,3 +292,4 @@ export const useOrders = (): OrderContextType => {
   }
   return context;
 };
+

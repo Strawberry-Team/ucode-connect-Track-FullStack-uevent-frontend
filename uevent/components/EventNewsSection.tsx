@@ -4,7 +4,6 @@ import { toast } from 'react-toastify';
 import { z } from 'zod';
 import { DeleteConfirmationModal } from './DeleteConfirmationModal';
 
-// Validation schema for news
 const NewsSchema = z.object({
   title: z
     .string()
@@ -17,7 +16,6 @@ const NewsSchema = z.object({
     .max(5000, { message: "Description is too long (max 5000 characters)" }),
 });
 
-// Type for news input form
 type NewsInput = z.infer<typeof NewsSchema>;
 
 interface EventNewsSectionProps {
@@ -27,7 +25,6 @@ interface EventNewsSectionProps {
 export const EventNewsSection: React.FC<EventNewsSectionProps> = ({ eventId }) => {
   const { getEventNews, createEventNews, updateEventNews, deleteEventNews } = useEvents();
   
-  // Component states
   const [newsItems, setNewsItems] = useState<EventNews[]>([]);
   const [isLoadingNews, setIsLoadingNews] = useState(false);
   const [isCreatingNews, setIsCreatingNews] = useState(false);
@@ -37,16 +34,13 @@ export const EventNewsSection: React.FC<EventNewsSectionProps> = ({ eventId }) =
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [newsToDelete, setNewsToDelete] = useState<string | null>(null);
   
-  // Track if news have been loaded
   const [newsLoaded, setNewsLoaded] = useState(false);
   
-  // Form for creating/editing news
   const [newsForm, setNewsForm] = useState<NewsInput>({
     title: '',
     description: '',
   });
   
-  // Debug with useEffect to track state changes
   useEffect(() => {
     console.log("newsItems state updated:", newsItems);
   }, [newsItems]);
@@ -55,7 +49,6 @@ export const EventNewsSection: React.FC<EventNewsSectionProps> = ({ eventId }) =
     console.log("newsLoaded state updated:", newsLoaded);
   }, [newsLoaded]);
   
-  // Function to load news - with improved logging and error handling
   const loadNews = () => {
     if (isLoadingNews) return;
     
@@ -66,7 +59,6 @@ export const EventNewsSection: React.FC<EventNewsSectionProps> = ({ eventId }) =
       .then(news => {
         console.log("News API response received:", news);
         
-        // Check if news is undefined or null
         if (!news) {
           console.error("News data is undefined or null");
           setNewsItems([]);
@@ -74,7 +66,6 @@ export const EventNewsSection: React.FC<EventNewsSectionProps> = ({ eventId }) =
           return;
         }
         
-        // Force news to be an array even if it's not
         const newsArray = Array.isArray(news) ? news : [];
         console.log("News array to be displayed:", newsArray);
         
@@ -92,13 +83,11 @@ export const EventNewsSection: React.FC<EventNewsSectionProps> = ({ eventId }) =
       });
   };
   
-  // Function to refresh news list
   const refreshNews = () => {
     loadNews();
     toast.info('News list refreshed');
   };
   
-  // Start creating news
   const handleStartCreateNews = () => {
     setNewsForm({
       title: '',
@@ -109,7 +98,6 @@ export const EventNewsSection: React.FC<EventNewsSectionProps> = ({ eventId }) =
     setNewsBeingEdited(null);
   };
 
-  // Start editing news
   const handleStartEditNews = (news: EventNews) => {
     setNewsForm({
       title: news.title || '',
@@ -120,7 +108,6 @@ export const EventNewsSection: React.FC<EventNewsSectionProps> = ({ eventId }) =
     setIsCreatingNews(false);
   };
   
-  // Handle form input changes
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setNewsForm(prev => ({
@@ -129,7 +116,6 @@ export const EventNewsSection: React.FC<EventNewsSectionProps> = ({ eventId }) =
     }));
   };
   
-  // Create news
   const handleCreateNews = async () => {
     try {
       const validationResult = NewsSchema.safeParse(newsForm);
@@ -164,7 +150,6 @@ export const EventNewsSection: React.FC<EventNewsSectionProps> = ({ eventId }) =
     }
   };
 
-  // Update news
   const handleUpdateNews = async () => {
     if (!newsBeingEdited) return;
     
@@ -202,7 +187,6 @@ export const EventNewsSection: React.FC<EventNewsSectionProps> = ({ eventId }) =
     }
   };
   
-  // Cancel form
   const handleCancelForm = () => {
     setIsCreatingNews(false);
     setIsEditingNews(false);
@@ -213,19 +197,16 @@ export const EventNewsSection: React.FC<EventNewsSectionProps> = ({ eventId }) =
     });
   };
 
-  // Open delete confirmation
   const openDeleteConfirmation = (newsId: string) => {
     setNewsToDelete(newsId);
     setIsDeleteModalOpen(true);
   };
   
-  // Close delete confirmation
   const closeDeleteConfirmation = () => {
     setIsDeleteModalOpen(false);
     setNewsToDelete(null);
   };
   
-  // Delete news
   const confirmDeleteNews = async () => {
     if (!newsToDelete) return;
     
@@ -246,7 +227,6 @@ export const EventNewsSection: React.FC<EventNewsSectionProps> = ({ eventId }) =
     }
   };
   
-  // Format date
   const formatDate = (dateString: string) => {
     try {
       return new Date(dateString).toLocaleDateString('en-US', {
@@ -261,23 +241,19 @@ export const EventNewsSection: React.FC<EventNewsSectionProps> = ({ eventId }) =
     }
   };
   
-  // Improved News List Rendering Function with better debugging
   const renderNewsList = () => {
     console.log("renderNewsList called with newsItems:", newsItems);
     
-    // First ensure newsItems is initialized as an array
     if (!newsItems) {
       console.log('newsItems is null or undefined');
       return renderEmptyState();
     }
     
-    // Then check if it's an array
     if (!Array.isArray(newsItems)) {
       console.log('newsItems is not an array:', typeof newsItems);
       return renderEmptyState();
     }
     
-    // Then check if it's empty
     if (newsItems.length === 0) {
       console.log('newsItems is an empty array');
       return renderEmptyState();
@@ -342,7 +318,6 @@ export const EventNewsSection: React.FC<EventNewsSectionProps> = ({ eventId }) =
     );
   };
   
-  // Extracted the empty state into a separate function
   const renderEmptyState = () => {
     return (
       <div className="py-12 flex flex-col items-center">
@@ -437,7 +412,7 @@ export const EventNewsSection: React.FC<EventNewsSectionProps> = ({ eventId }) =
           </div>
         ) : (
           <>
-            {/* News creation form */}
+            
             {isCreatingNews && (
               <div className="p-6 border-b border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/30">
                 <div className="space-y-4">
@@ -507,12 +482,12 @@ export const EventNewsSection: React.FC<EventNewsSectionProps> = ({ eventId }) =
               </div>
             )}
 
-            {/* News editing form */}
+            
             {isEditingNews && (
               <div className="p-6 border-b border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/30">
-                {/* Editing form content */}
+                
                 <div className="space-y-4">
-                  {/* Same form fields as creation */}
+                  
                   <div>
                     <label htmlFor="title" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
                       Title <span className="text-red-500">*</span>
@@ -557,7 +532,7 @@ export const EventNewsSection: React.FC<EventNewsSectionProps> = ({ eventId }) =
               </div>
             )}
             
-            {/* News list - using the improved rendering function */}
+            
             <div className="p-6">
               {isLoadingNews ? (
                 <div className="flex justify-center items-center py-12">
@@ -572,7 +547,7 @@ export const EventNewsSection: React.FC<EventNewsSectionProps> = ({ eventId }) =
         )}
       </div>
       
-      {/* Delete confirmation modal */}
+      
       <DeleteConfirmationModal
         isOpen={isDeleteModalOpen}
         title="Delete News Item"
@@ -583,3 +558,4 @@ export const EventNewsSection: React.FC<EventNewsSectionProps> = ({ eventId }) =
     </>
   );
 };
+

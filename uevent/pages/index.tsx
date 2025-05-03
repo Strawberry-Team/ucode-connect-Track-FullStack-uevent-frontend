@@ -48,12 +48,10 @@ import {
   Monitor,
   Theatre
 } from 'lucide-react';
-import { useTheme } from '../contexts/ThemeContext'; // Import the theme context
+import { useTheme } from '../contexts/ThemeContext';
 
-// API base URL
 const API_URL = 'http://localhost:8080/api';
 
-// Event type definition based on your API response
 export interface Event {
   id: number;
   companyId: number;
@@ -73,7 +71,7 @@ export interface Event {
     id: number;
     title: string;
   };
-  themes?: any; // Can be object or array
+  themes?: any;
   company?: {
     id: number;
     title: string;
@@ -89,55 +87,45 @@ export interface Event {
   attendeeCount?: number;
 }
 
-// Get image URL with correct domain
 const getImageUrl = (path) => {
   if (!path) return null;
   
-  // Check if path is already a full URL
   if (path.startsWith('http://') || path.startsWith('https://')) {
     return path;
   }
   
-  // If it's a relative path, prepend the backend URL
   const baseUrl = 'http://localhost:8080';
   return `${baseUrl}/uploads/event-posters/${path}`;
 };
 
-// Get company logo URL
 const getLogoUrl = (path?: string) => {
   if (!path) return null;
   
-  // Check if path is already a full URL
   if (path.startsWith('http://') || path.startsWith('https://')) {
     return path;
   }
   const baseUrl = 'http://localhost:8080';
-  // If it's a relative path, prepend the backend URL
   return `${baseUrl}/uploads/company-logos/${path}`;
 };
 
 export default function HomePage() {
   const router = useRouter();
-  const { isDarkMode, toggleTheme } = useTheme(); // Use theme context instead of local state
+  const { isDarkMode, toggleTheme } = useTheme();
   
-  // User authentication state
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   
-  // State variables
   const [events, setEvents] = useState<Event[]>([]);
   const [featuredEvent, setFeaturedEvent] = useState<Event | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [totalEvents, setTotalEvents] = useState(0);
   const [page, setPage] = useState(1);
-  const [limit, setLimit] = useState(6); // Default limit
+  const [limit, setLimit] = useState(6);
   const [filterOpen, setFilterOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   
-  // Filter state
   const [searchQuery, setSearchQuery] = useState('');
   const [venue, setVenue] = useState('');
-  // Changed from formatId to formatIds array for multiple format selection
   const [formatIds, setFormatIds] = useState<string[]>([]);
   const [themeIds, setThemeIds] = useState<string[]>([]);
   const [minPrice, setMinPrice] = useState<number | ''>('');
@@ -146,20 +134,15 @@ export default function HomePage() {
   const [activeFilters, setActiveFilters] = useState(0);
   const [activeFormat, setActiveFormat] = useState('all');
   
-  // Date range filtering - new state variables
   const [startDate, setStartDate] = useState<string>('');
   const [endDate, setEndDate] = useState<string>('');
   
-  // Sorting state
   const [sortBy, setSortBy] = useState('date');
   const [viewMode, setViewMode] = useState('grid');
   
-  // Data for filters
   const [formats, setFormats] = useState<{id: number, title: string}[]>([]);
   const [themes, setThemes] = useState<{id: number, title: string}[]>([]);
   
-  // Available format buttons for horizontal scrolling menu
-  // We'll populate with dynamic data from API, but have this as fallback
   const [formatButtons, setFormatButtons] = useState([
     { id: 'all', label: 'All Events', icon: <Tag className="w-4 h-4" />, formatId: null },
     { id: 'workshop', label: 'Art workshop', icon: <Palette className="w-4 h-4" />, formatId: 1 },
@@ -176,7 +159,6 @@ export default function HomePage() {
     { id: 'screening', label: 'Screening', icon: <Film className="w-4 h-4" />, formatId: 12 }
   ]);
   
-  // Available statuses and their display names
   const statusOptions = [
     { value: 'DRAFT', label: 'Draft' },
     { value: 'PUBLISHED', label: 'Published' },
@@ -194,13 +176,11 @@ export default function HomePage() {
     { value: 'popularity', label: 'Popularity' }
   ];
   
-  // Check if user is authenticated
   const checkAuthentication = () => {
     const token = localStorage.getItem('token');
     setIsAuthenticated(!!token);
   };
   
-  // Helper function to apply date filters directly to events
   const applyDateFilter = (events: Event[]) => {
     if (!startDate && !endDate) return events;
     
@@ -211,7 +191,6 @@ export default function HomePage() {
       if (startDate && endDate) {
         const filterStart = parseISO(startDate);
         const filterEnd = parseISO(endDate);
-        // Check if the event overlaps with the date range
         return (
           (isAfter(eventStart, filterStart) || isSameDay(eventStart, filterStart)) &&
           (isBefore(eventEnd, filterEnd) || isSameDay(eventEnd, filterEnd))
@@ -228,27 +207,20 @@ export default function HomePage() {
     });
   };
   
-  // Fetch events with filters and pagination
   const fetchEvents = () => {
     fetchEventsWithSort(sortBy);
   };
   
-  // Fetch formats and themes for filters
   const fetchFiltersData = async () => {
     try {
-      // Get auth headers
       const token = localStorage.getItem('token');
       const headers = token ? { Authorization: `Bearer ${token}` } : {};
       
-      // Fetch formats
       const formatsResponse = await axios.get(`${API_URL}/formats`, { headers });
       setFormats(formatsResponse.data);
       
-      // Update format buttons with real data if available
       if (formatsResponse.data && formatsResponse.data.length > 0) {
-        // Map format data to format buttons with appropriate icons
         const getIconForFormat = (title: string) => {
-          // Map format titles to appropriate icons
           const formatIconMap = {
             'Workshop': <Palette className="w-4 h-4" />,
             'Art workshop': <Palette className="w-4 h-4" />,
@@ -285,12 +257,10 @@ export default function HomePage() {
         setFormatButtons(newFormatButtons);
       }
       
-      // Fetch themes
       const themesResponse = await axios.get(`${API_URL}/themes`, { headers });
       setThemes(themesResponse.data);
     } catch (error) {
       console.error('Error fetching filter data:', error);
-      // Use fallback data in case of error
       setFormats([
         { id: 1, title: 'Art workshop' },
         { id: 2, title: 'Field trip' },
@@ -322,41 +292,33 @@ export default function HomePage() {
     }
   };
   
- // New effect to handle format changes
 useEffect(() => {
-  // Don't run on initial render, only when formatIds changes
   if (formatIds !== undefined) {
-    setPage(1); // Reset to first page
+    setPage(1);
     fetchEvents();
   }
 }, [formatIds]);
 
-// 3. Updated handleFormatChange function
 const handleFormatChange = (formatId: string) => {
-  // If All Events is selected, clear format selection
   if (formatId === 'all') {
     setFormatIds([]);
     setActiveFormat('all');
   } else {
-    // Get the numeric format ID from the button
     const formatButton = formatButtons.find(f => f.id === formatId);
     if (formatButton && formatButton.formatId) {
-      // Toggle format selection
       const formatIdStr = formatButton.formatId.toString();
       if (formatIds.includes(formatIdStr)) {
-        // If already selected, deselect it
         setFormatIds(formatIds.filter(id => id !== formatIdStr));
-        setActiveFormat('all'); // Reset active format since we're deselecting
+        setActiveFormat('all');
       } else {
-        // Otherwise, add it to selected formats
+
         setFormatIds([...formatIds, formatIdStr]);
-        setActiveFormat(formatId); // Set this format as active
+        setActiveFormat(formatId);
       }
     }
   }
 };
   
-  // Toggle format selection in dropdown
   const toggleFormat = (formatId: string) => {
     if (formatIds.includes(formatId)) {
       setFormatIds(formatIds.filter(id => id !== formatId));
@@ -364,31 +326,26 @@ const handleFormatChange = (formatId: string) => {
       setFormatIds([...formatIds, formatId]);
     }
     
-    // Reset the active format button if formats are selected from the dropdown
     setActiveFormat('all');
   };
   
-  // Apply filters and reset pagination
   const applyFilters = () => {
     setPage(1);
     
-    // Count active filters
     let count = 0;
     if (venue) count++;
     if (formatIds.length > 0) count++;
     if (themeIds.length > 0) count++;
     if (minPrice !== '' || maxPrice !== '') count++;
-    if (statuses.length !== 3) count++; // Default is 3 statuses
+    if (statuses.length !== 3) count++;
     if (startDate || endDate) count++;
     
     setActiveFilters(count);
     
-    // Fetch events with filters
     fetchEvents();
     setFilterOpen(false);
   };
   
-  // Reset all filters
   const resetFilters = () => {
     setSearchQuery('');
     setVenue('');
@@ -402,11 +359,9 @@ const handleFormatChange = (formatId: string) => {
     setPage(1);
     setActiveFilters(0);
     setActiveFormat('all');
-    // Fetch events with reset filters
     setTimeout(fetchEvents, 0);
   };
   
-  // Toggle theme filter selection
   const toggleThemeFilter = (themeId: string) => {
     if (themeIds.includes(themeId)) {
       setThemeIds(themeIds.filter(id => id !== themeId));
@@ -415,7 +370,6 @@ const handleFormatChange = (formatId: string) => {
     }
   };
   
-  // Toggle status selection
   const toggleStatus = (status: string) => {
     if (statuses.includes(status)) {
       setStatuses(statuses.filter(s => s !== status));
@@ -423,8 +377,7 @@ const handleFormatChange = (formatId: string) => {
       setStatuses([...statuses, status]);
     }
   };
-  
-  // Handle date filter presets
+
   const handleDatePreset = (preset: string) => {
     const today = new Date();
     
@@ -442,7 +395,6 @@ const handleFormatChange = (formatId: string) => {
         setEndDate(tomorrowStr);
         break;
       case 'weekend':
-        // Find the next Saturday and Sunday
         const saturday = new Date(today);
         saturday.setDate(today.getDate() + (6 - today.getDay()));
         const sunday = new Date(saturday);
@@ -451,14 +403,12 @@ const handleFormatChange = (formatId: string) => {
         setEndDate(format(sunday, 'yyyy-MM-dd'));
         break;
       case 'thisWeek':
-        // This week is from today to next 7 days
         const nextWeek = new Date(today);
         nextWeek.setDate(today.getDate() + 7);
         setStartDate(format(today, 'yyyy-MM-dd'));
         setEndDate(format(nextWeek, 'yyyy-MM-dd'));
         break;
       case 'nextWeek':
-        // Next week is from 7 days from now to 14 days from now
         const startNextWeek = new Date(today);
         startNextWeek.setDate(today.getDate() + 7);
         const endNextWeek = new Date(today);
@@ -469,17 +419,12 @@ const handleFormatChange = (formatId: string) => {
     }
   };
   
-  // Calculate the lowest available ticket price
   const getLowestPrice = (event: Event) => {
     if (!event.tickets || event.tickets.length === 0) {
       return 'Price not available';
     }
     
     const availableTickets = event.tickets;
-    // .filter(ticket => 
-    //   ticket.status === 'AVAILABLE'
-    // );
-    console.log('vot tyt',availableTickets);
     if (availableTickets.length === 0) {
       return 'Sold out';
     }
@@ -493,12 +438,10 @@ const handleFormatChange = (formatId: string) => {
     return `$${lowestPrice.toFixed(2)}`;
   };
   
-  // Handle pagination
   const goToPage = (newPage: number) => {
     setPage(newPage);
   };
   
-  // Format date for display
   const formatEventDate = (startDate: string, endDate: string) => {
     const start = parseISO(startDate);
     const end = parseISO(endDate);
@@ -510,19 +453,16 @@ const handleFormatChange = (formatId: string) => {
     }
   };
   
-  // Format date with day of week
   const formatEventDateWithDay = (startDate: string) => {
     const date = parseISO(startDate);
     return format(date, 'E, MMM d');
   };
   
-  // Format time
   const formatEventTime = (startDate: string) => {
     const date = parseISO(startDate);
     return format(date, 'h:mm a');
   };
 
-  // Get event badge color based on status
   const getStatusBadgeStyle = (status: string) => {
     switch(status) {
       case 'PUBLISHED':
@@ -540,7 +480,6 @@ const handleFormatChange = (formatId: string) => {
     }
   };
 
-  // Handle search input and Enter key
   const handleSearchKeyDown = (e) => {
     if (e.key === 'Enter') {
       applyFilters();
@@ -551,13 +490,11 @@ const handleFormatChange = (formatId: string) => {
     setError(null);
     
     try {
-      // Конструируем параметры запроса
       const params: any = {
         take: limit,
         skip: (page - 1) * limit
       };
       
-      // Добавляем фильтры
       if (searchQuery) {
         params.title = searchQuery;
         params.description = searchQuery;
@@ -577,7 +514,6 @@ const handleFormatChange = (formatId: string) => {
       if (maxPrice !== '') params.maxPrice = maxPrice;
       if (statuses.length > 0) params.status = statuses.join(',');
       
-      // Фильтрация по датам
       if (startDate) {
         params.startDate = format(parseISO(startDate), "yyyy-MM-dd'T'00:00:00.000'Z'");
       }
@@ -585,7 +521,6 @@ const handleFormatChange = (formatId: string) => {
         params.endDate = format(parseISO(endDate), "yyyy-MM-dd'T'23:59:59.999'Z'");
       }
       
-      // Используем параметр, переданный в функцию, а не состояние
       switch (sortValue) {
         case 'date':
           params.sortBy = 'startedAt';
@@ -612,21 +547,15 @@ const handleFormatChange = (formatId: string) => {
           params.sortOrder = 'desc';
       }
       
-      // Логирование для отладки
-      console.log('Fetching events with sort:', sortValue);
-      console.log('Params:', params);
       
-      // Получаем заголовки авторизации
       const token = localStorage.getItem('token');
       const headers = token ? { Authorization: `Bearer ${token}` } : {};
-      
-      // Выполняем API запрос
+
       const response = await axios.get(`${API_URL}/events`, {
         params,
         headers
       });
       
-      // Обрабатываем данные ответа
       let eventData: Event[] = [];
       if (response.data.items) {
         eventData = response.data.items;
@@ -640,8 +569,7 @@ const handleFormatChange = (formatId: string) => {
       }
       
       setEvents(eventData);
-      
-      // Устанавливаем избранное событие если нужно
+
       if (eventData.length > 0 && !featuredEvent) {
         const featureCandidate = eventData.find(event => 
           event.status === 'SALES_STARTED' || event.status === 'PUBLISHED'
@@ -660,22 +588,17 @@ const handleFormatChange = (formatId: string) => {
       setIsLoading(false);
     }
   };
-  // Handle sort change
   const handleSortChange = (value: string) => {
-    // Устанавливаем состояние для UI
     setSortBy(value);
-    setPage(1); // Сбрасываем на первую страницу
-    
-    // Передаем значение сортировки напрямую вместо использования состояния
+    setPage(1);
+  
     fetchEventsWithSort(value);
   };
-  
-  // Effect to fetch events on component mount and when pagination changes
+
   useEffect(() => {
     fetchEvents();
-  }, [page, limit]); // Only depend on pagination changes
+  }, [page, limit]);
   
-  // Effect to fetch filter data and check authentication on component mount
   useEffect(() => {
     fetchFiltersData();
     checkAuthentication();
@@ -982,10 +905,7 @@ const handleFormatChange = (formatId: string) => {
                       >
                         View Event
                       </Link>
-                      {/* <button className="px-6 py-3 border border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-200 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors flex items-center justify-center gap-2">
-                        <Share2 className="h-4 w-4" />
-                        <span>Share</span>
-                      </button> */}
+                      
                     </div>
                   </div>
                   
@@ -1033,7 +953,6 @@ const handleFormatChange = (formatId: string) => {
           <section className="mb-8 overflow-x-auto scrollbar-hidden">
             <div className="flex space-x-2 pb-2">
             {formatButtons.map(formatBtn => {
-  // Determine if this button is currently active
   const isActive = 
     formatBtn.id === 'all' 
       ? formatIds.length === 0 
@@ -1449,3 +1368,4 @@ const handleFormatChange = (formatId: string) => {
     </div>
   );
 }
+

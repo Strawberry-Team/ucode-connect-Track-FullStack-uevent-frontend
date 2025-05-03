@@ -1,10 +1,8 @@
 import axios from 'axios';
 import { PromoCode } from '../contexts/PromoCodeContext';
 
-// API base URL
 const API_URL = 'http://localhost:8080/api';
 
-// Helper function to get auth headers
 const getAuthHeaders = () => {
   const token = localStorage.getItem('token');
   return {
@@ -16,9 +14,9 @@ const getAuthHeaders = () => {
   };
 };
 
-// PromoCode service methods
+
 export const promoCodeService = {
-  // Get all promo codes for an event
+
   async getPromoCodesByEventId(eventId: number): Promise<PromoCode[]> {
     try {
       const response = await axios.get(`${API_URL}/events/${eventId}/promo-codes`, getAuthHeaders());
@@ -29,7 +27,7 @@ export const promoCodeService = {
     }
   },
 
-  // Get promo code by ID
+
   async getPromoCodeById(id: number): Promise<PromoCode> {
     try {
       const response = await axios.get(`${API_URL}/promo-codes/${id}`, getAuthHeaders());
@@ -40,7 +38,7 @@ export const promoCodeService = {
     }
   },
 
-  // Create a new promo code for an event
+
   async createPromoCode(eventId: number, promoCodeData: Partial<PromoCode>): Promise<PromoCode> {
     try {
       const response = await axios.post(`${API_URL}/events/${eventId}/promo-codes`, promoCodeData, getAuthHeaders());
@@ -51,7 +49,7 @@ export const promoCodeService = {
     }
   },
 
-  // Update an existing promo code
+
   async updatePromoCode(id: number, promoCodeData: Partial<PromoCode>): Promise<PromoCode> {
     try {
       const response = await axios.patch(`${API_URL}/promo-codes/${id}`, promoCodeData, getAuthHeaders());
@@ -62,8 +60,8 @@ export const promoCodeService = {
     }
   },
 
-  // Validate a promo code for an event
-  // Validate a promo code for an event
+
+
 async validatePromoCode(eventId: number, code: string): Promise<{ success: boolean, discountPercent?: number, message?: string }> {
   try {
     const response = await axios.post(
@@ -72,25 +70,25 @@ async validatePromoCode(eventId: number, code: string): Promise<{ success: boole
       getAuthHeaders()
     );
         
-    // Return success response with discount percent
+
     return {
       success: true,
       discountPercent: response.data.promoCode?.discountPercent || 0
     };
   } catch (error) {
-    // Handle Axios errors
+
     if (axios.isAxiosError(error) && error.response) {
       const serverError = error.response.data;
       const errorMessage = serverError.message || 'Failed to validate promo code';
             
-      // Return structured error response instead of throwing
+
       return {
         success: false,
         message: errorMessage
       };
     }
         
-    // For other types of errors, also return structured response
+
     console.error('Error validating promo code:', error);
     return {
       success: false,
@@ -100,3 +98,4 @@ async validatePromoCode(eventId: number, code: string): Promise<{ success: boole
 }
   
 };
+

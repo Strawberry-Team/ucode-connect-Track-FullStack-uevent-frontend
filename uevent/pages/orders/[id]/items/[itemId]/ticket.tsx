@@ -8,7 +8,6 @@ import Link from 'next/link';
 import Head from 'next/head';
 import { toast } from 'react-toastify';
 
-// Define the props type
 interface TicketPageProps {
   initialError?: string;
 }
@@ -30,7 +29,6 @@ const TicketPage = ({ initialError }: TicketPageProps) => {
   } | null>(null);
 
   useEffect(() => {
-    // Check if we're in the browser and have query parameters
     if (typeof window !== 'undefined' && id && itemId && user) {
       fetchTicket();
     }
@@ -44,37 +42,29 @@ const TicketPage = ({ initialError }: TicketPageProps) => {
       setIsPendingPayment(false);
       setPdfUrl(null);
 
-      // Use the order service to fetch the ticket PDF
       const response = await orderService.getTicketPdf(
         Number(id), 
         Number(itemId)
       );
-      
-      // Check if the response contains an error
+
       if (response.error) {
         console.log('Ticket error response:', response);
         
-        // Set the error message
         setError(response.message);
         
-        // Check if payment is required
         if (response.paymentRequired) {
           setIsPendingPayment(true);
         }
-        
-        // Store complete error state
+
         setLocalErrorState(response);
       } 
-      // No error, process the PDF blob
       else if (response.success && response.data) {
-        // Create a blob URL to display the PDF
         const blob = response.data as Blob;
         const url = URL.createObjectURL(blob);
         
         setPdfUrl(url);
       }
     } catch (err) {
-      // This should never happen since our service handles all errors
       console.error('Unexpected error fetching ticket:', err);
       setError('An unexpected error occurred. Please try again.');
     } finally {
@@ -101,10 +91,8 @@ const TicketPage = ({ initialError }: TicketPageProps) => {
     }
   };
 
-  // If not authenticated, redirect to login
   useEffect(() => {
     if (!isLoading && !user) {
-      // Save current URL for redirect after login
       const currentPath = router.asPath;
       sessionStorage.setItem('returnUrl', currentPath);
       
@@ -116,7 +104,6 @@ const TicketPage = ({ initialError }: TicketPageProps) => {
     <>
       <Head>
         <title>Ticket | Event Platform</title>
-        {/* Add special CSS to hide PDF viewer controls and remove borders */}
         <style jsx global>{`
           /* Hide PDF viewer controls and borders */
           .pdf-container iframe {
@@ -142,16 +129,9 @@ const TicketPage = ({ initialError }: TicketPageProps) => {
 
       <div className="min-h-screen bg-white py-6 px-4">
         <div className="max-w-4xl mx-auto">
-          {/* Header with back button and download */}
           <div className="mb-5 flex flex-col sm:flex-row sm:items-center justify-between">
             <div>
-              {/* <Link
-                href="/account/tickets"
-                className="inline-flex items-center text-gray-700 dark:text-gray-300 hover:text-emerald-600 dark:hover:text-emerald-500 mb-2 sm:mb-0 transition-colors"
-              >
-                <ArrowLeft className="h-4 w-4 mr-2" />
-                Back to My Tickets
-              </Link> */}
+              
               <h1 className="text-2xl font-bold text-gray-900 dark:text-white mt-2">
                 Ticket for Order #{id}
               </h1>
@@ -168,7 +148,7 @@ const TicketPage = ({ initialError }: TicketPageProps) => {
             )}
           </div>
 
-          {/* Content area */}
+          
           {isLoading ? (
             <div className="flex flex-col items-center justify-center h-96 p-8 bg-white rounded-xl shadow-lg">
               <Loader className="h-8 w-8 text-emerald-500 animate-spin mb-4" />
@@ -232,7 +212,7 @@ const TicketPage = ({ initialError }: TicketPageProps) => {
             </div>
           ) : pdfUrl ? (
             <div className="pdf-wrapper w-full flex justify-center bg-white rounded-lg overflow-hidden shadow-md">
-              {/* Full-size PDF viewer without controls or black frame */}
+              
               <div className="pdf-container w-full max-w-3xl">
                 <iframe
                   src={`${pdfUrl}#toolbar=0&navpanes=0&scrollbar=0&view=FitH`}
@@ -256,11 +236,9 @@ const TicketPage = ({ initialError }: TicketPageProps) => {
   );
 };
 
-// Server-side props to handle initial load and SEO
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const { id, itemId } = context.params || {};
   
-  // Validate parameters
   if (!id || !itemId) {
     return {
       props: {
@@ -269,10 +247,10 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     };
   }
 
-  // Return the ID and itemID to the client
   return {
-    props: {}, // We'll fetch the actual data client-side
+    props: {},
   };
 };
 
 export default TicketPage;
+

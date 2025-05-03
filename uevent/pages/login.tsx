@@ -12,55 +12,43 @@ export default function Login() {
   const { login, error: authError, loading, user, clearError } = useAuth();
   const router = useRouter();
   const { returnUrl } = router.query;
-  // Combined error handling from context and local state
   const error = localError || authError;
 
   useEffect(() => {
-    // Clear errors only when component mounts, not on every render
     if (authError) {
       clearError();
     }
     
-    // Redirect to returnUrl or home page if user is logged in
     if (user) {
-      // Если есть returnUrl, декодируем и используем его
       if (returnUrl && typeof returnUrl === 'string') {
         router.push(decodeURIComponent(returnUrl));
       } else {
-        // Иначе, проверяем есть ли сохраненный URL в sessionStorage
         const savedReturnUrl = sessionStorage.getItem('returnUrl');
         if (savedReturnUrl) {
           sessionStorage.removeItem('returnUrl');
           router.push(savedReturnUrl);
         } else {
-          // В крайнем случае, перенаправляем на главную
           router.push('/');
         }
       }
     }
-  }, [user, router, returnUrl, authError, clearError]);  // Removed clearError dependency to prevent unnecessary rerenders
+  }, [user, router, returnUrl, authError, clearError]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Clear previous errors
     setLocalError('');
     clearError();
     
     try {
-      // Attempt login
       const response = await login(email, password);
       if (response && response.error) {
-        // Если login вернул объект с ошибкой, обрабатываем его здесь
         setLocalError(response.message || 'Failed to login');
-        return; // Прекращаем выполнение функции
+        return;
       }
-      // На успех будет редирект через useEffect
     } catch (err: any) {
-      // Обрабатываем локально и не даем ошибке "всплыть" выше
       setLocalError(err.response?.data?.message || 'Login failed. Please check your credentials.');
       console.log('Login error handled:', err.message);
-      // Критически важно - не делаем throw err или return Promise.reject
     }
   };
 
@@ -73,7 +61,7 @@ export default function Login() {
 
       <div className="min-h-screen flex items-center justify-center bg-neutral-50 dark:bg-dark-bg">
         <div className="grid grid-cols-1 lg:grid-cols-5 w-full max-w-screen-xl shadow-2xl rounded-xl overflow-hidden">
-          {/* Левая панель с формой */}
+          
           <div className="col-span-3 p-8 md:p-12 lg:p-16 bg-white dark:bg-black dark:bg-black">
             <div className="mb-10">
               <Link href="/" className="inline-flex items-center space-x-2">
@@ -202,7 +190,7 @@ export default function Login() {
             </div>
           </div>
 
-          {/* Правая панель с иллюстрацией */}
+          
           <div className="col-span-2 hidden lg:block relative bg-emerald-700">
             <div className="absolute inset-0 bg-opacity-70 bg-emerald-700 flex flex-col justify-center p-12">
               <div className="text-white space-y-6">
@@ -244,3 +232,4 @@ export default function Login() {
     </>
   );
 }
+

@@ -1,9 +1,9 @@
-// next.config.js
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  reactStrictMode: true, // Отключаем строгий режим
+  reactStrictMode: true, 
   onDemandEntries: {
-    // Настройки буферизации страниц
+    
     maxInactiveAge: 25 * 1000,
     pagesBufferLength: 2,
   },

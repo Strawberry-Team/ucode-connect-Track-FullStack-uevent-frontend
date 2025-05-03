@@ -1,16 +1,13 @@
 import axios, { AxiosError, AxiosRequestConfig } from 'axios';
 
-// API base URL
 const API_URL = 'http://localhost:8080/api';
 
-// Error interface for consistent error handling
 export interface ApiError {
   message: string;
   error?: string;
   statusCode?: number;
 }
 
-// Helper function to get auth headers
 const getAuthHeaders = () => {
   const token = localStorage.getItem('token');
   return {
@@ -22,7 +19,7 @@ const getAuthHeaders = () => {
   };
 };
 
-// Helper function to get auth headers for blob/binary responses
+
 const getBlobAuthHeaders = () => {
   const token = localStorage.getItem('token');
   return {
@@ -34,9 +31,9 @@ const getBlobAuthHeaders = () => {
   } as AxiosRequestConfig;
 };
 
-// Helper to get current user ID
+
 const getCurrentUserId = (): number => {
-  // Get user data from localStorage
+
   const userData = localStorage.getItem('userData');
   if (!userData) {
     throw new Error('User not authenticated');
@@ -54,9 +51,9 @@ const getCurrentUserId = (): number => {
   }
 };
 
-// Order service methods
+
 export const orderService = {
-  // Create a new order
+
   async createOrder(orderData: {
     eventId: number;
     promoCode?: string;
@@ -69,7 +66,7 @@ export const orderService = {
     } catch (error: any) {
       console.error('Error creating order:', error);
       
-      // Return error object instead of throwing
+
       return {
         error: true,
         message: error.response?.data?.message || 'Failed to create order. Please try again.',
@@ -78,7 +75,7 @@ export const orderService = {
     }
   },
 
-  // Get order by ID
+
   async getOrderById(id: number): Promise<any> {
     try {
       const response = await axios.get(`${API_URL}/orders/${id}`, getAuthHeaders());
@@ -86,7 +83,7 @@ export const orderService = {
     } catch (error: any) {
       console.error(`Error fetching order with ID ${id}:`, error);
       
-      // Return error object instead of throwing
+
       return {
         error: true,
         message: error.response?.data?.message || `Failed to fetch order #${id}. Please try again.`,
@@ -95,7 +92,7 @@ export const orderService = {
     }
   },
 
-  // Get all orders for a user - now accepts userId parameter
+
   async getUserOrders(userId: number): Promise<any> {
     try {
       const response = await axios.get(`${API_URL}/users/${userId}/orders`, getAuthHeaders());
@@ -103,7 +100,7 @@ export const orderService = {
     } catch (error: any) {
       console.error('Error fetching user orders:', error);
       
-      // Return error object instead of throwing
+
       return {
         error: true,
         message: error.response?.data?.message || 'Failed to fetch your orders. Please try again.',
@@ -112,7 +109,7 @@ export const orderService = {
     }
   },
 
-  // Get all orders for an event (admin/organizer only)
+
   async getEventOrders(eventId: number): Promise<any> {
     try {
       const response = await axios.get(`${API_URL}/events/${eventId}/orders`, getAuthHeaders());
@@ -120,7 +117,7 @@ export const orderService = {
     } catch (error: any) {
       console.error(`Error fetching orders for event with ID ${eventId}:`, error);
       
-      // Return error object instead of throwing
+
       return {
         error: true,
         message: error.response?.data?.message || `Failed to fetch orders for event #${eventId}. Please try again.`,
@@ -129,7 +126,7 @@ export const orderService = {
     }
   },
 
-  // Update order status (admin/organizer only)
+
   async updateOrderStatus(orderId: number, status: string): Promise<any> {
     try {
       const response = await axios.patch(
@@ -141,7 +138,7 @@ export const orderService = {
     } catch (error: any) {
       console.error(`Error updating status for order with ID ${orderId}:`, error);
       
-      // Return error object instead of throwing
+
       return {
         error: true,
         message: error.response?.data?.message || `Failed to update order status. Please try again.`,
@@ -150,7 +147,7 @@ export const orderService = {
     }
   },
 
-  // Process payment for an order
+
   async processPayment(orderId: number, paymentData: any): Promise<any> {
     try {
       const response = await axios.post(
@@ -162,7 +159,7 @@ export const orderService = {
     } catch (error: any) {
       console.error(`Error processing payment for order with ID ${orderId}:`, error);
       
-      // Return error object instead of throwing
+
       return {
         error: true,
         message: error.response?.data?.message || `Failed to process payment. Please try again.`,
@@ -171,7 +168,7 @@ export const orderService = {
     }
   },
 
-  // Cancel an order
+
   async cancelOrder(orderId: number): Promise<any> {
     try {
       const response = await axios.post(
@@ -183,7 +180,7 @@ export const orderService = {
     } catch (error: any) {
       console.error(`Error canceling order with ID ${orderId}:`, error);
       
-      // Return error object instead of throwing
+
       return {
         error: true,
         message: error.response?.data?.message || `Failed to cancel order. Please try again.`,
@@ -192,7 +189,7 @@ export const orderService = {
     }
   },
 
-  // Get ticket PDF for an order item
+
   async getTicketPdf(orderId: number, itemId: number): Promise<any> {
     try {
       const response = await axios.get(
@@ -200,7 +197,7 @@ export const orderService = {
         getBlobAuthHeaders()
       );
       
-      // Return success object with blob data
+
       return {
         success: true,
         data: response.data
@@ -208,18 +205,18 @@ export const orderService = {
     } catch (error: any) {
       console.error(`Error fetching ticket PDF for order ${orderId}, item ${itemId}:`, error);
       
-      // For blob responses, need to handle errors differently
+
       if (error.response && error.response.data instanceof Blob) {
         const blob = error.response.data;
         
-        // If it's a JSON error message in a blob
+
         if (blob.type.includes('application/json')) {
           try {
-            // Read the blob as text
+
             const text = await blob.text();
             const errorData = JSON.parse(text) as ApiError;
             
-            // Check for payment required error
+
             const isPaymentRequired = 
               error.response.status === 403 && 
               errorData.message && 
@@ -232,7 +229,7 @@ export const orderService = {
               paymentRequired: isPaymentRequired
             };
           } catch (jsonError) {
-            // If parsing fails, return generic error
+
             return {
               error: true,
               message: 'Failed to load ticket. Please try again later.',
@@ -242,7 +239,7 @@ export const orderService = {
         }
       }
       
-      // Handle standard error cases by status code
+
       let errorMessage = 'Failed to load ticket. Please try again.';
       let paymentRequired = false;
       
@@ -257,7 +254,7 @@ export const orderService = {
         }
       }
       
-      // Return a consistent error object
+
       return {
         error: true,
         message: errorMessage,
@@ -267,3 +264,4 @@ export const orderService = {
     }
   }
 };
+

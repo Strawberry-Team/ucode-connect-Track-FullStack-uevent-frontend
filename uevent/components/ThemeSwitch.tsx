@@ -1,4 +1,3 @@
-// components/ThemeSwitch.tsx
 import { useTheme } from '../contexts/ThemeContext';
 import { useState } from 'react';
 
@@ -20,7 +19,6 @@ const ThemeSwitch: React.FC<ThemeSwitchProps> = ({ compact = false }) => {
   };
 
   if (compact) {
-    // Compact version for mobile menu
     return (
       <div className="relative">
         <button
@@ -102,7 +100,6 @@ const ThemeSwitch: React.FC<ThemeSwitchProps> = ({ compact = false }) => {
     );
   }
 
-  // Full desktop version
   return (
     <div className="bg-white dark:bg-black rounded-2xl shadow-sm dark:shadow-none overflow-hidden border border-gray-100 dark:border-gray-800">
       <div className="px-6 py-5 bg-gray-50 dark:bg-black border-b border-gray-100 dark:border-gray-800">
@@ -215,3 +212,4 @@ const ThemeSwitch: React.FC<ThemeSwitchProps> = ({ compact = false }) => {
 };
 
 export default ThemeSwitch;
+
