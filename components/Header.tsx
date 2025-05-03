@@ -228,7 +228,7 @@ export default function Header() {
         <div className="flex items-center justify-between h-16">
           
           <div className="pl-4 md:pl-6">
-  <Link href="/" className="flex items-center">
+  <Link href="/ucode-connect-Track-FullStack-uevent-frontend/public" className="flex items-center">
     <img 
       src="/logo.png" 
       alt="TripUp Logo" 

@@ -5,12 +5,12 @@ import Link from 'next/link';
 import Head from 'next/head';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import ThemeSwitch from '../components/ThemeSwitch';
+import ThemeSwitch from './ThemeSwitch';
 import { useTheme } from '../contexts/ThemeContext';
-import { CompanySection } from '../components/CompanySection';
-import SubscriptionsSection from '../components/SubscriptionsSection';
+import { CompanySection } from './CompanySection';
+import SubscriptionsSection from './SubscriptionsSection';
 import { SubscriptionProvider } from '../contexts/SubscriptionContext';
-import MyTicketsSection from '../components/MyTicketsSection';
+import MyTicketsSection from './MyTicketsSection';
 type TabType = 'profile' | 'tickets' | 'subscriptions' | 'company';
 
 const EMPTY_TICKETS_MESSAGE = "You don't have any purchased tickets yet. Start exploring available events!";
@@ -292,7 +292,7 @@ const handleChangePassword = async () => {
         
         <div className="hidden md:flex md:flex-col md:w-64 bg-gradient-to-b from-emerald-600 to-emerald-800 text-white flex-shrink-0">
           <div className="p-6">
-            <Link href="/" className="flex items-center space-x-2">
+            <Link href="/ucode-connect-Track-FullStack-uevent-frontend/public" className="flex items-center space-x-2">
               <div className="w-10 h-10 bg-white dark:bg-black rounded-full flex items-center justify-center">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.8} stroke="currentColor" className="w-6 h-6 text-emerald-600">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 6v.75m0 3v.75m0 3v.75m0 3V18m-9-5.25h5.25M7.5 15h3M3.375 5.25c-.621 0-1.125.504-1.125 1.125v3.026a2.999 2.999 0 0 1 0 5.198v3.026c0 .621.504 1.125 1.125 1.125h17.25c.621 0 1.125-.504 1.125-1.125v-3.026a2.999 2.999 0 0 1 0-5.198V6.375c0-.621-.504-1.125-1.125-1.125H3.375Z" />
@@ -435,7 +435,7 @@ const handleChangePassword = async () => {
         
         <div className="md:hidden fixed top-0 left-0 right-0 bg-white dark:bg-black z-10 shadow-sm dark:shadow-none">
           <div className="flex justify-between items-center p-4">
-            <Link href="/" className="flex items-center space-x-2">
+            <Link href="/ucode-connect-Track-FullStack-uevent-frontend/public" className="flex items-center space-x-2">
               <div className="w-8 h-8 bg-emerald-600 rounded-full flex items-center justify-center">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.8} stroke="currentColor" className="w-5 h-5 text-white">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 6v.75m0 3v.75m0 3v.75m0 3V18m-9-5.25h5.25M7.5 15h3M3.375 5.25c-.621 0-1.125.504-1.125 1.125v3.026a2.999 2.999 0 0 1 0 5.198v3.026c0 .621.504 1.125 1.125 1.125h17.25c.621 0 1.125-.504 1.125-1.125v-3.026a2.999 2.999 0 0 1 0-5.198V6.375c0-.621-.504-1.125-1.125-1.125H3.375Z" />

@@ -212,7 +212,7 @@ const SubscriptionsSection = () => {
       </p>
       
       <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-5">
-        <Link href="/" className="inline-flex items-center justify-center px-6 py-3 bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white font-medium rounded-xl transition-all shadow-lg shadow-emerald-200 dark:shadow-none hover:shadow-xl hover:shadow-emerald-200/30 dark:shadow-none">
+        <Link href="/ucode-connect-Track-FullStack-uevent-frontend/public" className="inline-flex items-center justify-center px-6 py-3 bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white font-medium rounded-xl transition-all shadow-lg shadow-emerald-200 dark:shadow-none hover:shadow-xl hover:shadow-emerald-200/30 dark:shadow-none">
           <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
             <line x1="16" y1="2" x2="16" y2="6"></line>

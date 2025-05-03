@@ -39,7 +39,7 @@ export default function ForgotPassword() {
       <div className="min-h-screen flex items-center justify-center bg-neutral-50 dark:bg-dark-bg">
         <div className="w-full max-w-md p-8 space-y-8 bg-white dark:bg-black rounded-xl shadow-lg dark:shadow-none">
           <div className="text-center">
-            <Link href="/" className="inline-flex items-center space-x-2">
+            <Link href="/ucode-connect-Track-FullStack-uevent-frontend/public" className="inline-flex items-center space-x-2">
               <div className="w-10 h-10 bg-emerald-50 dark:bg-emerald-900/40 rounded-full flex items-center justify-center">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.8} stroke="currentColor" className="w-6 h-6 text-emerald-600 dark:text-emerald-400">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 6v.75m0 3v.75m0 3v.75m0 3V18m-9-5.25h5.25M7.5 15h3M3.375 5.25c-.621 0-1.125.504-1.125 1.125v3.026a2.999 2.999 0 0 1 0 5.198v3.026c0 .621.504 1.125 1.125 1.125h17.25c.621 0 1.125-.504 1.125-1.125v-3.026a2.999 2.999 0 0 1 0-5.198V6.375c0-.621-.504-1.125-1.125-1.125H3.375Z" />

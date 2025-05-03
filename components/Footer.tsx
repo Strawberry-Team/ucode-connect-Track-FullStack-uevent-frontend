@@ -63,7 +63,7 @@ export default function Footer() {
               </h3>
               <ul className="mt-3 space-y-2">
                 <li>
-                  <Link href="/" className="text-sm text-gray-600 dark:text-gray-400 hover:text-emerald-500 dark:hover:text-emerald-400">
+                  <Link href="/ucode-connect-Track-FullStack-uevent-frontend/public" className="text-sm text-gray-600 dark:text-gray-400 hover:text-emerald-500 dark:hover:text-emerald-400">
                     Browse Events
                   </Link>
                 </li>

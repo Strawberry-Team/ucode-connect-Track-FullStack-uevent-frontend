@@ -168,7 +168,7 @@ const TermsOfServicePage = () => {
 
         
         <div className="mt-10 flex justify-center">
-          <Link href="/">
+          <Link href="/ucode-connect-Track-FullStack-uevent-frontend/public">
             <motion.div
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}

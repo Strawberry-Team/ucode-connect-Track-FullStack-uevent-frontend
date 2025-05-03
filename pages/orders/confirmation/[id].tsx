@@ -243,7 +243,7 @@ const OrderConfirmationPage: React.FC = () => {
                 View My Orders
               </Link>
               <Link 
-                href="/"
+                href="/ucode-connect-Track-FullStack-uevent-frontend/public"
                 className="inline-flex items-center px-5 py-2 bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-200 font-medium rounded-lg border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-600 transition-all shadow-sm"
               >
                 Browse Events
@@ -301,7 +301,7 @@ const OrderConfirmationPage: React.FC = () => {
               View My Orders
             </Link>
             <Link 
-              href="/"
+              href="/ucode-connect-Track-FullStack-uevent-frontend/public"
               className="w-full sm:w-auto inline-flex items-center justify-center px-5 py-2 bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-200 font-medium rounded-lg border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-600 transition-all shadow-sm"
             >
               Browse Events

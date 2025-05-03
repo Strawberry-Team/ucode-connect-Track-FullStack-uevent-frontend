@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useState, useCallback, ReactNode, useEffect } from 'react';
 import { toast } from 'react-toastify';
 import { eventService } from '../services/eventService';
-import { useAuth } from '../contexts/AuthContext';
+import { useAuth } from './AuthContext';
 export interface Event {
   id?: number;
   title: string;

@@ -16,7 +16,7 @@ import {
   EventTicket
 } from './eventValidation';
 import { usePromoCodes } from '../contexts/PromoCodeContext';
-import LocationPicker from '../components/LocationPicker';
+import LocationPicker from './LocationPicker';
 import  {useCallback } from 'react';
 
 type Step = 'basicInfo' | 'themes' | 'tickets' | 'promoCodes' | 'review';
